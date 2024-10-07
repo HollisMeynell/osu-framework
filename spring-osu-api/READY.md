@@ -1,0 +1,84 @@
+## work
+
+- [x] Beatmap Packs
+    - [x] Get Beatmap Packs
+    - [x] Get Beatmap Pack
+- [x] Beatmaps
+    - [x] Lookup Beatmap
+    - [x] Get a User Beatmap score
+    - [x] Get a User Beatmap scores
+    - [x] Get Beatmap scores
+    - [x] Get Beatmap scores (non-legacy)
+    - [x] Get Beatmaps
+    - [x] Get Beatmap
+    - [x] Get Beatmap Attributes
+- [x] Matches
+    - [x] Get Matches Listing
+    - [x] Get Match
+- [x] Users
+    - [x] Get Own Data
+    - [x] Get User Kudosu
+    - [x] Get User Scores
+    - [x] Get User Beatmaps
+    - [ ] Get User Recent Activity
+    - [x] Get User
+    - [x] Get Users
+- [ ] Beatmapset Discussions (in 2024/09/27,  **The response of this endpoint is likely to change soon!**)
+    - [ ] Get Beatmapset Discussion Posts
+    - [ ] Get Beatmapset Discussion Votes
+    - [ ] Get Beatmapset Discussions
+- [ ] Beatmapsets (no documentation)
+    - [ ] Get Beatmapsets Search 
+    - [ ] Get Beatmapsets Lookup
+    - [ ] Get Beatmapsets
+    - [ ] ~~Get Beatmapsets Download~~(Just for lazer!)
+- [ ] Changelog
+    - [ ] Get Changelog Build
+    - [ ] Get Changelog Listing
+    - [ ] Lookup Changelog Build
+- [ ] Chat
+    - [ ] Chat Keepalive
+    - [ ] Create New PM
+    - [ ] Get Updates
+    - [ ] Get Channel Messages
+    - [ ] Join Channel
+    - [ ] Leave Channel
+    - [ ] Mark Channel as Read
+    - [ ] Get Channel List
+    - [ ] Create Channel
+    - [ ] Get Channel
+- [ ] ~~Comments~~ (no plan)
+    - [ ] ~~Get Comments~~
+    - [ ] ~~Post a new comment~~
+    - [ ] ~~Get a Comment~~
+    - [ ] ~~Edit Comment~~
+    - [ ] ~~Delete Comment~~
+    - [ ] ~~Add Comment vote~~
+    - [ ] ~~Remove Comment vote~~
+- [ ] Multiplayer
+    - [ ] Get User High Score
+    - [ ] Get Scores
+    - [ ] Get a Score
+    - [ ] Get Multiplayer Rooms
+- [ ] Undocumented
+    - [ ] POST api/v2/session/verify
+    - [ ] POST api/v2/session/verify/reissue
+    - [ ] POST api/v2/beatmaps/{beatmap}/solo/scores
+    - [ ] PUT api/v2/beatmaps/{beatmap}/solo/scores/{token}
+    - [ ] GET api/v2/beatmapsets/events
+    - [ ] POST api/v2/beatmapsets/{beatmapset}/favourites
+    - [ ] GET api/v2/chat/presence
+    - [ ] POST api/v2/reports
+    - [ ] PUT api/v2/rooms/{room}/users/{user}
+    - [ ] DELETE api/v2/rooms/{room}/users/{user}
+    - [ ] GET api/v2/rooms/{room}/leaderboard
+    - [ ] POST api/v2/rooms/{room}/playlist/{playlist}/scores
+    - [ ] PUT api/v2/rooms/{room}/playlist/{playlist}/scores/{score}
+    - [ ] POST api/v2/rooms
+    - [ ] GET api/v2/rooms/{room}
+    - [x] GET api/v2/seasonal-backgrounds
+    - [x] GET api/v2/scores/{score}/download
+    - [ ] GET api/v2/scores/{rulesetOrScore}/{score}/download
+    - [ ] GET api/v2/scores/{rulesetOrScore}/{score?}
+    - [x] GET api/v2/friends
+    - [ ] GET api/v2/me/download-quota-check

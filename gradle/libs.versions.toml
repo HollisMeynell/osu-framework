@@ -1,0 +1,53 @@
+[versions]
+commons-compress = "1.26.2"
+exposed = "0.54.0"
+kotlin = "2.0.20"
+kotlin-coroutines = "1.8.1"
+kotlin-logging = "7.0.0"
+kotlin-jackson = "2.17.+"
+ktor = "2.3.12"
+logging-logback-classic = "1.5.6"
+postgres = "42.7.1"
+shadow = "8.3.0"
+
+[plugins]
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+
+[libraries]
+asm = { group = "org.ow2.asm", name = "asm", version = "9.7" }
+
+commons-compress = { group = "org.apache.commons", name = "commons-compress", version.ref = "commons-compress" }
+
+jackson = { group = "com.fasterxml.jackson.module", name = "jackson-module-kotlin", version.ref = "kotlin-jackson" }
+jackson-toml = { group = "com.fasterxml.jackson.dataformat", name = "jackson-dataformat-toml", version.ref = "kotlin-jackson" }
+jackson-datatype = { group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310", version.ref = "kotlin-jackson" }
+
+ktor-serialization-jackson = { group = "io.ktor", name = "ktor-serialization-jackson", version.ref = "ktor" }
+
+ktor-client-cio = { group = "io.ktor", name = "ktor-client-cio", version.ref = "ktor" }
+ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
+ktor-client-content-negotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-client-websockets = { group = "io.ktor", name = "ktor-client-websockets", version.ref = "ktor" }
+
+ktor-server-cio = { group = "io.ktor", name = "ktor-server-cio", version.ref = "ktor" }
+ktor-server-cors = { group = "io.ktor", name = "ktor-server-cors", version.ref = "ktor" }
+ktor-server-core = { group = "io.ktor", name = "ktor-server-core", version.ref = "ktor" }
+ktor-server-auth = { group = "io.ktor", name = "ktor-server-auth-jwt", version.ref = "ktor" }
+ktor-server-head = { group = "io.ktor", name = "ktor-server-auto-head-response", version.ref = "ktor" }
+ktor-server-status = { group = "io.ktor", name = "ktor-server-status-pages", version.ref = "ktor" }
+ktor-server-partial = { group = "io.ktor", name = "ktor-server-partial-content", version.ref = "ktor" }
+ktor-server-compression = { group = "io.ktor", name = "ktor-server-compression", version.ref = "ktor" }
+ktor-server-content-negotiation = { group = "io.ktor", name = "ktor-server-content-negotiation", version.ref = "ktor" }
+
+
+kotlin-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlin-coroutines" }
+kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin" }
+kotlin-logging = { group = "io.github.oshai", name = "kotlin-logging-jvm", version.ref = "kotlin-logging" }
+logback-classic = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logging-logback-classic" }
+postgresql = { group = "org.postgresql", name = "postgresql", version.ref = "postgres" }
+
+exposed-core = { group = "org.jetbrains.exposed", name = "exposed-core", version.ref = "exposed" }
+exposed-dao = { group = "org.jetbrains.exposed", name = "exposed-dao", version.ref = "exposed" }
+exposed-jdbc = { group = "org.jetbrains.exposed", name = "exposed-jdbc", version.ref = "exposed" }
+exposed-time = { group = "org.jetbrains.exposed", name = "exposed-java-time", version.ref = "exposed" }
