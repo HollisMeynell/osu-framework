@@ -1,8 +1,10 @@
 package org.spring.osu
 
+import org.spring.core.ProxyConfig
+
 data class OsuApiConfig(
-    val redirectUri: String,
-    val clientID: Long,
-    val clientToken: String,
-    val proxyUrl: String?,
+    var redirectUri: String,
+    var clientID: Long,
+    var clientToken: String,
+    var proxy: ProxyConfig?,
 )

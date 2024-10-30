@@ -23,8 +23,11 @@
             <option value="$PROJECT_DIR$/buildSrc" />
             <option value="$PROJECT_DIR$/spring-application" />
             <option value="$PROJECT_DIR$/spring-core" />
+            <option value="$PROJECT_DIR$/spring-image" />
             <option value="$PROJECT_DIR$/spring-osu-api" />
+            <option value="$PROJECT_DIR$/spring-osu-beatmap-mirror" />
             <option value="$PROJECT_DIR$/spring-osu-extended" />
+            <option value="$PROJECT_DIR$/spring-osu-persistence" />
             <option value="$PROJECT_DIR$/spring-web" />
           </set>
         </option>

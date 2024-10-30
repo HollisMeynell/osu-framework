@@ -1,9 +1,9 @@
 package org.spring.web
 
-@Target(AnnotationTarget.FIELD)
+//@Target(AnnotationTarget.FIELD)
+// 对 body 无效
 annotation class Param(
-    // 对 body 无效
-    val name: String = "-",
+    val name: String = "",
     val notNull: Boolean = true,
     val notEmpty: Boolean = true,
     val min: Long = Long.MIN_VALUE,

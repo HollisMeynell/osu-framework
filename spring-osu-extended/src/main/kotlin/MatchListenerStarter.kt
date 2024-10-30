@@ -4,10 +4,11 @@ import kotlinx.coroutines.*
 import org.spring.core.coroutineScope
 import org.spring.core.ticker
 import org.spring.osu.OsuApi
-import org.spring.osu.module.Match
-import org.spring.osu.module.MatchEvent
-import org.spring.osu.module.MatchEventType
-import org.spring.osu.module.User
+import org.spring.osu.model.Match
+import org.spring.osu.model.MatchEvent
+import org.spring.osu.model.MatchEventType
+import org.spring.osu.model.User
+import org.spring.osu.extended.model.MatchListener
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 

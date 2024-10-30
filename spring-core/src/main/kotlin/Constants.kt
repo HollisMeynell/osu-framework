@@ -10,6 +10,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.concurrent.getOrSet
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -19,6 +20,31 @@ typealias TickerStop = () -> Unit
 @OptIn(DelicateCoroutinesApi::class)
 var coroutineScope: CoroutineScope = GlobalScope
 val log = KotlinLogging.logger("org.spring.core")
+
+val LOCAL = ThreadLocal<MutableMap<String, Any>>()
+fun <T : Any> setContext(key: String, value: T) {
+    val map = LOCAL.getOrSet { mutableMapOf() }
+    map[key] = value
+}
+
+fun <T : Any> getContext(key: String): T? {
+    val map = LOCAL.get()
+    val value = map?.get(key)
+    @Suppress("UNCHECKED_CAST")
+    return value as T?
+}
+
+fun clearContext() {
+    LOCAL.remove()
+}
+
+suspend fun <T> withContext(block: suspend () -> T): T {
+    return coroutineScope {
+        async(coroutineContext + LOCAL.asContextElement()) {
+            block()
+        }.await()
+    }
+}
 
 /**
  * 重复执行任务

@@ -1,22 +1,19 @@
-plugins {
-    `java-gradle-plugin`
-}
+import org.gradle.kotlin.dsl.gradlePlugin
 
-dependencies {
-    api(libs.asm)
+plugins {
+    `kotlin-dsl`
 }
 
 repositories {
-    maven { url = uri("https://maven.aliyun.com/repository/public/") }
     mavenCentral()
+    maven { url = uri("https://maven.aliyun.com/repository/public/") }
 }
 
 gradlePlugin {
     plugins {
-        // here we register our plugin with an ID
-        register("extra-java-module-info") {
-            id = "extra-java-module-info"
-            implementationClass = "org.gradle.javamodules.ExtraModuleInfoPlugin"
+        create("skija") {
+            id = "skija"
+            implementationClass = "Skija"
         }
     }
 }

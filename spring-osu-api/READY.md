@@ -55,14 +55,14 @@
     - [ ] ~~Delete Comment~~
     - [ ] ~~Add Comment vote~~
     - [ ] ~~Remove Comment vote~~
-- [ ] Multiplayer
-    - [ ] Get User High Score
-    - [ ] Get Scores
-    - [ ] Get a Score
-    - [ ] Get Multiplayer Rooms
+- [ ] ~~Multiplayer~~ (no plan)
+    - [ ] ~~Get User High Score~~
+    - [ ] ~~Get Scores~~
+    - [ ] ~~Get a Score~~
+    - [ ] ~~Get Multiplayer Rooms~~
 - [ ] Undocumented
-    - [ ] POST api/v2/session/verify
-    - [ ] POST api/v2/session/verify/reissue
+    - [ ] ~~POST api/v2/session/verify~~
+    - [ ] ~~POST api/v2/session/verify/reissue~~
     - [ ] POST api/v2/beatmaps/{beatmap}/solo/scores
     - [ ] PUT api/v2/beatmaps/{beatmap}/solo/scores/{token}
     - [ ] GET api/v2/beatmapsets/events

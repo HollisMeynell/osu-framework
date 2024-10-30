@@ -146,25 +146,28 @@ enum class OsuMode(val value: Int, val describe: String) {
             else -> Default
         }
 
-        fun getMode(name: String) = when (name.lowercase()) {
-            "osu", "o", "0" -> Osu
-            "taiko", "t", "1" -> Taiko
-            "catch", "c", "fruits", "f", "2" -> Catch
-            "mania", "m", "3" -> Mania
-            else -> Default
+        fun getMode(name: String?): OsuMode {
+            if (name == null) return Default
+            return when (name.lowercase()) {
+                "osu", "o", "0" -> Osu
+                "taiko", "t", "1" -> Taiko
+                "catch", "c", "fruits", "f", "2" -> Catch
+                "mania", "m", "3" -> Mania
+                else -> Default
+            }
         }
 
     }
 
     override fun toString(): String = this.describe
 
-    internal class RulesetSerializer : JsonSerializer<OsuMode?>() {
+    class RulesetSerializer : JsonSerializer<OsuMode?>() {
         override fun serialize(value: OsuMode?, generator: JsonGenerator, provider: SerializerProvider) {
             if (value != null) generator.writeString(value.name)
         }
     }
 
-    internal class RulesetDeserializer : JsonDeserializer<OsuMode?>() {
+    class RulesetDeserializer : JsonDeserializer<OsuMode?>() {
         override fun deserialize(p: JsonParser, ctxt: DeserializationContext): OsuMode {
             return OsuMode.getMode(p.text)
         }
@@ -327,6 +330,21 @@ enum class OsuMod(val value: Int, val mod: String) {
         fun hasChangeRating(value: Int) = changeRatingValue and value != 0
 
         private val ModListType = Json.typeFactory.constructCollectionType(List::class.java, OsuMod::class.java)
+    }
+
+    internal class OsuModSerializer :
+        StdSerializer<OsuMod>(ModListType) {
+        override fun serialize(value: OsuMod?, gen: JsonGenerator, provider: SerializerProvider) {
+            gen.writeString(value?.mod)
+        }
+    }
+
+    internal class OsuModDeserializer :
+        StdDeserializer<OsuMod>(ModListType) {
+        override fun deserialize(p: JsonParser, ctxt: DeserializationContext): OsuMod {
+            val mods = p.readValueAs(String::class.java)
+            return getMod(mods)
+        }
     }
 
     internal class OsuModsSerializer :

@@ -1,23 +1,34 @@
 [versions]
-commons-compress = "1.26.2"
+commons-compress = "1.27.1"
 exposed = "0.54.0"
+hikari = "6.0.0"
 kotlin = "2.0.20"
 kotlin-coroutines = "1.8.1"
 kotlin-logging = "7.0.0"
 kotlin-jackson = "2.17.+"
 ktor = "2.3.12"
 logging-logback-classic = "1.5.6"
-postgres = "42.7.1"
+postgres = "42.7.2"
 shadow = "8.3.0"
+extra-java-module-info = "1.9"
+skija = "0.116.2"
+hoplite = "2.8.2"
 
 [plugins]
+extra-module-info = { id = "org.gradlex.extra-java-module-info", version.ref = "extra-java-module-info" }
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 
 [libraries]
-asm = { group = "org.ow2.asm", name = "asm", version = "9.7" }
-
+xz = { group = "org.tukaani", name = "xz", version = "1.10" }
 commons-compress = { group = "org.apache.commons", name = "commons-compress", version.ref = "commons-compress" }
+
+hoplite = { group = "com.sksamuel.hoplite", name = "hoplite-core", version.ref = "hoplite" }
+hoplite-toml = { group = "com.sksamuel.hoplite", name = "hoplite-toml", version.ref = "hoplite" }
+
+skija-linux = { group = "io.github.humbleui", name = "skija-linux-x64", version.ref = "skija" }
+skija-windows = { group = "io.github.humbleui", name = "skija-windows-x64", version.ref = "skija" }
+skija-macos = { group = "io.github.humbleui", name = "skija-macos-x64", version.ref = "skija" }
 
 jackson = { group = "com.fasterxml.jackson.module", name = "jackson-module-kotlin", version.ref = "kotlin-jackson" }
 jackson-toml = { group = "com.fasterxml.jackson.dataformat", name = "jackson-dataformat-toml", version.ref = "kotlin-jackson" }
@@ -45,8 +56,9 @@ kotlin-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutine
 kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin" }
 kotlin-logging = { group = "io.github.oshai", name = "kotlin-logging-jvm", version.ref = "kotlin-logging" }
 logback-classic = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logging-logback-classic" }
-postgresql = { group = "org.postgresql", name = "postgresql", version.ref = "postgres" }
 
+hikari = { group = "com.zaxxer", name = "HikariCP", version.ref = "hikari" }
+postgresql = { group = "org.postgresql", name = "postgresql", version.ref = "postgres" }
 exposed-core = { group = "org.jetbrains.exposed", name = "exposed-core", version.ref = "exposed" }
 exposed-dao = { group = "org.jetbrains.exposed", name = "exposed-dao", version.ref = "exposed" }
 exposed-jdbc = { group = "org.jetbrains.exposed", name = "exposed-jdbc", version.ref = "exposed" }
