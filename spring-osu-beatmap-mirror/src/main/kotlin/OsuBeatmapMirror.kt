@@ -7,7 +7,6 @@ import io.ktor.utils.io.jvm.javaio.toInputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
@@ -16,7 +15,7 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream
 import org.jetbrains.exposed.sql.Column
 import org.spring.osu.OsuApi
 import org.spring.osu.RankStatus
-import org.spring.osu.extended.OsuWebApi
+import org.spring.osu.extended.api.OsuWebApi
 import org.spring.osu.model.Beatmapset
 import org.spring.osu.persistence.OsuDatabases.suspendTransaction
 import org.spring.osu.persistence.model.OsuWebUserRecord

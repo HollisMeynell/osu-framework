@@ -88,7 +88,7 @@ data class LazerScore(
     var rulesetId: Int,
 
     @JsonProperty("started_at")
-    var startedAt: OffsetDateTime,
+    var startedAt: OffsetDateTime?,
 
     @JsonProperty("total_score")
     var totalScore: Int,

@@ -2,33 +2,17 @@ package org.spring.osu
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.github.oshai.kotlinlogging.KotlinLogging
-import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.engine.cio.CIO
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.defaultRequest
-import io.ktor.client.request.HttpRequestBuilder
-import io.ktor.client.request.accept
-import io.ktor.client.request.forms.FormDataContent
-import io.ktor.client.request.headers
-import io.ktor.client.request.post
-import io.ktor.client.request.request
-import io.ktor.client.request.setBody
-import io.ktor.client.request.url
-import io.ktor.client.statement.bodyAsText
-import io.ktor.client.statement.request
-import io.ktor.http.ContentType
-import io.ktor.http.HeadersBuilder
-import io.ktor.http.HttpHeaders
-import io.ktor.http.Parameters
-import io.ktor.http.URLBuilder
-import io.ktor.http.contentType
-import io.ktor.http.encodedPath
-import io.ktor.http.headers
-import io.ktor.http.isSuccess
-import io.ktor.serialization.jackson.JacksonConverter
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.request.*
+import io.ktor.client.request.forms.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import io.ktor.serialization.jackson.*
 import org.spring.core.Json
-import org.spring.osu.OsuApi.refreshUserAuth
 import org.spring.osu.model.UserAuth
 import kotlin.reflect.full.isSubclassOf
 
@@ -179,7 +163,7 @@ internal object ApiRequest {
             contentType(ContentType.Application.Json)
             headers.setAuth(auth)
             if (lazer) {
-                headers["x-api-version"] = "20240529"
+                headers["x-api-version"] = "20241101"
                 headers[HttpHeaders.AcceptLanguage] = "zh-CN,zh;q=0.9,en;q=0.8"
             }
         }

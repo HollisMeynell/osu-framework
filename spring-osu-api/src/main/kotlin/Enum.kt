@@ -58,7 +58,20 @@ enum class AuthScope(val scope: String) {
 }
 
 enum class UserScoreType(val type:String) {
-    Best("best"), First("firsts"), Recent("recent")
+    /**
+     * The user's best scores.(bp)
+     */
+    Best("best"),
+
+    /**
+     * The user's first scores.
+     */
+    First("firsts"),
+
+    /**
+     * The user's recent scores.(24h)
+     */
+    Recent("recent"),
 }
 
 enum class UserBeatmapType(val type: String) {

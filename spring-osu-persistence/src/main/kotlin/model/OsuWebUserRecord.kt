@@ -5,7 +5,7 @@ import org.jetbrains.exposed.sql.Expression
 import org.jetbrains.exposed.sql.QueryBuilder
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.upsert
-import org.spring.osu.extended.OsuWebApi
+import org.spring.osu.extended.api.OsuWebApi
 import org.spring.osu.extended.model.OsuWebAccount
 import org.spring.osu.persistence.OsuDatabases
 import org.spring.osu.persistence.OsuDatabases.suspendTransaction

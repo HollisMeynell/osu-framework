@@ -454,7 +454,7 @@ object OsuApi {
     /********************************* Other ******************************************/
 
     @JvmStatic
-    suspend fun getFriend(auth: UserAuth): List<User> {
+    suspend fun getFriend(auth: UserAuth): List<Friend> {
         return ApiRequest.request(auth) {
             url.path("friends")
         }

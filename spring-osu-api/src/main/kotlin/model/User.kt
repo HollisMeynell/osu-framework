@@ -11,43 +11,43 @@ import java.time.OffsetDateTime
 
 data class User(
     @JsonProperty("avatar_url")
-    var avatarUrl: String,
+    override var avatarUrl: String,
 
     @JsonProperty("country_code")
-    var countryCode: String,
+    override var countryCode: String,
 
     @JsonProperty("default_group")
-    var defaultGroup: String?,
+    override var defaultGroup: String?,
 
     @JsonProperty("id")
-    var id: Long,
+    override var id: Long,
 
     @JsonProperty("is_active")
-    var isActive: Boolean,
+    override var isActive: Boolean,
 
     @JsonProperty("is_bot")
-    var isBot: Boolean,
+    override var isBot: Boolean,
 
     @JsonProperty("is_deleted")
-    var isDeleted: Boolean,
+    override var isDeleted: Boolean,
 
     @JsonProperty("is_online")
-    var isOnline: Boolean,
+    override var isOnline: Boolean,
 
     @JsonProperty("is_supporter")
-    var isSupporter: Boolean,
+    override var isSupporter: Boolean,
 
     @JsonProperty("last_visit")
-    var lastVisit: OffsetDateTime?,
+    override var lastVisit: OffsetDateTime?,
 
     @JsonProperty("pm_friends_only")
-    var pmFriendsOnly: Boolean,
+    override var pmFriendsOnly: Boolean,
 
     @JsonProperty("profile_colour")
-    var profileColour: String?,
+    override var profileColour: String?,
 
     @JsonProperty("username")
-    var username: String,
+    override var username: String,
 
     // Optional fields
     @JsonProperty("account_history")
@@ -66,10 +66,10 @@ data class User(
     var beatmapPlaycountsCount: Int?,
 
     @JsonProperty("country")
-    var country: Country?,
+    override var country: Country?,
 
     @JsonProperty("cover")
-    var cover: UserCover?,
+    override var cover: UserCover?,
 
     @JsonProperty("favourite_beatmapset_count")
     var favouriteBeatmapsetCount: Int?,
@@ -84,7 +84,7 @@ data class User(
     var graveyardBeatmapsetCount: Int?,
 
     @JsonProperty("groups")
-    var groups: List<UserGroup>?,
+    override var groups: List<UserGroup>?,
 
     @JsonProperty("guest_beatmapset_count")
     var guestBeatmapsetCount: Int?,
@@ -138,13 +138,13 @@ data class User(
     var sessionVerified: Boolean?,
 
     @JsonProperty("statistics")
-    var statistics: UserStatistics?,
+    override var statistics: UserStatistics?,
 
     @JsonProperty("statistics_rulesets")
     var statisticsRulesets: UserStatisticsRulesets?,
 
     @JsonProperty("support_level")
-    var supportLevel: Int?,
+    override var supportLevel: Int?,
 
     @JsonProperty("unread_pm_count")
     var unreadPmCount: Int?,
@@ -210,7 +210,7 @@ data class User(
 
     @JsonProperty("website")
     var website: String?,
-) {
+) :Friend{
     data class Kudosu(
         @JsonProperty("available")
         val available:Int,

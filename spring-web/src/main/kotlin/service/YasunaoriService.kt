@@ -2,7 +2,7 @@ package org.spring.web.service
 
 import org.spring.osu.OsuApi
 import org.spring.osu.OsuMode
-import org.spring.osu.extended.OsuWebApi
+import org.spring.osu.extended.api.OsuWebApi
 import org.spring.osu.model.User
 import org.spring.osu.persistence.model.OsuWebUserRecord
 import org.spring.web.HttpTipsException

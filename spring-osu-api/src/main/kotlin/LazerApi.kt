@@ -3,16 +3,37 @@
 package org.spring.osu
 
 import com.fasterxml.jackson.databind.JsonNode
-import io.ktor.http.path
+import io.ktor.http.*
 import org.spring.core.jsonList
 import org.spring.osu.OsuMode.Default
-import org.spring.osu.model.LazerBeatmapScores
-import org.spring.osu.model.LazerBeatmapUserScore
-import org.spring.osu.model.LazerMod
-import org.spring.osu.model.LazerScore
-import org.spring.osu.model.UserAuth
+import org.spring.osu.model.*
 
 object LazerApi {
+    @JvmStatic
+    suspend fun getUserScores(
+        user: Long,
+        type: UserScoreType,
+        mode: OsuMode = Default,
+        limit: Int = 100,
+        offset: Int = 0,
+        legacyOnly: Boolean = false,
+        includeFails: Boolean = false,
+        auth: UserAuth? = null,
+    ): List<LazerScore> {
+        return ApiRequest.request(auth,true) {
+            url.path("users", user.toString(), "scores", type.type)
+            url.parameters.apply {
+                if (mode != Default) {
+                    append("mode", mode.describe)
+                    append("ruleset", mode.describe)
+                }
+                append("limit", limit.toString())
+                append("offset", offset.toString())
+                if (legacyOnly) append("legacy_only", "1") else append("legacy_only", "0")
+                if (includeFails) append("include_fails", "1") else append("include_fails", "0")
+            }
+        }
+    }
     /**
      * @param beatmap [beatmap] beatmap id
      * @param user [user] user id
@@ -30,6 +51,7 @@ object LazerApi {
             url.path("beatmaps", beatmap.toString(), "scores/users", user.toString())
             url.parameters.apply {
                 if (mode != Default) {
+                    append("mode", mode.describe)
                     append("ruleset", mode.describe)
                 }
                 if (legacyOnly) append("legacy_only", "1") else append("legacy_only", "0")
@@ -55,6 +77,7 @@ object LazerApi {
             url.parameters.apply {
                 if (legacyOnly) append("legacy_only", "1") else append("legacy_only", "0")
                 if (mode != Default) {
+                    append("mode", mode.describe)
                     append("ruleset", mode.describe)
                 }
             }
@@ -81,6 +104,7 @@ object LazerApi {
             url.parameters.apply {
                 if (legacyOnly) append("legacy_only", "1") else append("legacy_only", "0")
                 if (mode != Default) {
+                    append("mode", mode.describe)
                     append("ruleset", mode.describe)
                 }
                 type?.let { append("type", it) }
@@ -107,11 +131,18 @@ object LazerApi {
             url.path("beatmaps", beatmap.toString(), "solo-scores")
             url.parameters.apply {
                 if (mode != Default) {
+                    append("mode", mode.describe)
                     append("ruleset", mode.describe)
                 }
                 mods.forEach { m -> append("mods[]", m.type) }
                 type?.let { append("type", it) }
             }
+        }
+    }
+
+    suspend fun getFriend(auth: UserAuth): List<LazerFriend> {
+        return ApiRequest.request(auth, true) {
+            url.path("friends")
         }
     }
 }

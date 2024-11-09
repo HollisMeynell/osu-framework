@@ -1,4 +1,4 @@
-package org.spring.osu.extended
+package org.spring.osu.extended.rosu
 
 import org.spring.osu.OsuMod
 import org.spring.osu.OsuMode
@@ -10,7 +10,7 @@ import kotlin.io.path.absolutePathString
 import kotlin.io.path.createDirectories
 
 object Rosu {
-    private const val libName = ""
+    private const val libName = "spring_jni"
     private const val libEnvKey = "ROSU_LIB"
     val load: Unit by lazy {
         val libPath = System.getenv(libEnvKey)
@@ -36,35 +36,5 @@ object Rosu {
             System.load(filePath.absolutePathString())
         }
         return@lazy
-    }
-}
-
-sealed class JniParameter {
-    abstract fun size(): Int
-    abstract fun bytes(): ByteArray
-    protected fun buffer(action: ByteBuffer.() -> Unit): ByteArray {
-        val buffer = ByteBuffer.allocate(size())
-        buffer.action()
-        return buffer.array()
-    }
-}
-
-data class JniMapConfig(
-    var mode: OsuMode = OsuMode.Default,
-    var mods: Int = 0,
-    var speed: Double = -1.0,
-    var accuracy: Double = 0.0,
-) : JniParameter() {
-    fun setMods(mods: Iterable<OsuMod>) {
-        mods.forEach {
-            this.mods += it
-        }
-    }
-    override fun size() = 1 + 4 + 8 + 8
-    override fun bytes() = buffer {
-        put(mode.value.toByte())
-        putInt(mods)
-        putDouble(speed)
-        putDouble(accuracy)
     }
 }

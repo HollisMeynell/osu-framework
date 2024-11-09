@@ -29,7 +29,7 @@ import io.ktor.server.routing.routing
 import org.jetbrains.exposed.sql.Database
 import org.spring.core.Json
 import org.spring.osu.OsuApi
-import org.spring.osu.extended.OsuWebApi
+import org.spring.osu.extended.api.OsuWebApi
 import org.spring.osu.persistence.OsuDatabases
 import org.spring.web.databases.OsuAuth
 

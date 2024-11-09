@@ -1,4 +1,4 @@
-package org.spring.osu.extended
+package org.spring.osu.extended.irc
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import java.net.Proxy

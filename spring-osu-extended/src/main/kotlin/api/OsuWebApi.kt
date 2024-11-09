@@ -1,4 +1,4 @@
-package org.spring.osu.extended
+package org.spring.osu.extended.api
 
 import com.fasterxml.jackson.databind.JsonNode
 import io.ktor.client.*
@@ -11,6 +11,7 @@ import io.ktor.utils.io.ByteWriteChannel
 import io.ktor.utils.io.copyAndClose
 import io.ktor.utils.io.jvm.javaio.*
 import org.spring.core.json
+import org.spring.osu.extended.Replay
 import org.spring.osu.extended.model.OsuWebAccount
 import org.spring.osu.extended.model.WebUser
 import java.net.Proxy
