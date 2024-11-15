@@ -139,7 +139,6 @@ suspend inline fun <reified T : Any> synchronizedTask(
             }
         }
     }
-    @Suppress("UNCHECKED_CAST")
     deferred.await() as T
 }
 

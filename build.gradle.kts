@@ -2,6 +2,9 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.shadow)
     application
+
+    `java-library`
+    `maven-publish`
 }
 
 application {
@@ -29,5 +32,10 @@ allprojects {
 
     tasks.test {
         useJUnitPlatform()
+    }
+
+    java {
+        withSourcesJar()
+        withJavadocJar()
     }
 }

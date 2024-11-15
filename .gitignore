@@ -44,5 +44,6 @@ bin/
 ### Mac OS ###
 .DS_Store
 
-**/native/.idea
-**/native/target
+.idea
+**/.idea
+**/native/**/target
