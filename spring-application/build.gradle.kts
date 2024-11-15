@@ -1,3 +1,10 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
+plugins {
+    alias(libs.plugins.shadow)
+    application
+}
+
 dependencies {
     api(project(":spring-core"))
     api(project(":spring-web"))
@@ -8,4 +15,13 @@ dependencies {
 
     api(libs.hikari)
     api(libs.postgresql)
+}
+
+application {
+    mainClass = "org.spring.application.Main"
+}
+
+tasks.withType<ShadowJar> {
+    minimize()
+    archiveFileName = "app.jar"
 }
