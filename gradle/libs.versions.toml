@@ -7,7 +7,7 @@ kotlin-coroutines = "1.8.1"
 kotlin-logging = "7.0.0"
 kotlin-jackson = "2.17.+"
 ktor = "2.3.12"
-logging-logback-classic = "1.5.6"
+logback = "1.5.12"
 postgres = "42.7.2"
 shadow = "8.3.0"
 extra-java-module-info = "1.9"
@@ -55,7 +55,8 @@ ktor-server-content-negotiation = { group = "io.ktor", name = "ktor-server-conte
 kotlin-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlin-coroutines" }
 kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin" }
 kotlin-logging = { group = "io.github.oshai", name = "kotlin-logging-jvm", version.ref = "kotlin-logging" }
-logback-classic = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logging-logback-classic" }
+logback-classic = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logback" }
+logback-core = { group = "ch.qos.logback", name = "logback-core", version.ref = "logback" }
 
 hikari = { group = "com.zaxxer", name = "HikariCP", version.ref = "hikari" }
 postgresql = { group = "org.postgresql", name = "postgresql", version.ref = "postgres" }

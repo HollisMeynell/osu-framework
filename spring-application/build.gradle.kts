@@ -18,7 +18,7 @@ dependencies {
 }
 
 application {
-    mainClass = "org.spring.application.Main"
+    mainClass = "org.spring.application.MainKt"
 }
 
 tasks.withType<ShadowJar> {

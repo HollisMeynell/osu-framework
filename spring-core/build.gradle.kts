@@ -6,4 +6,5 @@ dependencies {
     api(libs.kotlin.coroutines)
     api(libs.kotlin.logging)
     api(libs.logback.classic)
+    api(libs.logback.core)
 }
