@@ -1,23 +1,14 @@
 package org.spring.web
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import io.ktor.client.HttpClient
-import io.ktor.client.request.prepareRequest
-import io.ktor.client.request.setBody
-import io.ktor.client.request.url
-import io.ktor.client.statement.bodyAsChannel
-import io.ktor.http.ContentType
-import io.ktor.http.HttpMethod
-import io.ktor.server.application.call
-import io.ktor.server.response.header
-import io.ktor.server.response.respond
-import io.ktor.server.response.respondBytes
-import io.ktor.server.response.respondOutputStream
-import io.ktor.server.routing.Route
-import io.ktor.server.routing.get
-import io.ktor.server.routing.post
-import io.ktor.server.routing.route
-import io.ktor.utils.io.jvm.javaio.copyTo
+import io.ktor.client.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
+import io.ktor.utils.io.*
+import io.ktor.utils.io.jvm.javaio.*
 import org.spring.web.service.UserService
 import org.spring.web.service.YasunaoriService
 
@@ -40,7 +31,6 @@ fun Route.userController() = route("user") {
 }
 
 fun Route.public() = route("public") {
-
     get("getOauthUrl") {
         call.respond(UserService.oauthUrl())
     }
@@ -50,11 +40,11 @@ fun Route.public() = route("public") {
             method = HttpMethod.parse(p.method)
             url {
                 url(p.url)
-                p.parameter?.forEach { k, v ->
+                p.parameter?.forEach { (k, v) ->
                     parameters.append(k, v)
                 }
             }
-            p.headers?.forEach { k, v ->
+            p.headers?.forEach { (k, v) ->
                 headers.append(k, v)
             }
             p.body?.let { setBody(it) }
@@ -68,6 +58,42 @@ fun Route.public() = route("public") {
             val contentType = req.headers["Content-Type"]?.let { ContentType.parse(it) }
             call.respondOutputStream(contentType = contentType, status = req.status) {
                 req.bodyAsChannel().copyTo(this)
+            }
+        }
+    }
+}
+
+fun Route.yasunaori() = route("yasunaori") {
+    get("user") {
+        val uid = call.getData<Long>("uid")
+        val name = call.getData<String>("name")
+
+        call.respond(YasunaoriService.getUser(uid, name, call.getData("mode")))
+    }
+
+    get("beatmap/{bid}") {
+        val bid = call.getData<Long>("bid")
+        val mods = call.getData<String>("mods")
+        val mode = call.getData<String>("mode")
+        call.respond(YasunaoriService.getBeatmap(bid, mods, mode))
+    }
+
+    get("avatar/{id}") {
+        val id = call.getData<Long>("id")!!
+        call.respondBytesWriter(
+            contentType = ContentType.Image.JPEG
+        ) {
+            val out = this
+            val request = client.prepareRequest {
+                url("https://a.ppy.sh/$id")
+            }
+
+            request.execute {
+                if (!it.status.isSuccess()) {
+                    val message = it.bodyAsText()
+                    throw HttpTipsException(message = message)
+                }
+                it.bodyAsChannel().copyTo(out)
             }
         }
     }

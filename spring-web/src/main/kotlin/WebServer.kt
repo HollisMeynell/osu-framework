@@ -2,46 +2,47 @@ package org.spring.web
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import dev.inmo.krontab.KronScheduler
+import dev.inmo.krontab.KrontabConfig
+import dev.inmo.krontab.doInfinity
+import dev.inmo.krontab.doWhile
 import io.github.oshai.kotlinlogging.KotlinLogging
-import io.ktor.http.ContentType
-import io.ktor.http.HttpStatusCode
-import io.ktor.serialization.jackson.JacksonConverter
+import io.ktor.http.*
+import io.ktor.serialization.jackson.*
 import io.ktor.server.application.Application
-import io.ktor.server.application.call
 import io.ktor.server.application.install
-import io.ktor.server.auth.authenticate
-import io.ktor.server.auth.authentication
-import io.ktor.server.cio.CIO
-import io.ktor.server.engine.embeddedServer
-import io.ktor.server.plugins.autohead.AutoHeadResponse
-import io.ktor.server.plugins.compression.Compression
-import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.server.plugins.cors.routing.CORS
-import io.ktor.server.plugins.partialcontent.PartialContent
-import io.ktor.server.plugins.statuspages.StatusPages
-import io.ktor.server.request.httpMethod
-import io.ktor.server.response.respond
-import io.ktor.server.response.respondText
-import io.ktor.server.routing.get
-import io.ktor.server.routing.post
-import io.ktor.server.routing.route
-import io.ktor.server.routing.routing
+import io.ktor.server.auth.*
+import io.ktor.server.cio.*
+import io.ktor.server.engine.*
+import io.ktor.server.plugins.autohead.*
+import io.ktor.server.plugins.compression.*
+import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.plugins.cors.routing.*
+import io.ktor.server.plugins.partialcontent.*
+import io.ktor.server.plugins.statuspages.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
+import korlibs.time.DateTime
+import kotlinx.coroutines.launch
+import org.intellij.lang.annotations.Language
 import org.jetbrains.exposed.sql.Database
 import org.spring.core.Json
+import org.spring.core.coroutineScope
 import org.spring.osu.OsuApi
 import org.spring.osu.extended.api.OsuWebApi
 import org.spring.osu.persistence.OsuDatabases
 import org.spring.web.databases.OsuAuth
 
 object WebServer {
-    private val log = KotlinLogging.logger {  }
+    private val log = KotlinLogging.logger { }
 
     fun initServer(wait: Boolean = true) {
         val config = WebConfig.loadFromFile()
         startServer(config, wait)
     }
 
-    fun startServer(config: WebConfig, wait: Boolean) {
+    private fun startServer(config: WebConfig, wait: Boolean) {
         // init database
         HikariConfig().apply {
             jdbcUrl = config.database.url
@@ -62,16 +63,14 @@ object WebServer {
         val server = embeddedServer(CIO, port = config.server.port) {
             configureJson()
             configureRouting()
-            configureHTTP(config.server.cros)
+            configureHTTP(config.server.cors)
             setupJwt(config.server.secret)
-
             initServerRouting()
         }
 
         Runtime.getRuntime().addShutdownHook(Thread {
             server.stop(500, 800)
         })
-
         server.start(wait)
     }
 
@@ -83,7 +82,7 @@ object WebServer {
 
     private fun Application.configureRouting() {
         install(StatusPages) {
-            status(HttpStatusCode.NotFound) { call, cause ->
+            status(HttpStatusCode.NotFound) { call, _ ->
                 val result = DataVo(404, "Not Found", null)
                 call.respond(HttpStatusCode.OK, result)
             }
@@ -107,6 +106,8 @@ object WebServer {
             cros?.forEach {
                 allowHost(it)
             }
+            allowHost("a.yasunaori.be", schemes = listOf("https"))
+            allowHost("www.websocket-test.com", schemes = listOf("http"))
         }
         install(AutoHeadResponse)
         install(PartialContent)
@@ -114,28 +115,26 @@ object WebServer {
     }
 
 
-    fun Application.initServerRouting() {
+    private fun Application.initServerRouting() {
         routing {
             route("api") {
-                get("alumni") {
-                    call.respondText("okok")
-                }
                 userController()
                 public()
-            }
-            authenticate {
-                get("selfInfo") {
-                    val u = call.authentication.principal<JwtUser>()
-                    val auth = OsuAuth.getByID(u!!.uid)
-                    val beatmap = OsuApi.getOwnData(auth!!)
-                    call.respond(DataVo(data = beatmap))
-                }
-                get("f") {
-                    val type = call.request.httpMethod.value
-                    val u = call.authentication.principal<JwtUser>()
-                    val name = u?.name ?: "no user"
-                    val x = call.parameters.get("o") ?: throw IllegalArgumentException("no o")
-                    call.respondText { "$x (${type}) okok~ $name" }
+                yasunaori()
+                authenticate {
+                    get("selfInfo") {
+                        val u = call.authentication.principal<JwtUser>()
+                        val auth = OsuAuth.getByID(u!!.uid)
+                        val beatmap = OsuApi.getOwnData(auth!!)
+                        call.respond(DataVo(data = beatmap))
+                    }
+                    get("f") {
+                        val type = call.request.httpMethod.value
+                        val u = call.authentication.principal<JwtUser>()
+                        val name = u?.name ?: "no user"
+                        val x = call.parameters["o"] ?: throw IllegalArgumentException("no o")
+                        call.respondText { "$x (${type}) okok~ $name" }
+                    }
                 }
             }
 

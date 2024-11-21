@@ -3,8 +3,12 @@ use crate::{to_ptr, to_status_use, Result};
 use jni::objects::{JObject, JValueGen};
 use jni::sys::jint;
 use jni::JNIEnv;
+use rosu_mods::{GameModIntermode, GameMode};
+use rosu_mods::serde::GameModSeed::Mode;
 use rosu_pp::any::ScoreState;
-use rosu_pp::{Beatmap, Performance};
+use rosu_pp::{Beatmap, GameMods, Performance};
+use serde::de::DeserializeSeed;
+use crate::osu::mods::get_mods_from_json;
 
 pub fn generate_state(env: &mut JNIEnv, obj: &JObject) -> Result<()> {
     let state = ScoreState::new();
@@ -84,5 +88,13 @@ pub fn get_performance_from_beatmap(
     generate_state_from_performance(env, &state.l()?, &mut performance)?;
     let performance_ptr = to_ptr(performance);
     set_object_ptr(env, this, performance_ptr)?;
+    Ok(())
+}
+
+#[test]
+fn test_mods() ->Result<()>{
+    let mods_str = "[{\"acronym\":\"HD\",\"settings\":{}},{\"acronym\":\"DT\",\"settings\":{}}]";
+    let x = get_mods_from_json(mods_str, GameMode::Osu)?;
+    println!("{:?}", x);
     Ok(())
 }

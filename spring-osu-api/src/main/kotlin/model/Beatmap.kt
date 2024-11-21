@@ -52,10 +52,10 @@ data class Beatmap(
     var maxCombo: Int? = null,
 
     @JsonProperty("accuracy")
-    var accuracy: Float,
+    var accuracy: Float?,
 
     @JsonProperty("ar")
-    var ar: Float,
+    var ar: Float?,
 
     @JsonProperty("bpm")
     var bpm: Float?,

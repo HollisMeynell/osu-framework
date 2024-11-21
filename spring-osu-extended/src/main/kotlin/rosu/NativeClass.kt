@@ -44,16 +44,20 @@ fun main() {
 fun a1() {
     val b =
         JniBeatmap(Path("/home/spring/Documents/match/osu/1456709/Kano - Stella-rium (Asterisk MAKINA Remix) (Vaporfly) [Starlight].osu"))
-    val b2 =
-        JniBeatmap(Path("/home/spring/Documents/match/osu/1456709/Kano - Stella-rium (Asterisk MAKINA Remix) (Vaporfly) [Starlight].osu"))
-    b2.close()
 
+    println(b.cs)
     b.use {
-        b.convertInPlace(OsuMode.Taiko)
-        val d = JniDifficulty()
-        d.setAr(2f, false)
+        b.convertInPlace(OsuMode.Osu)
+//        val p = JniPerformance.createByBeatmap(b)
+
+        val d = JniDifficulty(
+            isLazer = true
+        )
+        d.setCs(3.8f, false)
 
         val c = d.calculate(it)
+        val c1 = d.calculate(it)
+        val c2 = d.calculate(it)
         if (c is OsuDifficultyAttributes) {
             println(c.stars)
             println(c.speed)

@@ -2,16 +2,15 @@ package org.spring.web
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import io.ktor.server.application.Application
-import io.ktor.server.auth.Principal
-import io.ktor.server.auth.authentication
-import io.ktor.server.auth.jwt.jwt
-import io.ktor.server.response.respond
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.auth.jwt.*
+import io.ktor.server.response.*
 
 object Jwt {
     lateinit var secret: String
     fun isAdmin(id: Long?): Boolean {
-        return false
+        return WebConfig.Instance.server.adminUsers.contains(id)
     }
 }
 
@@ -29,7 +28,7 @@ fun Application.setupJwt(secret: String) {
                 }
                 return@validate user
             }
-            challenge { defaultScheme, realm ->
+            challenge { _, _ ->
                 call.respond(DataVo(401, "Unauthorized", null))
             }
         }
@@ -40,8 +39,8 @@ data class JwtUser(
     var uid: Long = 0,
     var name: String = "",
     var role: String = "",
-) : Principal {
-    fun token(secret: String) = JWT.create()
+) {
+    fun token(secret: String): String = JWT.create()
         .withClaim("uid", uid)
         .withClaim("name", name)
         .withClaim("role", role)

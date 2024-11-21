@@ -21,7 +21,7 @@ object LazerApi {
         auth: UserAuth? = null,
     ): List<LazerScore> {
         return ApiRequest.request(auth,true) {
-            url.path("users", user.toString(), "scores", type.type)
+            url.appendPathSegments("users", user.toString(), "scores", type.type)
             url.parameters.apply {
                 if (mode != Default) {
                     append("mode", mode.describe)
@@ -48,7 +48,7 @@ object LazerApi {
         auth: UserAuth? = null,
     ): LazerBeatmapUserScore {
         return ApiRequest.request(auth, true) {
-            url.path("beatmaps", beatmap.toString(), "scores/users", user.toString())
+            url.appendPathSegments("beatmaps", beatmap.toString(), "scores/users", user.toString())
             url.parameters.apply {
                 if (mode != Default) {
                     append("mode", mode.describe)
@@ -73,7 +73,7 @@ object LazerApi {
         auth: UserAuth? = null,
     ): List<LazerScore> {
         val node: JsonNode = ApiRequest.request(auth, true) {
-            url.path("beatmaps", beatmap.toString(), "scores/users", user.toString(), "all")
+            url.appendPathSegments("beatmaps", beatmap.toString(), "scores/users", user.toString(), "all")
             url.parameters.apply {
                 if (legacyOnly) append("legacy_only", "1") else append("legacy_only", "0")
                 if (mode != Default) {
@@ -100,7 +100,7 @@ object LazerApi {
         auth: UserAuth? = null,
     ): LazerBeatmapScores {
         return ApiRequest.request(auth, true) {
-            url.path("beatmaps", beatmap.toString(), "scores")
+            url.appendPathSegments("beatmaps", beatmap.toString(), "scores")
             url.parameters.apply {
                 if (legacyOnly) append("legacy_only", "1") else append("legacy_only", "0")
                 if (mode != Default) {
@@ -128,7 +128,7 @@ object LazerApi {
         auth: UserAuth? = null,
     ): LazerBeatmapScores {
         return ApiRequest.request(auth, true) {
-            url.path("beatmaps", beatmap.toString(), "solo-scores")
+            url.appendPathSegments("beatmaps", beatmap.toString(), "solo-scores")
             url.parameters.apply {
                 if (mode != Default) {
                     append("mode", mode.describe)
@@ -142,7 +142,7 @@ object LazerApi {
 
     suspend fun getFriend(auth: UserAuth): List<LazerFriend> {
         return ApiRequest.request(auth, true) {
-            url.path("friends")
+            url.appendPathSegments("friends")
         }
     }
 }

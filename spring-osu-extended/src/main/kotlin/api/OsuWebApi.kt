@@ -97,7 +97,7 @@ object OsuWebApi {
             throw Exception("Download avatar [${response.status.description}]")
         }
 
-        return response.readBytes()
+        return response.readRawBytes()
     }
 
     private suspend fun Headers.parseCookie(account: OsuWebAccount) {

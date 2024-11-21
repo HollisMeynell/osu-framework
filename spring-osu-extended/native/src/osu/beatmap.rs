@@ -1,11 +1,11 @@
 use crate::java::get_jni_field_id;
 use crate::osu::java_fu::{get_bytes, get_object_ptr, set_object_ptr};
-use crate::{to_ptr, to_status_use, NativeError, Result};
+use crate::{to_ptr, to_status_use, Result};
 use jni::objects::{JByteArray, JObject, JString, JValueGen};
 use jni::sys::{jboolean, jbyte, JNI_TRUE};
 use jni::JNIEnv;
-use rosu_pp::model::mode::{ConvertStatus, GameMode};
-use rosu_pp::Beatmap;
+use rosu_pp::model::mode::GameMode;
+use rosu_pp::{Beatmap, GameMods};
 
 static BEATMAP_FIELD_AR: &str = "bm_f_ar";
 static BEATMAP_FIELD_OD: &str = "bm_f_od";
@@ -78,12 +78,12 @@ pub fn try_to_convert(env: &mut JNIEnv, this: &JObject, mode_byte: jbyte) -> Res
     let ptr = get_object_ptr(env, this)?;
     let beatmap = to_status_use::<Beatmap>(ptr)?;
     let mode = GameMode::from(mode_byte as u8);
-    match beatmap.convert_in_place(mode) {
-        ConvertStatus::Noop => Ok(JNI_TRUE),
-        ConvertStatus::Conversion => {
-            set_beatmap_field(env, this, &beatmap)?;
-            Ok(JNI_TRUE)
-        }
-        ConvertStatus::Incompatible => Err("Conversion not possible".into()),
+    if beatmap.mode == mode {
+        return Ok(JNI_TRUE)
     }
+    beatmap.convert_mut(mode, &GameMods::default()).or_else(|e| {
+        Err(e.to_string())
+    })?;
+    set_beatmap_field(env, this, &beatmap)?;
+    Ok(JNI_TRUE)
 }

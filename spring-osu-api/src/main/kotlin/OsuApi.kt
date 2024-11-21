@@ -35,7 +35,7 @@ object OsuApi {
         auth: UserAuth? = null,
     ): List<BeatmapPack> {
         val node = ApiRequest.request<JsonNode>(auth) {
-            url.path("beatmaps/packs")
+            url.appendPathSegments("beatmaps/packs")
             url.parameters.apply {
                 type?.let { append("type", it.describe) }
                 cursor?.let { append("cursor_string", it) }
@@ -54,7 +54,7 @@ object OsuApi {
         auth: UserAuth? = null,
     ): BeatmapPack {
         return ApiRequest.request(auth) {
-            url.path("beatmaps/packs", tag)
+            url.appendPathSegments("beatmaps/packs", tag)
             if (legacyOnly) {
                 url.parameters.append("legacy_only", "1")
             } else {
@@ -75,7 +75,7 @@ object OsuApi {
         auth: UserAuth? = null,
     ): Beatmap {
         return ApiRequest.request(auth) {
-            url.path("beatmaps/lookup")
+            url.appendPathSegments("beatmaps/lookup")
             url.parameters.apply {
                 name?.let { append("filename", it) }
                 checksum?.let { append("checksum", it) }
@@ -100,7 +100,7 @@ object OsuApi {
         }
 
         val node: JsonNode = ApiRequest.request(auth) {
-            url.path("beatmaps")
+            url.appendPathSegments("beatmaps")
             url.parameters.apply {
                 allID.forEach { append("ids[]", it.toString()) }
             }
@@ -114,7 +114,7 @@ object OsuApi {
     @JvmStatic
     suspend fun getBeatmap(beatmap: Long, auth: UserAuth? = null): Beatmap {
         return ApiRequest.request(auth) {
-            url.path("beatmaps", beatmap.toString())
+            url.appendPathSegments("beatmaps", beatmap.toString())
         }
     }
 
@@ -143,7 +143,7 @@ object OsuApi {
 
         var node: JsonNode = ApiRequest.request(auth) {
             method = HttpMethod.Post
-            url.path("beatmaps", beatmap.toString(), "attributes")
+            url.appendPathSegments("beatmaps", beatmap.toString(), "attributes")
             url.parameters.apply {
                 if (mode != Default) {
                     append("ruleset", mode.describe)
@@ -179,7 +179,7 @@ object OsuApi {
     ): List<Beatmapset> {
         if (type == UserBeatmapType.MostPlayed) throw IllegalArgumentException("MostPlayed is not supported, use getUserMostPlayedBeatmaps")
         return ApiRequest.request(auth) {
-            url.path("users", user.toString(), "beatmapsets", type.type)
+            url.appendPathSegments("users", user.toString(), "beatmapsets", type.type)
             url.parameters.apply {
                 append("limit", limit.toString())
                 append("offset", offset.toString())
@@ -195,7 +195,7 @@ object OsuApi {
         auth: UserAuth? = null,
     ): List<BeatmapPlaycount> {
         return ApiRequest.request(auth) {
-            url.path("users", user.toString(), "beatmapsets", UserBeatmapType.MostPlayed.type)
+            url.appendPathSegments("users", user.toString(), "beatmapsets", UserBeatmapType.MostPlayed.type)
             url.parameters.apply {
                 append("limit", limit.toString())
                 append("offset", offset.toString())
@@ -209,7 +209,7 @@ object OsuApi {
     @JvmStatic
     internal suspend fun searchBeatmaps(): JsonNode {
         return ApiRequest.request {
-            url.path("beatmapsets/search")
+            url.appendPathSegments("beatmapsets/search")
             url.parameters.apply {
                 append("query", "Giniro Hikousen")
             }
@@ -223,7 +223,7 @@ object OsuApi {
     @JvmStatic
     suspend fun getBeatmapset(beatmapsets: Long, auth: UserAuth? = null): Beatmapset {
         return ApiRequest.request(auth) {
-            url.path("beatmapsets", beatmapsets.toString())
+            url.appendPathSegments("beatmapsets", beatmapsets.toString())
         }
     }
 
@@ -231,8 +231,8 @@ object OsuApi {
     @JvmStatic
     suspend fun getOwnData(auth: UserAuth, mode: OsuMode = Default): User {
         return ApiRequest.request<User>(auth) {
-            url.path("me")
-            if (mode != Default) url.path(mode.describe)
+            url.appendPathSegments("me")
+            if (mode != Default) url.appendPathSegments(mode.describe)
         }
     }
 
@@ -244,7 +244,7 @@ object OsuApi {
         offset: Int = 0,
     ): List<KudosuHistory> {
         return ApiRequest.request(auth) {
-            url.path("users", user.toString(), "kudosu")
+            url.appendPathSegments("users", user.toString(), "kudosu")
             url.parameters.apply {
                 append("limit", limit.toString())
                 append("offset", offset.toString())
@@ -263,8 +263,8 @@ object OsuApi {
         if (userKey == null && auth?.isAuthed() == true) return getOwnData(auth, mode)
         if (userKey == null) throw IllegalArgumentException("user and name can't be null at the same time")
         return ApiRequest.request(auth) {
-            url.path("users", userKey)
-            if (mode != Default) url.path(mode.describe)
+            url.appendPathSegments("users", userKey)
+            if (mode != Default) url.appendPathSegments(mode.describe)
         }
     }
 
@@ -279,7 +279,7 @@ object OsuApi {
         userID: List<Long>,
     ): List<User> {
         return ApiRequest.request<JsonNode> {
-            url.path("users")
+            url.appendPathSegments("users")
             url.parameters.apply {
                 userID.forEach { append("ids[]", it.toString()) }
                 append("include_variant_statistics", includeVariantStatistics.toString())
@@ -295,7 +295,7 @@ object OsuApi {
     suspend fun sessionVerify(auth: UserAuth): String {
         return ApiRequest.request<String>(auth) {
             method = HttpMethod.Post
-            url.path("session/verify")
+            url.appendPathSegments("session/verify")
         }
     }
 
@@ -315,7 +315,7 @@ object OsuApi {
         auth: UserAuth? = null,
     ): BeatmapUserScore {
         return ApiRequest.request(auth) {
-            url.path("beatmaps", beatmap.toString(), "scores/users", user.toString())
+            url.appendPathSegments("beatmaps", beatmap.toString(), "scores/users", user.toString())
             url.parameters.apply {
                 if (mode != Default) {
                     append("mode", mode.describe)
@@ -344,7 +344,7 @@ object OsuApi {
         auth: UserAuth? = null,
     ): List<Score> {
         val node: JsonNode = ApiRequest.request(auth) {
-            url.path("beatmaps", beatmap.toString(), "scores/users", user.toString(), "all")
+            url.appendPathSegments("beatmaps", beatmap.toString(), "scores/users", user.toString(), "all")
             url.parameters.apply {
                 if (legacyOnly) append("legacy_only", "1") else append("legacy_only", "0")
                 if (mode != Default) {
@@ -371,7 +371,7 @@ object OsuApi {
         auth: UserAuth? = null,
     ): BeatmapScores {
         return ApiRequest.request(auth) {
-            url.path("beatmaps", beatmap.toString(), "scores")
+            url.appendPathSegments("beatmaps", beatmap.toString(), "scores")
             url.parameters.apply {
                 if (legacyOnly) append("legacy_only", "1") else append("legacy_only", "0")
                 if (mode != Default) {
@@ -395,7 +395,7 @@ object OsuApi {
         auth: UserAuth? = null,
     ): MatchSearch {
         return ApiRequest.request(auth) {
-            url.path("matches")
+            url.appendPathSegments("matches")
             url.parameters.apply {
                 append("limit", limit.toString())
                 append("sort", sortDesc.sort)
@@ -416,7 +416,7 @@ object OsuApi {
         auth: UserAuth? = null,
     ): Match {
         return ApiRequest.request(auth) {
-            url.path("matches", match.toString())
+            url.appendPathSegments("matches", match.toString())
             url.parameters.apply {
                 append("limit", limit.toString())
                 before?.let { append("before", it.toString()) }
@@ -437,7 +437,7 @@ object OsuApi {
         auth: UserAuth? = null,
     ): List<Score> {
         return ApiRequest.request(auth) {
-            url.path("users", user.toString(), "scores", type.type)
+            url.appendPathSegments("users", user.toString(), "scores", type.type)
             url.parameters.apply {
                 if (mode != Default) {
                     append("mode", mode.describe)
@@ -456,13 +456,13 @@ object OsuApi {
     @JvmStatic
     suspend fun getFriend(auth: UserAuth): List<Friend> {
         return ApiRequest.request(auth) {
-            url.path("friends")
+            url.appendPathSegments("friends")
         }
     }
 
     @JvmStatic
     suspend fun getSeasonalBackgrounds(): SeasonalBackgrounds {
-        return ApiRequest.request { url.path("seasonal-backgrounds") }
+        return ApiRequest.request { url.appendPathSegments("seasonal-backgrounds") }
     }
 
     /**
@@ -475,7 +475,7 @@ object OsuApi {
         output: ByteWriteChannel
     ) {
         val stream = ApiRequest.client.prepareGet {
-            url.path("scores", score.toString(), "download")
+            url.appendPathSegments("scores", score.toString(), "download")
             accept(ContentType.Application.Json)
             contentType(ContentType.Application.Json)
             headers.setAuth(auth)

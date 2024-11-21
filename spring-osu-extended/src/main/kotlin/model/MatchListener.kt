@@ -1,13 +1,8 @@
 package org.spring.osu.extended.model
 
-import org.spring.osu.OsuMod
 import org.spring.osu.OsuMode
 import org.spring.osu.extended.MatchListenerStarter
-import org.spring.osu.model.Beatmap
-import org.spring.osu.model.GameTeamType
-import org.spring.osu.model.Match
-import org.spring.osu.model.MatchGame
-import org.spring.osu.model.User
+import org.spring.osu.model.*
 import java.time.OffsetDateTime
 
 interface MatchListener {

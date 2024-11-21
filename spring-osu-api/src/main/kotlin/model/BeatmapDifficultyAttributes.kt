@@ -3,7 +3,7 @@ package org.spring.osu.model
 import com.fasterxml.jackson.annotation.JsonProperty
 
 
-open class BeatmapDifficultyAttributes(
+sealed class BeatmapDifficultyAttributes(
     @JsonProperty("max_combo")
     open var maxCombo: Int,
 

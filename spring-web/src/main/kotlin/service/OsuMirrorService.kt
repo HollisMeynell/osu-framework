@@ -1,3 +1,5 @@
 package org.spring.web.service
 
-object OsuMirrorService
+object OsuMirrorService {
+
+}

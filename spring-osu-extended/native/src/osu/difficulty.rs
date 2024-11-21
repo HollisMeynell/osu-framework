@@ -1,13 +1,11 @@
-use std::cell::RefCell;
-use std::rc::Rc;
+use crate::java::{get_jni_class, get_jni_method_id};
 use crate::osu::java_fu::{get_object_ptr, set_object_ptr};
 use crate::{to_ptr, to_status, to_status_use, Result};
-use jni::objects::{JClass, JObject, JValue, JValueGen};
-use jni::sys::{jboolean, jbyte, jclass, jdouble, jfloat, jobject, jvalue};
-use jni::{objects, JNIEnv};
+use jni::objects::{JClass, JObject};
+use jni::sys::{jdouble, jfloat, jobject, jvalue};
+use jni::JNIEnv;
 use rosu_pp::any::DifficultyAttributes;
 use rosu_pp::Difficulty;
-use crate::java::{get_jni_class, get_jni_field_id, get_jni_method_id};
 
 static DIFFICULTY_OSU: &str = "dm_init_o";
 static DIFFICULTY_TAIKO: &str = "dm_init_t";
@@ -17,6 +15,7 @@ static DIFFICULTY_MANAI: &str = "dm_init_m";
 macro_rules! set_state {
     ($fx:ident($f:ident)) => {
         pub fn $fx(env: &mut JNIEnv, this: &JObject, value: f32, is_lazer: bool) -> Result<()> {
+            println!("set -> {}", value);
             set_difficulty_attr(env, this, |difficulty| difficulty.$f(value, is_lazer))
         }
     };
@@ -27,9 +26,9 @@ macro_rules! set_state {
     };
 }
 set_state!(set_difficulty_ar(ar));
+set_state!(set_difficulty_od(od));
 set_state!(set_difficulty_cs(cs));
 set_state!(set_difficulty_hp(hp));
-set_state!(set_difficulty_od(od));
 set_state!(set_difficulty_is_lazer[lazer]);
 set_state!(set_difficulty_is_hardrock[hardrock_offsets]);
 
@@ -97,31 +96,11 @@ pub fn difficulty_calculate(
     let beatmap = to_status_use(beatmap_ptr)?;
     let difficulty_ptr = get_object_ptr(env, this)?;
     let difficulty = to_status_use::<Difficulty>(difficulty_ptr)?;
+    println!("{:?}", difficulty);
     let attr = difficulty.calculate(beatmap);
 
     let (obj, ptr) = match attr {
         DifficultyAttributes::Osu(data) => {
-            // let args = &[
-            //     JValueGen::Double(data.aim),
-            //     JValueGen::Double(data.speed),
-            //     JValueGen::Double(data.flashlight),
-            //     JValueGen::Double(data.slider_factor),
-            //     JValueGen::Double(data.speed_note_count),
-            //     JValueGen::Double(data.aim_difficult_strain_count),
-            //     JValueGen::Double(data.speed_difficult_strain_count),
-            //     JValueGen::Double(data.stars),
-            //     JValueGen::Int(data.max_combo as i32),
-            // ];
-            // let object = env
-            //     // .new_object("org/spring/osu/extended/rosu/OsuDifficultyAttributes", "(DDDDDDDDI)V", args)?;
-            //     .call_static_method(
-            //         "org/spring/osu/extended/rosu/JniDifficultyAttributes",
-            //         "createOsu",
-            //         "(DDDDDDDDI)Lorg/spring/osu/extended/rosu/JniDifficultyAttributes;",
-            //         args,
-            //     )?
-            //     .l()?;
-            // env.exception_describe()?;
             let args = &[
                 jvalue { d: data.aim },
                 jvalue { d: data.speed },
@@ -134,11 +113,12 @@ pub fn difficulty_calculate(
                 jvalue { i: data.max_combo as i32 },
             ];
 
-            let class = env.find_class("org/spring/osu/extended/rosu/OsuDifficultyAttributes")?;
-            let jclass = class.as_raw();
+            let jclass = get_jni_class("class_osu", || {
+                let class = env.find_class("org/spring/osu/extended/rosu/OsuDifficultyAttributes")?;
+                Ok(class.into_raw())
+            })?;
             let class = unsafe { JClass::from_raw(jclass) };
             let f = get_jni_method_id(DIFFICULTY_TAIKO, || {
-                let c = class.as_raw();
                 let class = unsafe { JClass::from_raw(jclass) };
                 let f = env.get_method_id(class, "<init>", "(DDDDDDDDI)V")?;
                 Ok(f)
@@ -150,25 +130,6 @@ pub fn difficulty_calculate(
             (object, to_ptr(data))
         }
         DifficultyAttributes::Taiko(data) => {
-            // let args = &[
-            //     JValueGen::Double(data.stamina),
-            //     JValueGen::Double(data.rhythm),
-            //     JValueGen::Double(data.color),
-            //     JValueGen::Double(data.peak),
-            //     JValueGen::Double(data.great_hit_window),
-            //     JValueGen::Double(data.ok_hit_window),
-            //     JValueGen::Double(data.stars),
-            //     JValueGen::Int(data.max_combo as i32),
-            //     JValueGen::Bool(jboolean::from(data.is_convert)),
-            // ];
-            // let object = env
-            //     .call_static_method(
-            //         attr_static_class,
-            //         "createTaiko",
-            //         "(DDDDDDDIZ)Lorg/spring/osu/extended/rosu/JniDifficultyAttributes;",
-            //         args,
-            //     )?
-            //     .l()?;
             let args = &[
                 jvalue { d: data.stamina },
                 jvalue { d: data.rhythm },
@@ -185,7 +146,6 @@ pub fn difficulty_calculate(
             let jclass = class.as_raw();
             let class = unsafe { JClass::from_raw(jclass) };
             let f = get_jni_method_id(DIFFICULTY_TAIKO, || {
-                let c = class.as_raw();
                 let class = unsafe { JClass::from_raw(jclass) };
                 let f = env.get_method_id(class, "<init>", "(DDDDDDDIZ)V")?;
                 Ok(f)
@@ -197,22 +157,6 @@ pub fn difficulty_calculate(
             (object, to_ptr(data))
         }
         DifficultyAttributes::Catch(data) => {
-            // let args = &[
-            //     JValueGen::Double(data.stars),
-            //     JValueGen::Double(data.ar),
-            //     JValueGen::Int(data.n_fruits as i32),
-            //     JValueGen::Int(data.n_droplets as i32),
-            //     JValueGen::Int(data.n_tiny_droplets as i32),
-            //     JValueGen::Bool(jboolean::from(data.is_convert)),
-            // ];
-            // let object = env
-            //     .call_static_method(
-            //         attr_static_class,
-            //         "createCatch",
-            //         "(DDIIIZ)Lorg/spring/osu/extended/rosu/JniDifficultyAttributes;",
-            //         args,
-            //     )?
-            //     .l()?;
             let args = &[
                 jvalue { d: data.stars },
                 jvalue { d: data.ar },
@@ -226,7 +170,6 @@ pub fn difficulty_calculate(
             let jclass = class.as_raw();
             let class = unsafe { JClass::from_raw(jclass) };
             let f = get_jni_method_id(DIFFICULTY_CATCH, || {
-                let c = class.as_raw();
                 let class = unsafe { JClass::from_raw(jclass) };
                 let f = env.get_method_id(class, "<init>", "(DDIIIZ)V")?;
                 Ok(f)
@@ -238,21 +181,6 @@ pub fn difficulty_calculate(
             (object, to_ptr(data))
         }
         DifficultyAttributes::Mania(data) => {
-            /*
-            let args = &[
-                JValue::Double(data.stars),
-                JValue::Double(data.hit_window),
-                JValue::Int(data.n_objects as i32),
-                JValue::Int(data.max_combo as i32),
-                JValue::Bool(jboolean::from(data.is_convert)),
-            ];
-            let object = env.new_object(
-                "org/spring/osu/extended/rosu/ManiaDifficultyAttributes",
-                "(DDIIZ)V",
-                args,
-            )?;
-           */
-
             let args = &[
                 jvalue { d: data.stars },
                 jvalue { d: data.hit_window },
@@ -261,10 +189,9 @@ pub fn difficulty_calculate(
                 jvalue { b: if data.is_convert { 1i8 } else { 0i8 } },
             ];
             let class = env.find_class("org/spring/osu/extended/rosu/ManiaDifficultyAttributes")?;
-            let jclass = class.as_raw();
+            let jclass = class.into_raw();
             let class = unsafe { JClass::from_raw(jclass) };
             let f = get_jni_method_id(DIFFICULTY_MANAI, || {
-                let c = class.as_raw();
                 let class = unsafe { JClass::from_raw(jclass) };
                 let f = env.get_method_id(class, "<init>", "(DDIIZ)V")?;
                 Ok(f)

@@ -6,6 +6,7 @@ kotlin = "2.0.20"
 kotlin-coroutines = "1.9.0"
 kotlin-logging = "7.0.0"
 kotlin-jackson = "2.18.+"
+krontab = "2.6.1"
 ktor = "3.0.1"
 logback = "1.5.12"
 postgres = "42.7.4"
@@ -22,6 +23,7 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 [libraries]
 xz = { group = "org.tukaani", name = "xz", version = "1.10" }
 commons-compress = { group = "org.apache.commons", name = "commons-compress", version.ref = "commons-compress" }
+krontab = { group = "dev.inmo", name = "krontab", version.ref = "krontab" }
 
 hoplite = { group = "com.sksamuel.hoplite", name = "hoplite-core", version.ref = "hoplite" }
 hoplite-toml = { group = "com.sksamuel.hoplite", name = "hoplite-toml", version.ref = "hoplite" }

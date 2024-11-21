@@ -1,6 +1,7 @@
 mod beatmap;
 mod difficulty;
 mod performance;
+mod mods;
 
 use crate::java::{throw_jni, JavaBoolean};
 use crate::osu::performance::{generate_state, get_performance_from_beatmap};
@@ -70,16 +71,12 @@ mod java_fu {
     }
     pub fn set_object_ptr(env: &mut JNIEnv, obj: &JObject, ptr: i64) -> Result<()> {
         let field = get_ptr_field(env)?;
-        unsafe {
-            env.set_field_unchecked(obj, field, JValueGen::Long(ptr))
-        }?;
+        env.set_field_unchecked(obj, field, JValueGen::Long(ptr))?;
         Ok(())
     }
     pub fn get_object_ptr(env: &mut JNIEnv, obj: &JObject) -> Result<i64> {
         let f_id = get_ptr_field(env)?;
-        let r = unsafe {
-            env.get_field_unchecked(obj, f_id, ReturnType::Primitive(Primitive::Long))
-        };
+        let r = env.get_field_unchecked(obj, f_id, ReturnType::Primitive(Primitive::Long));
         let result = match r {
             Ok(data) => data,
             Err(e) => {
@@ -141,9 +138,9 @@ macro_rules! set_difficulty_state {
 }
 
 set_difficulty_state!(nativeSetAr:set_difficulty_ar);
-set_difficulty_state!(nativeSetOd:set_difficulty_cs);
-set_difficulty_state!(nativeSetCs:set_difficulty_hp);
-set_difficulty_state!(nativeSetHp:set_difficulty_od);
+set_difficulty_state!(nativeSetOd:set_difficulty_od);
+set_difficulty_state!(nativeSetCs:set_difficulty_cs);
+set_difficulty_state!(nativeSetHp:set_difficulty_hp);
 set_difficulty_state!(setLazer > set_difficulty_is_lazer);
 set_difficulty_state!(setHardrock > set_difficulty_is_hardrock);
 

@@ -10,7 +10,6 @@ import org.spring.osu.RankStatus
 import org.spring.osu.model.Beatmap
 import org.spring.osu.persistence.OsuDatabases
 import org.spring.osu.persistence.OsuDatabases.suspendTransaction
-import org.spring.osu.persistence.model.OsuAuthRecord.Companion.uid
 import java.time.Instant
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
@@ -53,8 +52,8 @@ object OsuBeatmapRecord : IdTable<Long>("osu_beatmap") {
                 it[status] = data.status.value
                 it[chechsum] = data.checksum ?: ""
                 it[maxCombo] = data.maxCombo ?: 0
-                it[od] = data.accuracy
-                it[ar] = data.ar
+                it[od] = data.accuracy ?: 0f
+                it[ar] = data.ar ?: 0f
                 it[hp] = data.drain ?: 0f
                 it[cs] = data.cs ?: 0f
                 it[bpm] = data.bpm ?: 0f

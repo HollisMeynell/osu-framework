@@ -1,5 +1,5 @@
 use crate::{to_ptr, to_status_use, NativeError, Result};
-use jni::objects::{JClass, JFieldID, JMethodID, JStaticFieldID, JStaticMethodID};
+use jni::objects::{JFieldID, JMethodID, JStaticFieldID, JStaticMethodID};
 use jni::sys::{jboolean, jclass, jfieldID, jmethodID, JNI_TRUE};
 use jni::JNIEnv;
 use std::collections::HashMap;
@@ -15,11 +15,9 @@ fn get_global_map() -> Result<&'static mut JniIdMap> {
     INIT.call_once(|| {
         let map: JniIdMap = JniIdMap::new();
         let m_ptr = to_ptr(map);
-        unsafe {
-            GLOBAL_JNI_ID.store(m_ptr, SeqCst);
-        }
+        GLOBAL_JNI_ID.store(m_ptr, SeqCst);
     });
-    let m_ptr = unsafe { GLOBAL_JNI_ID.load(SeqCst) };
+    let m_ptr = GLOBAL_JNI_ID.load(SeqCst);
     to_status_use::<JniIdMap>(m_ptr)
 }
 fn get_id(key: &str) -> Option<usize> {
@@ -38,6 +36,7 @@ macro_rules! get_id_fn {
         pub fn $fx(key: &'static str, default: impl FnOnce() -> Result<$t>) -> Result<$t> {
             let j = match get_id(key) {
                 None => {
+                    println!("new");
                     let f = default()?.into_raw();
                     set_id(key, f.clone() as usize)?;
                     f
@@ -56,16 +55,18 @@ get_id_fn! { get_jni_static_field_id(JStaticFieldID, jfieldID) }
 get_id_fn! { get_jni_static_method_id(JStaticMethodID, jmethodID) }
 
 pub fn get_jni_class(key: &'static str, default: impl FnOnce() -> Result<jclass>) -> Result<jclass> {
+/*
     let j = match get_id(key) {
         None => {
-            println!("is null");
-            let f = default()?;
-            set_id(key, f as usize)?;
-            f
+            let raw = default()?;
+            set_id(key, raw as usize)?;
+            raw
         }
         Some(p) => p as jclass,
     };
     Ok(j)
+ */
+    default()
 }
 
 pub fn throw_jni(env: &mut JNIEnv, err: NativeError) {

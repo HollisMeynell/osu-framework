@@ -21,10 +21,17 @@ data class WebConfig(
         }
     }
 
+    fun selfUrl(): String {
+        return if (server.ssl) "https://${server.localUrl}" else "http://${server.localUrl}"
+    }
+
     data class ServerConfig(
         var port: Int = 8080,
         var secret: String = "*",
-        var cros: List<String>? = null,
+        val localUrl: String = "localhost$port",
+        val ssl: Boolean = false,
+        var cors: List<String>? = null,
+        var adminUsers: Set<Long> = emptySet(),
     )
 
     data class DatabaseConfig(
@@ -35,14 +42,16 @@ data class WebConfig(
     )
 
     companion object {
+        lateinit var Instance: WebConfig
+            private set
+
         fun loadFromFile(): WebConfig {
             val local = System.getProperty("user.dir")
             val builder = ConfigLoaderBuilder.default()
             Path(local, "config", "config.toml").load(builder)
             Path(local, "config.toml").load(builder)
             builder.addResourceSource("/config.toml", true)
-
-            return builder.build().loadConfigOrThrow<WebConfig>()
+            return builder.build().loadConfigOrThrow<WebConfig>().also { Instance = it }
         }
 
         private fun Path.load(builder: ConfigLoaderBuilder) {

@@ -18,5 +18,6 @@ dependencies {
     api(libs.ktor.server.compression)
     api(libs.ktor.server.content.negotiation)
     api(libs.ktor.serialization.jackson)
+    api(libs.krontab)
 }
 

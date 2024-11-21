@@ -9,10 +9,16 @@ import org.spring.web.LoginUserDto
 import org.spring.web.databases.OsuAuth
 
 object UserService {
-    fun oauthUrl() = DataVo(data = OsuApi.getOauthUrl("state", AuthScope.Identify, AuthScope.Public))
+    fun oauthUrl() = DataVo(
+        data = OsuApi.getOauthUrl(
+            "state",
+            AuthScope.Identify,
+            AuthScope.Public,
+            AuthScope.FriendsRead,
+        )
+    )
 
     suspend fun login(code: String): LoginUserDto {
-
         val auth = OsuAuth(refreshToken = code)
         OsuApi.refreshUserAuth(auth)
         val jwt = JwtUser(

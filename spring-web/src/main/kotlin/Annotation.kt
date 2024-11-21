@@ -1,7 +1,7 @@
 package org.spring.web
 
-//@Target(AnnotationTarget.FIELD)
 // 对 body 无效
+@Target(AnnotationTarget.FIELD)
 annotation class Param(
     val name: String = "",
     val notNull: Boolean = true,

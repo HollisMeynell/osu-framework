@@ -11,14 +11,14 @@ type Result<T> = std::result::Result<T, NativeError>;
 pub enum NativeError {
     #[error("run error: {0}")]
     Runtime(String),
-    #[error("value is null")]
-    Null,
     #[error(transparent)]
     Io(#[from] std::io::Error),
     #[error(transparent)]
     Jni(#[from] jni::errors::Error),
     #[error(transparent)]
     JniOther(#[from] jni::errors::JniError),
+    #[error(transparent)]
+    Json(#[from] serde_json::Error),
 }
 
 impl From<String> for NativeError {
