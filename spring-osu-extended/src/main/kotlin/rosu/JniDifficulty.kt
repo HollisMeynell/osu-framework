@@ -1,4 +1,10 @@
+@file:Suppress("unused")
 package org.spring.osu.extended.rosu
+
+import org.spring.core.toJson
+import org.spring.osu.OsuMode
+import org.spring.osu.model.LazerMod
+import org.spring.osu.model.OsuMod
 
 class JniDifficulty(
     withMods: Boolean = false,
@@ -7,7 +13,8 @@ class JniDifficulty(
     cs: Float? = null,
     hp: Float? = null,
     clockRate: Double? = null,
-    isLazer: Boolean = false,
+    isLazer: Boolean = true,
+    var mode: OsuMode? = null,
 ) : NativeClass(1) {
     @set:JvmName("_setAr")
     var ar: Float? = ar
@@ -75,11 +82,64 @@ class JniDifficulty(
         isLazer = bool
     }
 
-    fun isHardrock(bool: Boolean) {
+    fun hardrockOffsets(bool: Boolean) {
         setHardrock(bool)
     }
 
-    @JvmName("isAllNull")
+    fun passObject(sum: Int) {
+        setPassObject(sum)
+    }
+
+    fun setMods(legacy: Int) {
+        nativeSetMods(legacy)
+    }
+
+    fun setMods(vararg legacy: OsuMod) {
+        val int = legacy.map { it.value }.reduce { acc, mod -> acc or mod }
+        nativeSetMods(int)
+    }
+
+    fun setMods(legacy: Collection<OsuMod>) {
+        val int = legacy.map { it.value }.reduce { acc, mod -> acc or mod }
+        nativeSetMods(int)
+    }
+
+    fun setMods(json: String, mode: OsuMode? = this.mode) {
+        mode?.let {
+            nativeSetModsByStr(it.value.toByte(), json)
+        } ?: throw IllegalArgumentException("unknown mode")
+    }
+
+    fun setMods(vararg mods: LazerMod) {
+        mode?.let {
+            nativeSetModsByStr(it.value.toByte(), mods.toJson())
+        } ?: throw IllegalArgumentException("unknown mode")
+    }
+
+    fun setMods(mods: Collection<LazerMod>, mode: OsuMode? = this.mode) {
+        mode?.let {
+            nativeSetModsByStr(it.value.toByte(), mods.toJson())
+        } ?: throw IllegalArgumentException("unknown mode")
+    }
+
+    fun setMods(legacy: Int, json: String, mode: OsuMode? = this.mode) {
+        mode?.let {
+            nativeSetModsMix(it.value.toByte(), legacy, json)
+        } ?: throw IllegalArgumentException("unknown mode")
+    }
+
+    fun setMods(legacy: Int, vararg mods: LazerMod) {
+        mode?.let {
+            nativeSetModsMix(it.value.toByte(), legacy, mods.toJson())
+        } ?: throw IllegalArgumentException("unknown mode")
+    }
+
+    fun setMods(legacy: Int, mods: Collection<LazerMod>, mode: OsuMode? = this.mode) {
+        mode?.let {
+            nativeSetModsMix(it.value.toByte(), legacy, mods.toJson())
+        } ?: throw IllegalArgumentException("unknown mode")
+    }
+
     private fun isAllNull(): Boolean = ar == null && od == null && cs == null && hp == null && clockRate == null
     private external fun initDifficulty(
         withMods: Boolean,
@@ -92,14 +152,23 @@ class JniDifficulty(
         clockRate: Double = this.clockRate ?: -1.0,
     )
 
+    fun calculate(beatmap: JniBeatmap): JniDifficultyAttributes {
+        return nativeCalculate(beatmap.getPtr())
+    }
+
     private external fun nativeSetAr(value: Float, withMods: Boolean)
     private external fun nativeSetOd(value: Float, withMods: Boolean)
     private external fun nativeSetCs(value: Float, withMods: Boolean)
     private external fun nativeSetHp(value: Float, withMods: Boolean)
     private external fun setLazer(bool: Boolean)
     private external fun setHardrock(bool: Boolean)
+    private external fun setPassObject(sum: Int)
+    private external fun nativeSetMods(legacy: Int)
+    private external fun nativeSetModsByStr(mode: Byte, lazer: String)
+    private external fun nativeSetModsMix(mode: Byte, legacy: Int, lazer: String)
     private external fun nativeSetClockRate(value: Double)
-    external fun calculate(beatmap: JniBeatmap): JniDifficultyAttributes
+
+    private external fun nativeCalculate(beatmap: Long): JniDifficultyAttributes
 
     init {
         initDifficulty(withMods, isLazer, isAllNull())

@@ -1,3 +1,4 @@
+@file:Suppress("unused")
 package org.spring.osu.extended.rosu
 
 
@@ -47,9 +48,32 @@ class JniBeatmap private constructor() : NativeClass(0) {
         return convertInPlace(modeValue.toByte())
     }
 
+    fun createDifficulty(): JniDifficulty {
+        return JniDifficulty(mode = mode)
+    }
+
+    fun createPerformance(state: JniScoreState? = null): JniPerformance {
+        return JniPerformance.createByBeatmap(this, state)
+    }
+
+
     private external fun convertInPlace(mode: Byte): Boolean
     private external fun parseByBytes(map: ByteArray)
     private external fun parseByPath(local: String)
 
-    external fun getPtrs(): Long
+    override fun toString(): String {
+        return """
+            |JniBeatmap(
+            |   mode=$mode,
+            |   ar=$ar,
+            |   od=$od,
+            |   cs=$cs,
+            |   hp=$hp,
+            |   stackLeniency=$stackLeniency,
+            |   bpm=$bpm,
+            |   sliderMultiplier=$sliderMultiplier,
+            |   sliderTickTate=$sliderTickTate
+            |)
+        """.trimMargin()
+    }
 }

@@ -10,6 +10,8 @@ import com.fasterxml.jackson.databind.JsonNode
 import org.spring.core.json
 import org.spring.core.toJson
 import org.spring.osu.OsuMode
+import kotlin.reflect.full.memberProperties
+import kotlin.reflect.jvm.isAccessible
 
 sealed interface Mod {
     val acronym: String
@@ -106,6 +108,16 @@ sealed class LazerMod {
     @get:JsonProperty("settings")
     abstract val settings: Any?
 
+    @JsonIgnore
+    fun isSettingNull(): Boolean {
+        if (settings == null) return true
+        return settings?.let { s ->
+            s::class.memberProperties.all {
+                it.isAccessible = true
+                it.getter.call(s) == null
+            }
+        } ?: true
+    }
 
     class Easy(
         retries: Float? = null,

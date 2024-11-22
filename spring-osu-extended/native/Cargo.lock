@@ -108,11 +108,6 @@ name = "rosu-mods"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2a0fb1475e860c987673e8abc1df5d23f22c4e1ae62e9459e656cff4d82f603b"
-
-[[package]]
-name = "rosu-mods"
-version = "0.2.0"
-source = "git+https://github.com/MaxOhn/rosu-mods.git?branch=main#67c39afd8ef822a2fe0c21deae844457fabb0f67"
 dependencies = [
  "serde",
 ]
@@ -123,7 +118,7 @@ version = "1.1.0"
 source = "git+https://github.com/MaxOhn/rosu-pp.git?branch=main#d1f5910bd113cbca24a2c1ae921c443f68b8f962"
 dependencies = [
  "rosu-map",
- "rosu-mods 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "rosu-mods",
 ]
 
 [[package]]
@@ -179,7 +174,7 @@ version = "0.0.1"
 dependencies = [
  "jni",
  "jni-macro",
- "rosu-mods 0.2.0 (git+https://github.com/MaxOhn/rosu-mods.git?branch=main)",
+ "rosu-mods",
  "rosu-pp",
  "serde",
  "serde_json",

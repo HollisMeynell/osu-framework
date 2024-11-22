@@ -40,6 +40,11 @@ impl NativeError {
 }
 
 #[inline]
+pub fn throw<T>(info: String) -> Result<T> {
+    Err(info.into())
+}
+
+#[inline]
 pub fn to_ptr<T>(s: T) -> i64 {
     Box::into_raw(Box::new(s)) as i64
 }

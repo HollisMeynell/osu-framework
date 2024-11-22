@@ -1,100 +1,392 @@
-use crate::osu::java_fu::{get_object_ptr, set_object_ptr};
-use crate::{to_ptr, to_status_use, Result};
-use jni::objects::{JObject, JValueGen};
-use jni::sys::jint;
+use super::java_fu::{get_object_ptr, set_object_ptr};
+use crate::java::{get_jni_field_id, get_jni_static_method_id};
+use crate::osu::difficulty::*;
+use crate::{get_mods_from_java, to_ptr, to_status, to_status_use, Result};
+use jni::objects::{JClass, JObject, JString};
+use jni::signature::{Primitive, ReturnType};
+use jni::sys::{jbyte, jclass, jint, jlong, jobject, jvalue};
 use jni::JNIEnv;
-use rosu_mods::{GameModIntermode, GameMode};
-use rosu_mods::serde::GameModSeed::Mode;
-use rosu_pp::any::ScoreState;
-use rosu_pp::{Beatmap, GameMods, Performance};
-use serde::de::DeserializeSeed;
-use crate::osu::mods::get_mods_from_json;
+use rosu_pp::any::{HitResultPriority, PerformanceAttributes, ScoreState};
+use rosu_pp::catch::CatchDifficultyAttributes;
+use rosu_pp::mania::ManiaDifficultyAttributes;
+use rosu_pp::osu::OsuDifficultyAttributes;
+use rosu_pp::taiko::TaikoDifficultyAttributes;
+use rosu_pp::{Beatmap, Difficulty, Performance};
 
-pub fn generate_state(env: &mut JNIEnv, obj: &JObject) -> Result<()> {
-    let state = ScoreState::new();
-    let ptr = to_ptr(state);
-    set_object_ptr(env, obj, ptr)?;
-    parse_java_state(env, obj, Some(ptr))
+const PERFORMANCE_STATE_MAX_COMBO: &str = "pm_state_max_combo";
+pub const PERFORMANCE_FIELD_MAX_COMBO: &str = "maxCombo";
+const PERFORMANCE_STATE_LARGE_TICK_HITS: &str = "pm_state_large_tick_hits";
+pub const PERFORMANCE_FIELD_LARGE_TICK_HITS: &str = "largeTickHits";
+const PERFORMANCE_STATE_SLIDER_END_HITS: &str = "pm_state_slider_end_hits";
+pub const PERFORMANCE_FIELD_SLIDER_END_HITS: &str = "sliderEndHits";
+const PERFORMANCE_STATE_N_GEKI: &str = "pm_state_n_geki";
+pub const PERFORMANCE_FIELD_N_GEKI: &str = "geki";
+const PERFORMANCE_STATE_N_KATU: &str = "pm_state_n_katu";
+pub const PERFORMANCE_FIELD_N_KATU: &str = "katu";
+const PERFORMANCE_STATE_N300: &str = "pm_state_n300";
+pub const PERFORMANCE_FIELD_N300: &str = "n300";
+const PERFORMANCE_STATE_N100: &str = "pm_state_n100";
+pub const PERFORMANCE_FIELD_N100: &str = "n100";
+const PERFORMANCE_STATE_N50: &str = "pm_state_n50";
+pub const PERFORMANCE_FIELD_N50: &str = "n50";
+const PERFORMANCE_STATE_MISSES: &str = "pm_state_misses";
+pub const PERFORMANCE_FIELD_MISSES: &str = "misses";
+
+const PERFORMANCE_STATE: &str = "pm_create_state";
+const PERFORMANCE_ATTR_OSU: &str = "pm_create_attr_o";
+const PERFORMANCE_ATTR_TAIKO: &str = "pm_create_attr_t";
+const PERFORMANCE_ATTR_CATCH: &str = "pm_create_attr_c";
+const PERFORMANCE_ATTR_MANAI: &str = "pm_create_attr_m";
+const PERFORMANCE_BEATMAP: &str = "pm_init_m";
+const PERFORMANCE_OSU: &str = "pm_init_attr_o";
+const PERFORMANCE_TAIKO: &str = "pm_init_attr_t";
+const PERFORMANCE_CATCH: &str = "pm_init_attr_c";
+const PERFORMANCE_MANAI: &str = "pm_init_attr_m";
+
+pub fn generate_state(env: &mut JNIEnv, obj: &JObject) -> Result<jobject> {
+    let ptr = get_object_ptr(env, obj)?;
+    let performance = to_status_use::<Performance>(ptr)?;
+    let data = performance.generate_state();
+    let args = &[
+        jvalue {
+            i: data.max_combo as jint,
+        },
+        jvalue {
+            i: data.osu_large_tick_hits as jint,
+        },
+        jvalue {
+            i: data.slider_end_hits as jint,
+        },
+        jvalue {
+            i: data.n_geki as jint,
+        },
+        jvalue {
+            i: data.n_katu as jint,
+        },
+        jvalue {
+            i: data.n300 as jint,
+        },
+        jvalue {
+            i: data.n100 as jint,
+        },
+        jvalue {
+            i: data.n50 as jint,
+        },
+        jvalue {
+            i: data.misses as jint,
+        },
+    ];
+    let class = env.find_class("org/spring/osu/extended/rosu/JniPerformance")?;
+    let jclass = class.as_raw();
+    let method = get_jni_static_method_id(PERFORMANCE_STATE, || {
+        let class = unsafe { JClass::from_raw(jclass) };
+        let method = env.get_static_method_id(
+            class,
+            "createState",
+            "(IIIIIIIII)Lorg/spring/osu/extended/rosu/JniScoreState;",
+        )?;
+        Ok(method)
+    })?;
+    let class = unsafe { JClass::from_raw(jclass) };
+    let object =
+        unsafe { env.call_static_method_unchecked(class, method, ReturnType::Object, args)? }
+            .l()?;
+    Ok(object.into_raw())
 }
 
-fn parse_java_state(env: &mut JNIEnv, this: &JObject, state: Option<i64>) -> Result<()> {
-    let state = match state {
-        Some(data) => to_status_use::<ScoreState>(data)?,
-        None => {
-            let ptr = get_object_ptr(env, this)?;
-            to_status_use::<ScoreState>(ptr)?
+fn parse_java_state(env: &mut JNIEnv, this: &JObject) -> Result<ScoreState> {
+    let mut state = ScoreState::default();
+    macro_rules! get_state_field {
+        ([$env:expr, $this:expr, $state:expr]$([$key:expr]$jf:expr=>$rf:ident,)+) => {$(
+            let field_id = get_jni_field_id($key, || {
+                let class = $env.get_object_class($this)?;
+                let field_id = env.get_field_id(class, $jf, "I")?;
+                Ok(field_id)
+            })?;
+            $state.$rf = $env.get_field_unchecked(
+                $this,
+                field_id,
+                ReturnType::Primitive(Primitive::Int)
+            )?.i()? as u32;
+        )+};
+    }
+    get_state_field! {
+        [env, this, state]
+        [PERFORMANCE_STATE_MAX_COMBO]
+        PERFORMANCE_FIELD_MAX_COMBO         => max_combo,
+        [PERFORMANCE_STATE_LARGE_TICK_HITS]
+        PERFORMANCE_FIELD_LARGE_TICK_HITS   => osu_large_tick_hits,
+        [PERFORMANCE_STATE_SLIDER_END_HITS]
+        PERFORMANCE_FIELD_SLIDER_END_HITS   => slider_end_hits,
+        [PERFORMANCE_STATE_N_GEKI]
+        PERFORMANCE_FIELD_N_GEKI            => n_geki,
+        [PERFORMANCE_STATE_N_KATU]
+        PERFORMANCE_FIELD_N_KATU            => n_katu,
+        [PERFORMANCE_STATE_N300]
+        PERFORMANCE_FIELD_N300              => n300,
+        [PERFORMANCE_STATE_N100]
+        PERFORMANCE_FIELD_N100              => n100,
+        [PERFORMANCE_STATE_N50]
+        PERFORMANCE_FIELD_N50               => n50,
+        [PERFORMANCE_STATE_MISSES]
+        PERFORMANCE_FIELD_MISSES            => misses,
+    }
+    Ok(state)
+}
+
+macro_rules! init_performance {
+    ($(-$fx:ident($ty:ty);)+) => {$(
+        pub fn $fx(
+            env: &mut JNIEnv,
+            this: &JObject,
+            ptr: jlong,
+        ) -> Result<()> {
+            let from = to_status_use::<$ty>(ptr)?;
+            let mut performance = Performance::new(from.clone());
+            let x = performance.generate_state();
+            let performance_ptr = to_ptr(performance);
+            set_object_ptr(env, this, performance_ptr)?;
+            Ok(())
         }
-    };
-    state.max_combo = env.get_field(this, "maxCombo", "I")?.i()? as u32;
-    state.max_combo = env.get_field(this, "sliderTickHits", "I")?.i()? as u32;
-    state.max_combo = env.get_field(this, "sliderEndHits", "I")?.i()? as u32;
-    state.n_geki = env.get_field(this, "geki", "I")?.i()? as u32;
-    state.n_katu = env.get_field(this, "katu", "I")?.i()? as u32;
-    state.n300 = env.get_field(this, "n300", "I")?.i()? as u32;
-    state.n100 = env.get_field(this, "n100", "I")?.i()? as u32;
-    state.n50 = env.get_field(this, "n50", "I")?.i()? as u32;
-    state.misses = env.get_field(this, "misses", "I")?.i()? as u32;
-    Ok(())
-}
-fn generate_state_from_performance(
-    env: &mut JNIEnv,
-    obj: &JObject,
-    performance: &mut Performance,
-) -> Result<()> {
-    let state = performance.generate_state();
-    env.set_field(
-        obj,
-        "maxCombo",
-        "I",
-        JValueGen::Int(state.max_combo as jint),
-    )?;
-    env.set_field(
-        obj,
-        "sliderTickHits",
-        "I",
-        JValueGen::Int(state.max_combo as jint),
-    )?;
-    env.set_field(
-        obj,
-        "sliderEndHits",
-        "I",
-        JValueGen::Int(state.max_combo as jint),
-    )?;
-    env.set_field(obj, "geki", "I", JValueGen::Int(state.n_geki as jint))?;
-    env.set_field(obj, "katu", "I", JValueGen::Int(state.n_katu as jint))?;
-    env.set_field(obj, "n300", "I", JValueGen::Int(state.n300 as jint))?;
-    env.set_field(obj, "n100", "I", JValueGen::Int(state.n100 as jint))?;
-    env.set_field(obj, "n50", "I", JValueGen::Int(state.n50 as jint))?;
-    env.set_field(obj, "misses", "I", JValueGen::Int(state.misses as jint))?;
-
-    let ptr = to_ptr(state);
-    set_object_ptr(env, obj, ptr)?;
-    Ok(())
+    )+};
+    ($(+$fx:ident($ty:ty);)+) => {$(
+        pub fn $fx(
+            env: &mut JNIEnv,
+            this: &JObject,
+            ptr: jlong,
+            state: &JObject,
+        ) -> Result<()> {
+            let from = to_status_use::<$ty>(ptr)?;
+            let state = parse_java_state(env, state)?;
+            let performance = Performance::new(from.clone()).state(state);
+            let performance_ptr = to_ptr(performance);
+            set_object_ptr(env, this, performance_ptr)?;
+            Ok(())
+        }
+    )+};
 }
 
-pub fn get_performance_from_beatmap(
+init_performance! {
+    -init_performance_by_beatmap(Beatmap);
+    -init_performance_by_osu_attributes(OsuDifficultyAttributes);
+    -init_performance_by_taiko_attributes(TaikoDifficultyAttributes);
+    -init_performance_by_catch_attributes(CatchDifficultyAttributes);
+    -init_performance_by_mania_attributes(ManiaDifficultyAttributes);
+}
+init_performance! {
+    +init_performance_by_beatmap_with_state(Beatmap);
+    +init_performance_by_osu_attributes_with_state(OsuDifficultyAttributes);
+    +init_performance_by_taiko_attributes_with_state(TaikoDifficultyAttributes);
+    +init_performance_by_catch_attributes_with_state(CatchDifficultyAttributes);
+    +init_performance_by_mania_attributes_with_state(ManiaDifficultyAttributes);
+}
+
+#[inline]
+fn set_performance_attr(
     env: &mut JNIEnv,
     this: &JObject,
-    beatmap: &JObject,
+    f: impl FnOnce(Box<Performance>) -> Performance,
 ) -> Result<()> {
-    let beatmap_ptr = get_object_ptr(env, beatmap)?;
-    let beatmap = to_status_use::<Beatmap>(beatmap_ptr)?;
-    let mut performance = Performance::new(beatmap.clone());
-    let state = env.get_field(
-        this,
-        "state",
-        "Lorg/spring/osu/extended/rosu/JniScoreState;",
-    )?;
-    generate_state_from_performance(env, &state.l()?, &mut performance)?;
-    let performance_ptr = to_ptr(performance);
-    set_object_ptr(env, this, performance_ptr)?;
+    let ptr = get_object_ptr(env, this)?;
+    let performance = to_status(ptr)?;
+    let performance = f(performance);
+    let old_ptr = ptr;
+    let ptr = to_ptr(performance);
+    set_object_ptr(env, this, ptr)?;
     Ok(())
 }
 
-#[test]
-fn test_mods() ->Result<()>{
-    let mods_str = "[{\"acronym\":\"HD\",\"settings\":{}},{\"acronym\":\"DT\",\"settings\":{}}]";
-    let x = get_mods_from_json(mods_str, GameMode::Osu)?;
-    println!("{:?}", x);
+macro_rules! set_state {
+    ($($fx:ident($f:ident);)+) => { $(
+        pub fn $fx(env: &mut JNIEnv, this: &JObject, value:jint) -> Result<()> {
+            set_performance_attr(env, this, |performance| {
+                performance.$f(value as u32)
+            })
+        }
+    )+};
+    ($($fx:ident[$f:ident:$t:ty];)+) => { $(
+        pub fn $fx(env: &mut JNIEnv, this: &JObject, value:$t) -> Result<()> {
+            set_performance_attr(env, this, |performance| {
+                performance.$f(value)
+            })
+        }
+    )+};
+}
+
+set_state! {
+    set_performance_combo(combo);
+    set_performance_geki(n_geki);
+    set_performance_katu(n_katu);
+    set_performance_n300(n300);
+    set_performance_n100(n100);
+    set_performance_n50(n50);
+    set_performance_misses(misses);
+    set_performance_large_tick(large_tick_hits);
+    set_performance_slider_ends(n_slider_ends);
+    set_performance_passed_objects(passed_objects);
+}
+
+set_state! {
+    set_performance_is_lazer[lazer:bool];
+    set_performance_is_hardrock[lazer:bool];
+    set_performance_clock_rate[clock_rate:f64];
+    set_performance_hitresult_priority[hitresult_priority:HitResultPriority];
+}
+
+pub fn set_performance_mods_bitflag(env: &mut JNIEnv, this: &JObject, legacy: jint) -> Result<()> {
+    let legacy = get_mods_from_java!(legacy);
+    set_performance_attr(env, this, |performance| performance.mods(legacy))
+}
+
+pub fn set_performance_mods_lazer(
+    env: &mut JNIEnv,
+    this: &JObject,
+    mode: jbyte,
+    lazer: &JString,
+) -> Result<()> {
+    let lazer = get_mods_from_java!(env, mode, lazer)?;
+    set_performance_attr(env, this, |performance| performance.mods(lazer))
+}
+
+pub fn set_performance_mods_mix(
+    env: &mut JNIEnv,
+    this: &JObject,
+    mode: jbyte,
+    legacy: jint,
+    lazer: &JString,
+) -> Result<()> {
+    let all = get_mods_from_java!(env, mode, legacy, lazer)?;
+    set_performance_attr(env, this, |performance| performance.mods(all))
+}
+
+pub fn set_performance_state(env: &mut JNIEnv, this: &JObject, state: &JObject) -> Result<()> {
+    let state = parse_java_state(env, state)?;
+    set_performance_attr(env, this, |performance| performance.state(state))?;
     Ok(())
+}
+
+pub fn set_performance_difficulty(env: &mut JNIEnv, this: &JObject, difficulty: jlong) -> Result<()> {
+    let ptr = difficulty;
+    let difficulty = to_status::<Difficulty>(ptr)?;
+    set_performance_attr(env, this, |performance| {
+        performance.difficulty((*difficulty).clone())
+    })?;
+    Ok(())
+}
+
+pub fn calculate_performance(env: &mut JNIEnv, this: &JObject) -> Result<jclass> {
+    let ptr = get_object_ptr(env, this)?;
+    set_object_ptr(env, this, 0)?;
+    let performance = to_status::<Performance>(ptr)?;
+    let attr = performance.calculate();
+
+    let class = env.find_class("org/spring/osu/extended/rosu/JniPerformanceAttributes")?;
+    let jclass = class.as_raw();
+
+    let obj: Result<JObject> = match attr {
+        PerformanceAttributes::Osu(data) => {
+            let method = get_jni_static_method_id(PERFORMANCE_ATTR_OSU, || {
+                let class = unsafe { JClass::from_raw(jclass) };
+                let field = env.get_static_method_id(
+                    class,
+                    "createOsu",
+                    "(DDDDDDLorg/spring/osu/extended/rosu/OsuDifficultyAttributes;)Lorg/spring/osu/extended/rosu/JniPerformanceAttributes;",
+                )?;
+                Ok(field)
+            })?;
+            let attr = generate_difficulty_attributes_osu(env, &data.difficulty)?.as_raw();
+            let args = &[
+                jvalue { d: data.pp },
+                jvalue { d: data.pp_acc },
+                jvalue { d: data.pp_aim },
+                jvalue {
+                    d: data.pp_flashlight,
+                },
+                jvalue { d: data.pp_speed },
+                jvalue {
+                    d: data.effective_miss_count,
+                },
+                jvalue { l: attr },
+            ];
+            let class = unsafe { JClass::from_raw(jclass) };
+            let obj = unsafe {
+                env.call_static_method_unchecked(class, method, ReturnType::Object, args)?
+            };
+            Ok(obj.l()?)
+        }
+        PerformanceAttributes::Taiko(data) => {
+            let method = get_jni_static_method_id(PERFORMANCE_ATTR_TAIKO, || {
+                let class = unsafe { JClass::from_raw(jclass) };
+                let field = env.get_static_method_id(
+                    class,
+                    "createTaiko",
+                    "(DDDDDLorg/spring/osu/extended/rosu/TaikoDifficultyAttributes;)Lorg/spring/osu/extended/rosu/JniPerformanceAttributes;",
+                )?;
+                Ok(field)
+            })?;
+            let attr = generate_difficulty_attributes_taiko(env, &data.difficulty)?.as_raw();
+            let args = &[
+                jvalue { d: data.pp },
+                jvalue { d: data.pp_acc },
+                jvalue {
+                    d: data.pp_difficulty,
+                },
+                jvalue {
+                    d: data.effective_miss_count,
+                },
+                jvalue {
+                    d: data.estimated_unstable_rate.unwrap_or(-1f64),
+                },
+                jvalue { l: attr },
+            ];
+            let class = unsafe { JClass::from_raw(jclass) };
+            let obj = unsafe {
+                env.call_static_method_unchecked(class, method, ReturnType::Object, args)?
+            };
+            Ok(obj.l()?)
+        }
+        PerformanceAttributes::Catch(data) => {
+            let method = get_jni_static_method_id(PERFORMANCE_ATTR_CATCH, || {
+                let class = unsafe { JClass::from_raw(jclass) };
+                let field = env.get_static_method_id(
+                    class,
+                    "createCatch",
+                    "(DLorg/spring/osu/extended/rosu/CatchDifficultyAttributes;)Lorg/spring/osu/extended/rosu/JniPerformanceAttributes;",
+                )?;
+                Ok(field)
+            })?;
+            let attr = generate_difficulty_attributes_catch(env, &data.difficulty)?.as_raw();
+            let args = &[jvalue { d: data.pp }, jvalue { l: attr }];
+            let class = unsafe { JClass::from_raw(jclass) };
+            let obj = unsafe {
+                env.call_static_method_unchecked(class, method, ReturnType::Object, args)?
+            };
+            Ok(obj.l()?)
+        }
+        PerformanceAttributes::Mania(data) => {
+            let method = get_jni_static_method_id(PERFORMANCE_ATTR_MANAI, || {
+                let class = unsafe { JClass::from_raw(jclass) };
+                let field = env.get_static_method_id(
+                    class,
+                    "createMania",
+                    "(DDLorg/spring/osu/extended/rosu/ManiaDifficultyAttributes;)Lorg/spring/osu/extended/rosu/JniPerformanceAttributes;",
+                )?;
+                Ok(field)
+            })?;
+            let attr = generate_difficulty_attributes_mania(env, &data.difficulty)?.as_raw();
+            let args = &[
+                jvalue { d: data.pp },
+                jvalue {
+                    d: data.pp_difficulty,
+                },
+                jvalue { l: attr },
+            ];
+            let class = unsafe { JClass::from_raw(jclass) };
+            let obj = unsafe {
+                env.call_static_method_unchecked(class, method, ReturnType::Object, args)?
+            };
+            Ok(obj.l()?)
+        }
+    };
+    Ok(obj?.as_raw())
 }

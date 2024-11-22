@@ -36,7 +36,6 @@ macro_rules! get_id_fn {
         pub fn $fx(key: &'static str, default: impl FnOnce() -> Result<$t>) -> Result<$t> {
             let j = match get_id(key) {
                 None => {
-                    println!("new");
                     let f = default()?.into_raw();
                     set_id(key, f.clone() as usize)?;
                     f
@@ -54,18 +53,26 @@ get_id_fn! { get_jni_method_id(JMethodID, jmethodID) }
 get_id_fn! { get_jni_static_field_id(JStaticFieldID, jfieldID) }
 get_id_fn! { get_jni_static_method_id(JStaticMethodID, jmethodID) }
 
-pub fn get_jni_class(key: &'static str, default: impl FnOnce() -> Result<jclass>) -> Result<jclass> {
-/*
-    let j = match get_id(key) {
-        None => {
-            let raw = default()?;
-            set_id(key, raw as usize)?;
-            raw
-        }
-        Some(p) => p as jclass,
-    };
-    Ok(j)
- */
+/// 缓存class, 目前无法使用
+/// ```
+/// get_jni_class("cache_key", || {
+///     let class = env.find_class("org/spring/osu/extended/rosu/Class")?;
+///     Ok(class.into_raw())
+/// })?;
+/// ```
+pub fn get_jni_class(_: &'static str, default: impl FnOnce() -> Result<jclass>) -> Result<jclass> {
+    // 目前的 class id 缓存无法在全局中生效 (JClass::into_row())
+    /*
+       let j = match get_id(key) {
+           None => {
+               let raw = default()?;
+               set_id(key, raw as usize)?;
+               raw
+           }
+           Some(p) => p as jclass,
+       };
+       Ok(j)
+    */
     default()
 }
 

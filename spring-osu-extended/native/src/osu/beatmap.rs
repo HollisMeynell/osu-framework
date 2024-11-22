@@ -39,14 +39,16 @@ pub fn set_beatmap_field(env: &mut JNIEnv, this: &JObject, map: &Beatmap) -> Res
         ($key:ident[$name:literal, $ty:literal, $vl:ident]) => {
             let id = get_jni_field_id($key, || {
                 let class = env.get_object_class(this)?;
-                env.get_field_id(class, $name, $ty).or_else(|e|Err(e.into()))
+                env.get_field_id(class, $name, $ty)
+                    .or_else(|e| Err(e.into()))
             })?;
             env.set_field_unchecked(this, id, $vl)?;
         };
         ($key:ident($name:literal, $field:ident)) => {
             let id = get_jni_field_id($key, || {
                 let class = env.get_object_class(this)?;
-                env.get_field_id(class, $name, "F").or_else(|e|Err(e.into()))
+                env.get_field_id(class, $name, "F")
+                    .or_else(|e| Err(e.into()))
             })?;
             env.set_field_unchecked(this, id, JValueGen::Float(map.$field))?;
         };
@@ -79,11 +81,11 @@ pub fn try_to_convert(env: &mut JNIEnv, this: &JObject, mode_byte: jbyte) -> Res
     let beatmap = to_status_use::<Beatmap>(ptr)?;
     let mode = GameMode::from(mode_byte as u8);
     if beatmap.mode == mode {
-        return Ok(JNI_TRUE)
+        return Ok(JNI_TRUE);
     }
-    beatmap.convert_mut(mode, &GameMods::default()).or_else(|e| {
-        Err(e.to_string())
-    })?;
+    beatmap
+        .convert_mut(mode, &GameMods::default())
+        .or_else(|e| Err(e.to_string()))?;
     set_beatmap_field(env, this, &beatmap)?;
     Ok(JNI_TRUE)
 }

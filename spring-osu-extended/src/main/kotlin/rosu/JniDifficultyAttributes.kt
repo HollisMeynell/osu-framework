@@ -1,17 +1,15 @@
 package org.spring.osu.extended.rosu
 
-import kotlin.properties.Delegates
-
-sealed interface JniDifficultyAttributes {
+sealed interface JniDifficultyAttributes : AutoCloseable {
     fun getStarRating(): Double
     fun getMaxCombo(): Int
 
+
+    fun createPerformance(state: JniScoreState? = null): JniPerformance {
+        return JniPerformance.createByDifficultyAttributes(this, state)
+    }
+
     companion object {
-        @JvmStatic
-        fun a(ar: Double){
-            println(ar)
-        }
-        
         @JvmStatic
         fun createOsu(
             aim: Double,
@@ -23,8 +21,8 @@ sealed interface JniDifficultyAttributes {
             speedDifficultStrainCount: Double,
             stars: Double,
             maxCombo: Int,
-        ): JniDifficultyAttributes {
-            return OsuDifficultyAttributes(
+        ): JniDifficultyAttributes =
+            OsuDifficultyAttributes(
                 aim,
                 speed,
                 flashlight,
@@ -35,7 +33,7 @@ sealed interface JniDifficultyAttributes {
                 stars,
                 maxCombo
             )
-        }
+
 
         @JvmStatic
         fun createTaiko(
@@ -48,8 +46,8 @@ sealed interface JniDifficultyAttributes {
             stars: Double,
             maxCombo: Int,
             isConvert: Boolean,
-        ): JniDifficultyAttributes {
-            return TaikoDifficultyAttributes(
+        ): JniDifficultyAttributes =
+            TaikoDifficultyAttributes(
                 stamina,
                 rhythm,
                 color,
@@ -60,7 +58,7 @@ sealed interface JniDifficultyAttributes {
                 maxCombo,
                 isConvert
             )
-        }
+
 
         @JvmStatic
         fun createCatch(
@@ -70,9 +68,9 @@ sealed interface JniDifficultyAttributes {
             nDroplets: Int,
             nTinyDroplets: Int,
             isConvert: Boolean,
-        ): JniDifficultyAttributes {
-            return CatchDifficultyAttributes(stars, ar, nFruits, nDroplets, nTinyDroplets, isConvert)
-        }
+        ): JniDifficultyAttributes =
+            CatchDifficultyAttributes(stars, ar, nFruits, nDroplets, nTinyDroplets, isConvert)
+
 
         @JvmStatic
         fun createMania(
@@ -81,9 +79,9 @@ sealed interface JniDifficultyAttributes {
             nObjects: Int,
             maxCombo: Int,
             isConvert: Boolean,
-        ): JniDifficultyAttributes {
-            return ManiaDifficultyAttributes(stars, hitWindow, nObjects, maxCombo, isConvert)
-        }
+        ): JniDifficultyAttributes =
+            ManiaDifficultyAttributes(stars, hitWindow, nObjects, maxCombo, isConvert)
+
     }
 }
 

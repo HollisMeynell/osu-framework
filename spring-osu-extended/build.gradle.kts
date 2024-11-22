@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 dependencies {
     api(project(":spring-core"))
     api(project(":spring-osu-api"))
@@ -5,4 +7,12 @@ dependencies {
     api(libs.ktor.client.core)
     api(libs.xz)
     api(libs.commons.compress)
+}
+
+plugins {
+    alias(libs.plugins.shadow)
+}
+
+tasks.withType<ShadowJar> {
+    minimize()
 }

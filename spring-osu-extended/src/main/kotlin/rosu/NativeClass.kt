@@ -1,11 +1,17 @@
+@file:Suppress("unused")
 package org.spring.osu.extended.rosu
 
-import org.spring.osu.OsuMode
+import org.spring.osu.model.OsuMod
 import java.lang.ref.Cleaner
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.StandardCopyOption
 import kotlin.io.path.Path
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.createDirectories
 
 
-abstract class NativeClass(
+sealed class NativeClass(
     type: Byte
 ) : AutoCloseable {
     private val _type: Byte = type
@@ -19,7 +25,7 @@ abstract class NativeClass(
         }
     }
 
-    protected fun ready(): Boolean {
+    internal fun ready(): Boolean {
         return _ptr != 0L
     }
 
@@ -27,7 +33,47 @@ abstract class NativeClass(
         _c.clean()
     }
 
+    internal fun getPtr() = _ptr
+
     companion object {
+        const val libName = "spring_jni"
+        private fun loadLib() {
+            var isLibDir = false
+            System.getenv("ROSU_LIB_PATH")?.let {
+                val path = Path(it)
+                if (Files.isRegularFile(path)) {
+                    System.load(it)
+                    return
+                }
+                if (Files.isDirectory(path)){
+                    isLibDir = true
+                }
+            }
+            val os: String = System.getProperty("os.name")
+            val name = when {
+                os.contains("windows", ignoreCase = true) -> "$libName.dll"
+                os.contains("mac", ignoreCase = true) -> "lib$libName.dylib"
+                os.contains("linux", ignoreCase = true) -> "lib$libName.so"
+                else -> throw Error("Unsupported OS")
+            }
+            val lib = NativeClass::class.java.getResourceAsStream("/lib/${name}")
+            lib?.use {
+                val tmpDirPath = if (isLibDir)
+                    Path.of(System.getenv("ROSU_LIB_PATH"))
+                else
+                    Path.of(System.getProperty("java.io.tmpdir"), "/rosulib")
+                tmpDirPath.createDirectories()
+                val f = tmpDirPath.resolve(name)
+                Files.copy(it, f, StandardCopyOption.REPLACE_EXISTING)
+                f.toFile().deleteOnExit()
+                System.load(f.absolutePathString())
+            }
+        }
+
+        init {
+            loadLib()
+        }
+
         private val cleaner = Cleaner.create(Thread.ofVirtual().factory())
 
         @JvmStatic
@@ -37,35 +83,30 @@ abstract class NativeClass(
 }
 
 fun main() {
-    System.load("/home/spring/IdeaProjects/osu-framework/spring-osu-extended/native/target/debug/libspring_jni.so")
-    a1()
-}
+    val beatmap = JniBeatmap(Files.readAllBytes(Path("/home/spring/Documents/match/osu/1456709/Kano - Stella-rium (Asterisk MAKINA Remix) (Vaporfly) [Starlight].osu")))
+    val difficulty = beatmap.createDifficulty()
+    difficulty.setMods(OsuMod.DoubleTime, OsuMod.HardRock)
+    val attr = difficulty.calculate(beatmap)
+    println(attr.getStarRating())
 
-fun a1() {
-    val b =
-        JniBeatmap(Path("/home/spring/Documents/match/osu/1456709/Kano - Stella-rium (Asterisk MAKINA Remix) (Vaporfly) [Starlight].osu"))
+    val performance1 = beatmap.createPerformance()
+    val performance2 = attr.createPerformance()
 
-    println(b.cs)
-    b.use {
-        b.convertInPlace(OsuMode.Osu)
-//        val p = JniPerformance.createByBeatmap(b)
+    performance1.setDifficulty(difficulty)
+    val pp1 = performance1.calculate()
 
-        val d = JniDifficulty(
-            isLazer = true
-        )
-        d.setCs(3.8f, false)
+    performance2.setMods("[{\"acronym\": \"DT\"}]")
+    val pp2 = performance2.calculate()
 
-        val c = d.calculate(it)
-        val c1 = d.calculate(it)
-        val c2 = d.calculate(it)
-        if (c is OsuDifficultyAttributes) {
-            println(c.stars)
-            println(c.speed)
-        }
+    println(pp1.getPP())
+    println(pp2.getPP())
 
-        if (c is ManiaDifficultyAttributes) {
-            println(c.stars)
-            println(c.isConvert)
-        }
+    try {
+
+    }finally {
+        performance1.close()
+        performance2.close()
+        difficulty.close()
+        beatmap.close()
     }
 }
