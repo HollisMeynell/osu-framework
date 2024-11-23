@@ -1,0 +1,53 @@
+name: build-rs
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - spring-osu-extended/native/**
+permissions:
+  contents: write
+  discussions: write
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    defaults:
+      run:
+        working-directory: spring-osu-extended/native
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - name: Set up cache
+        uses: Swatinem/rust-cache@v2
+      - name: Build
+        run: cargo build --release
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.os }}-x86_64
+          path: |
+            spring-osu-extended/native/target/release/spring_jni.dll
+            spring-osu-extended/native/target/release/libspring_jni.so
+            spring-osu-extended/native/target/release/libspring_jni.dylib
+      - name: Upload build to release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            spring-osu-extended/native/target/release/spring_jni.dll
+            spring-osu-extended/native/target/release/libspring_jni.so
+            spring-osu-extended/native/target/release/libspring_jni.dylib
