@@ -283,18 +283,28 @@ fn setLazer(mut env: JNIEnv, this: JObject, value: jboolean) {
         [env]set_performance_is_lazer(&mut env, &this, value.is_true())
     }
 }
+
 #[jni_fn("org.spring.osu.extended.rosu.JniPerformance")]
 fn setHardrock(mut env: JNIEnv, this: JObject, value: jboolean) {
     jni_call! {
         [env]set_performance_is_hardrock(&mut env, &this, value.is_true())
     }
 }
+
 #[jni_fn("org.spring.osu.extended.rosu.JniPerformance")]
 fn setClockRate(mut env: JNIEnv, this: JObject, value: jdouble) {
     jni_call! {
         [env]set_performance_clock_rate(&mut env, &this, value)
     }
 }
+
+#[jni_fn("org.spring.osu.extended.rosu.JniPerformance")]
+fn nativeSetAccuracy(mut env: JNIEnv, this: JObject, value: jdouble) {
+    jni_call! {
+        [env]set_performance_accuracy(&mut env, &this, value)
+    }
+}
+
 #[jni_fn("org.spring.osu.extended.rosu.JniPerformance")]
 fn setHitResultPriority(mut env: JNIEnv, this: JObject, value: jboolean) {
     jni_call! {

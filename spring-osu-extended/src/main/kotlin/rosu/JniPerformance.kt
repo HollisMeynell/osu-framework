@@ -41,6 +41,7 @@ class JniPerformance private constructor(
     private external fun nativeSetState(state: JniScoreState)
     private external fun nativeSetDifficulty(ptr: Long)
     private external fun nativeSetMods(legacy: Int)
+    private external fun nativeSetAccuracy(acc: Double)
     private external fun nativeSetModsByStr(mode: Byte, lazer: String)
     private external fun nativeSetModsMix(mode: Byte, legacy: Int, lazer: String)
 
@@ -99,6 +100,16 @@ class JniPerformance private constructor(
 
     fun setDifficulty(state: JniDifficulty) {
         nativeSetDifficulty(state.getPtr())
+    }
+
+    fun setAcc(acc: Double) {
+        if (acc < 0 || acc > 100) throw IllegalArgumentException("accuracy must be in range 0..100")
+        val accuracy = if (acc > 0 && acc < 1) {
+            acc * 100
+        } else {
+            acc
+        }
+        nativeSetAccuracy(accuracy)
     }
 
     fun calculate(): JniPerformanceAttributes {

@@ -14,5 +14,12 @@ plugins {
 }
 
 tasks.withType<ShadowJar> {
-    minimize()
+    minimize {
+        exclude(
+            "com.fasterxml.jackson.*",
+            "org.spring.osu.extended.rosu.*",
+            "org.spring.osu.model.*",
+            "org.spring.core.*",
+        )
+    }
 }

@@ -228,6 +228,7 @@ set_state! {
     set_performance_is_lazer[lazer:bool];
     set_performance_is_hardrock[lazer:bool];
     set_performance_clock_rate[clock_rate:f64];
+    set_performance_accuracy[accuracy:f64];
     set_performance_hitresult_priority[hitresult_priority:HitResultPriority];
 }
 
