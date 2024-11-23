@@ -1,14 +1,9 @@
 package org.spring.osu.beatmap.mirror
 
-import io.ktor.util.cio.readChannel
-import io.ktor.utils.io.ByteChannel
-import io.ktor.utils.io.jvm.javaio.copyTo
-import io.ktor.utils.io.jvm.javaio.toInputStream
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import io.ktor.util.cio.*
+import io.ktor.utils.io.*
+import io.ktor.utils.io.jvm.javaio.*
+import kotlinx.coroutines.*
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream
@@ -19,11 +14,7 @@ import org.spring.osu.extended.api.OsuWebApi
 import org.spring.osu.model.Beatmapset
 import org.spring.osu.persistence.OsuDatabases.suspendTransaction
 import org.spring.osu.persistence.model.OsuWebUserRecord
-import java.io.BufferedReader
-import java.io.ByteArrayInputStream
-import java.io.InputStream
-import java.io.InputStreamReader
-import java.io.OutputStream
+import java.io.*
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
@@ -98,7 +89,9 @@ object OsuBeatmapMirror {
 
     suspend fun remove(sid: Long) {
         OsuFileRecord.deleteBySid(sid)
-        Files.walk(basePath.resolve(sid.toString())).use {
+        withContext(Dispatchers.IO) {
+            Files.walk(basePath.resolve(sid.toString()))
+        }.use {
             it.sorted(Comparator.reverseOrder()).forEach(Files::delete)
         }
     }
@@ -129,7 +122,9 @@ object OsuBeatmapMirror {
     }
 
     private suspend fun writeDirToZip(zip: ZipArchiveOutputStream, path: Path, hasVideo: Boolean, base: String = "") {
-        Files.list(path).use { list ->
+        withContext(Dispatchers.IO) {
+            Files.list(path)
+        }.use { list ->
             for (it in list.toList()) {
                 if (hasVideo.not()) {
                     val name = it.fileName.toString()
@@ -149,7 +144,7 @@ object OsuBeatmapMirror {
         }
     }
 
-    suspend fun getLocalPathByBid(bid: Long, type: OsuFileRecord.Type): Path? {
+    suspend fun getLocalPathByBid(bid: Long, type: OsuFileRecord.Type): Path {
         val column: Column<String> = when (type) {
             OsuFileRecord.Type.Audio -> OsuFileRecord.audio
             OsuFileRecord.Type.Background -> OsuFileRecord.background
@@ -181,9 +176,9 @@ object OsuBeatmapMirror {
     }
 
     private fun ZipArchiveInputStream.read(beatmapset: Beatmapset, basePath: Path): List<OsuFileRecord> {
-        val beatmapHashMap = beatmapset.beatmaps!!.map {
-            it.checksum to it
-        }.toMap()
+        val beatmapHashMap = beatmapset.beatmaps!!.associateBy {
+            it.checksum
+        }
         val records = ArrayList<OsuFileRecord>(beatmapHashMap.size)
         var entry: ZipArchiveEntry
         var zipFilePath: Path
@@ -225,8 +220,8 @@ object OsuBeatmapMirror {
 
     private fun ZipArchiveInputStream.bufferWrite(path: Path, size: Long) {
         var n = 0
-        var buffer = ByteArray(BUFFER_SIZE)
-        var channel = Files.newOutputStream(path, StandardOpenOption.WRITE, StandardOpenOption.CREATE)
+        val buffer = ByteArray(BUFFER_SIZE)
+        val channel = Files.newOutputStream(path, StandardOpenOption.WRITE, StandardOpenOption.CREATE)
         channel.use {
             while (n < size - BUFFER_SIZE) {
                 readNBytes(buffer, 0, BUFFER_SIZE)

@@ -4,16 +4,16 @@ mod mods;
 mod performance;
 
 use crate::java::{throw_jni, JavaBoolean};
+use crate::jni_call;
 use crate::osu::performance::*;
-use crate::{jni_call, to_status_use};
 use beatmap::*;
 use difficulty::*;
 use java_fu::*;
-use jni::objects::{JByteArray, JClass, JObject, JString, JValueGen};
+use jni::objects::{JByteArray, JClass, JObject, JString};
 use jni::sys::{jboolean, jbyte, jdouble, jfloat, jint, jlong, jobject, JNI_FALSE};
 use jni::JNIEnv;
 use jni_macro::jni_fn;
-use rosu_pp::any::{HitResultPriority, ScoreState};
+use rosu_pp::any::HitResultPriority;
 
 mod java_fu {
     use crate::java::get_jni_field_id;
@@ -301,10 +301,8 @@ fn setHitResultPriority(mut env: JNIEnv, this: JObject, value: jboolean) {
         [env]set_performance_hitresult_priority(
             &mut env,
             &this,
-            (
-                if value.is_true() { HitResultPriority::BestCase }
-                else { HitResultPriority::WorstCase }
-            )
+            if value.is_true() { HitResultPriority::BestCase }
+            else { HitResultPriority::WorstCase }
         )
     }
 }

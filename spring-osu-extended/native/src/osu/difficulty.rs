@@ -1,5 +1,5 @@
 use super::java_fu::{get_object_ptr, set_object_ptr};
-use crate::java::get_jni_static_method_id;
+use crate::java::{get_jni_class, get_jni_static_method_id};
 use crate::{get_mods_from_java, to_ptr, to_status, to_status_use, Result};
 use jni::objects::{JClass, JObject, JString};
 use jni::signature::ReturnType;
@@ -12,10 +12,7 @@ use rosu_pp::osu::OsuDifficultyAttributes;
 use rosu_pp::taiko::TaikoDifficultyAttributes;
 use rosu_pp::Difficulty;
 
-const DIFFICULTY_CLASS_OSU: &str = "dm_c_o";
-const DIFFICULTY_CLASS_TAIKO: &str = "dm_c_t";
-const DIFFICULTY_CLASS_CATCH: &str = "dm_c_c";
-const DIFFICULTY_CLASS_MANAI: &str = "dm_c_m";
+const DIFFICULTY_ATTR_CLASS: &str = "dm_c_attr";
 const DIFFICULTY_OSU: &str = "dm_init_o";
 const DIFFICULTY_TAIKO: &str = "dm_init_t";
 const DIFFICULTY_CATCH: &str = "dm_init_c";
@@ -126,8 +123,10 @@ pub fn generate_difficulty_attributes_osu<'l>(
     env: &mut JNIEnv<'l>,
     data: &OsuDifficultyAttributes,
 ) -> Result<JObject<'l>> {
-    let class = env.find_class("org/spring/osu/extended/rosu/JniDifficultyAttributes")?;
-    let jclass = class.as_raw();
+    let jclass = get_jni_class(DIFFICULTY_ATTR_CLASS, || {
+        let class = env.find_class("org/spring/osu/extended/rosu/JniDifficultyAttributes")?;
+        Ok(class.into_raw())
+    })?;
     let args = &[
         jvalue { d: data.aim },
         jvalue { d: data.speed },
@@ -167,8 +166,10 @@ pub fn generate_difficulty_attributes_taiko<'l>(
     env: &mut JNIEnv<'l>,
     data: &TaikoDifficultyAttributes,
 ) -> Result<JObject<'l>> {
-    let class = env.find_class("org/spring/osu/extended/rosu/JniDifficultyAttributes")?;
-    let jclass = class.as_raw();
+    let jclass = get_jni_class(DIFFICULTY_ATTR_CLASS, || {
+        let class = env.find_class("org/spring/osu/extended/rosu/JniDifficultyAttributes")?;
+        Ok(class.into_raw())
+    })?;
     let args = &[
         jvalue { d: data.stamina },
         jvalue { d: data.rhythm },
@@ -207,8 +208,10 @@ pub fn generate_difficulty_attributes_catch<'l>(
     env: &mut JNIEnv<'l>,
     data: &CatchDifficultyAttributes,
 ) -> Result<JObject<'l>> {
-    let class = env.find_class("org/spring/osu/extended/rosu/JniDifficultyAttributes")?;
-    let jclass = class.as_raw();
+    let jclass = get_jni_class(DIFFICULTY_ATTR_CLASS, || {
+        let class = env.find_class("org/spring/osu/extended/rosu/JniDifficultyAttributes")?;
+        Ok(class.into_raw())
+    })?;
     let args = &[
         jvalue { d: data.stars },
         jvalue { d: data.ar },
@@ -244,9 +247,10 @@ pub fn generate_difficulty_attributes_mania<'l>(
     env: &mut JNIEnv<'l>,
     data: &ManiaDifficultyAttributes,
 ) -> Result<JObject<'l>> {
-    let class = env.find_class("org/spring/osu/extended/rosu/JniDifficultyAttributes")?;
-    let jclass = class.as_raw();
-    let class = unsafe { JClass::from_raw(jclass) };
+    let jclass = get_jni_class(DIFFICULTY_ATTR_CLASS, || {
+        let class = env.find_class("org/spring/osu/extended/rosu/JniDifficultyAttributes")?;
+        Ok(class.into_raw())
+    })?;
     let args = &[
         jvalue { d: data.stars },
         jvalue { d: data.hit_window },
@@ -270,6 +274,7 @@ pub fn generate_difficulty_attributes_mania<'l>(
         )?;
         Ok(method)
     })?;
+    let class = unsafe { JClass::from_raw(jclass) };
     let obj = unsafe { env.call_static_method_unchecked(class, method, ReturnType::Object, args)? };
     Ok(obj.l()?)
 }
@@ -298,10 +303,10 @@ pub fn difficulty_calculate(
     let attr = difficulty.calculate(beatmap);
     let obj = generate_difficulty_attributes(env, &attr)?;
     let ptr = match attr {
-        DifficultyAttributes::Osu(data) => { to_ptr(data) }
-        DifficultyAttributes::Taiko(data) => { to_ptr(data) }
-        DifficultyAttributes::Catch(data) => { to_ptr(data) }
-        DifficultyAttributes::Mania(data) => { to_ptr(data) }
+        DifficultyAttributes::Osu(data) => to_ptr(data),
+        DifficultyAttributes::Taiko(data) => to_ptr(data),
+        DifficultyAttributes::Catch(data) => to_ptr(data),
+        DifficultyAttributes::Mania(data) => to_ptr(data),
     };
     set_object_ptr(env, &obj, ptr)?;
     Ok(obj.into_raw())

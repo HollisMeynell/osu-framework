@@ -1,7 +1,7 @@
 @file:Suppress("unused")
+
 package org.spring.osu.extended.rosu
 
-import org.spring.osu.model.OsuMod
 import java.lang.ref.Cleaner
 import java.nio.file.Files
 import java.nio.file.Path
@@ -15,6 +15,7 @@ sealed class NativeClass(
     type: Byte
 ) : AutoCloseable {
     private val _type: Byte = type
+    @Suppress("LeakingThis")
     private val _c = cleaner.register(this, this::release)
     private var _ptr: Long = 0
 
@@ -36,7 +37,7 @@ sealed class NativeClass(
     internal fun getPtr() = _ptr
 
     companion object {
-        const val libName = "spring_jni"
+        private const val libName = "spring_jni"
         private fun loadLib() {
             var isLibDir = false
             System.getenv("ROSU_LIB_PATH")?.let {
@@ -45,7 +46,7 @@ sealed class NativeClass(
                     System.load(it)
                     return
                 }
-                if (Files.isDirectory(path)){
+                if (Files.isDirectory(path)) {
                     isLibDir = true
                 }
             }
@@ -79,34 +80,5 @@ sealed class NativeClass(
         @JvmStatic
         @JvmName("release")
         private external fun release(ptr: Long, type: Byte)
-    }
-}
-
-fun main() {
-    val beatmap = JniBeatmap(Files.readAllBytes(Path("/home/spring/Documents/match/osu/1456709/Kano - Stella-rium (Asterisk MAKINA Remix) (Vaporfly) [Starlight].osu")))
-    val difficulty = beatmap.createDifficulty()
-    difficulty.setMods(OsuMod.DoubleTime, OsuMod.HardRock)
-    val attr = difficulty.calculate(beatmap)
-    println(attr.getStarRating())
-
-    val performance1 = beatmap.createPerformance()
-    val performance2 = attr.createPerformance()
-
-    performance1.setDifficulty(difficulty)
-    val pp1 = performance1.calculate()
-
-    performance2.setMods("[{\"acronym\": \"DT\"}]")
-    val pp2 = performance2.calculate()
-
-    println(pp1.getPP())
-    println(pp2.getPP())
-
-    try {
-
-    }finally {
-        performance1.close()
-        performance2.close()
-        difficulty.close()
-        beatmap.close()
     }
 }

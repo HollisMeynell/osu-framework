@@ -66,7 +66,7 @@ class MatchListenerStarter(
         // has game
         if (newMatch.currentGameID != null) {
             val gameEvent = newMatch.events.last { it.game != null }
-            var isAbort = nowGame != newMatch.currentGameID
+            val isAbort = nowGame != newMatch.currentGameID
 
             if (isAbort) {
                 nowGame = newMatch.currentGameID
@@ -78,7 +78,7 @@ class MatchListenerStarter(
                 nowEvent = gameEvent.ID - 1
             }
         } else {
-            nowGame == null
+            nowGame = null
             nowEvent = newMatch.latestEventID
         }
         onNewMatch(newMatch)

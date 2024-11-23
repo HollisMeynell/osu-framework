@@ -2,7 +2,6 @@ package org.spring.osu.extended.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import org.spring.osu.OsuMode
 import org.spring.osu.model.User
 import java.time.OffsetDateTime

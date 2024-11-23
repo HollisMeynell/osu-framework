@@ -1,5 +1,5 @@
 use super::java_fu::{get_object_ptr, set_object_ptr};
-use crate::java::{get_jni_field_id, get_jni_static_method_id};
+use crate::java::{get_jni_class, get_jni_field_id, get_jni_static_method_id};
 use crate::osu::difficulty::*;
 use crate::{get_mods_from_java, to_ptr, to_status, to_status_use, Result};
 use jni::objects::{JClass, JObject, JString};
@@ -37,11 +37,8 @@ const PERFORMANCE_ATTR_OSU: &str = "pm_create_attr_o";
 const PERFORMANCE_ATTR_TAIKO: &str = "pm_create_attr_t";
 const PERFORMANCE_ATTR_CATCH: &str = "pm_create_attr_c";
 const PERFORMANCE_ATTR_MANAI: &str = "pm_create_attr_m";
-const PERFORMANCE_BEATMAP: &str = "pm_init_m";
-const PERFORMANCE_OSU: &str = "pm_init_attr_o";
-const PERFORMANCE_TAIKO: &str = "pm_init_attr_t";
-const PERFORMANCE_CATCH: &str = "pm_init_attr_c";
-const PERFORMANCE_MANAI: &str = "pm_init_attr_m";
+const PERFORMANCE_ATTR_CLASS: &str = "pm_c_attr";
+const PERFORMANCE_CLASS: &str = "pm_c_perf";
 
 pub fn generate_state(env: &mut JNIEnv, obj: &JObject) -> Result<jobject> {
     let ptr = get_object_ptr(env, obj)?;
@@ -76,8 +73,11 @@ pub fn generate_state(env: &mut JNIEnv, obj: &JObject) -> Result<jobject> {
             i: data.misses as jint,
         },
     ];
-    let class = env.find_class("org/spring/osu/extended/rosu/JniPerformance")?;
-    let jclass = class.as_raw();
+
+    let jclass = get_jni_class(PERFORMANCE_CLASS, || {
+        let class = env.find_class("org/spring/osu/extended/rosu/JniPerformance")?;
+        Ok(class.into_raw())
+    })?;
     let method = get_jni_static_method_id(PERFORMANCE_STATE, || {
         let class = unsafe { JClass::from_raw(jclass) };
         let method = env.get_static_method_id(
@@ -96,22 +96,22 @@ pub fn generate_state(env: &mut JNIEnv, obj: &JObject) -> Result<jobject> {
 
 fn parse_java_state(env: &mut JNIEnv, this: &JObject) -> Result<ScoreState> {
     let mut state = ScoreState::default();
+
     macro_rules! get_state_field {
-        ([$env:expr, $this:expr, $state:expr]$([$key:expr]$jf:expr=>$rf:ident,)+) => {$(
+        ($([$key:expr]$jf:expr=>$rf:ident,)+) => {$(
             let field_id = get_jni_field_id($key, || {
-                let class = $env.get_object_class($this)?;
+                let class = env.get_object_class(this)?;
                 let field_id = env.get_field_id(class, $jf, "I")?;
                 Ok(field_id)
             })?;
-            $state.$rf = $env.get_field_unchecked(
-                $this,
+            state.$rf = env.get_field_unchecked(
+                this,
                 field_id,
                 ReturnType::Primitive(Primitive::Int)
             )?.i()? as u32;
         )+};
     }
     get_state_field! {
-        [env, this, state]
         [PERFORMANCE_STATE_MAX_COMBO]
         PERFORMANCE_FIELD_MAX_COMBO         => max_combo,
         [PERFORMANCE_STATE_LARGE_TICK_HITS]
@@ -142,8 +142,7 @@ macro_rules! init_performance {
             ptr: jlong,
         ) -> Result<()> {
             let from = to_status_use::<$ty>(ptr)?;
-            let mut performance = Performance::new(from.clone());
-            let x = performance.generate_state();
+            let performance = Performance::new(from.clone());
             let performance_ptr = to_ptr(performance);
             set_object_ptr(env, this, performance_ptr)?;
             Ok(())
@@ -190,7 +189,6 @@ fn set_performance_attr(
     let ptr = get_object_ptr(env, this)?;
     let performance = to_status(ptr)?;
     let performance = f(performance);
-    let old_ptr = ptr;
     let ptr = to_ptr(performance);
     set_object_ptr(env, this, ptr)?;
     Ok(())
@@ -265,11 +263,15 @@ pub fn set_performance_state(env: &mut JNIEnv, this: &JObject, state: &JObject) 
     Ok(())
 }
 
-pub fn set_performance_difficulty(env: &mut JNIEnv, this: &JObject, difficulty: jlong) -> Result<()> {
+pub fn set_performance_difficulty(
+    env: &mut JNIEnv,
+    this: &JObject,
+    difficulty: jlong,
+) -> Result<()> {
     let ptr = difficulty;
-    let difficulty = to_status::<Difficulty>(ptr)?;
+    let difficulty = to_status_use::<Difficulty>(ptr)?;
     set_performance_attr(env, this, |performance| {
-        performance.difficulty((*difficulty).clone())
+        performance.difficulty(difficulty.clone())
     })?;
     Ok(())
 }
@@ -280,8 +282,10 @@ pub fn calculate_performance(env: &mut JNIEnv, this: &JObject) -> Result<jclass>
     let performance = to_status::<Performance>(ptr)?;
     let attr = performance.calculate();
 
-    let class = env.find_class("org/spring/osu/extended/rosu/JniPerformanceAttributes")?;
-    let jclass = class.as_raw();
+    let jclass = get_jni_class(PERFORMANCE_ATTR_CLASS, || {
+        let class = env.find_class("org/spring/osu/extended/rosu/JniPerformanceAttributes")?;
+        Ok(class.into_raw())
+    })?;
 
     let obj: Result<JObject> = match attr {
         PerformanceAttributes::Osu(data) => {

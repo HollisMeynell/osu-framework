@@ -1,33 +1,21 @@
-use crate::{to_ptr, to_status_use, NativeError, Result};
-use jni::objects::{JFieldID, JMethodID, JStaticFieldID, JStaticMethodID};
+use crate::{NativeError, Result};
+use jni::objects::{JFieldID, JStaticMethodID};
 use jni::sys::{jboolean, jclass, jfieldID, jmethodID, JNI_TRUE};
 use jni::JNIEnv;
-use std::collections::HashMap;
-use std::sync::atomic::AtomicI64;
-use std::sync::atomic::Ordering::SeqCst;
-use std::sync::Once;
+use mini_moka::sync::Cache;
+use std::sync::LazyLock;
 
-type JniIdMap = HashMap<&'static str, usize>;
-static GLOBAL_JNI_ID: AtomicI64 = AtomicI64::new(0);
-static INIT: Once = Once::new();
+static GLOBAL_CACHE: LazyLock<Cache<Key, usize>> = LazyLock::new(|| Cache::new(50));
 
-fn get_global_map() -> Result<&'static mut JniIdMap> {
-    INIT.call_once(|| {
-        let map: JniIdMap = JniIdMap::new();
-        let m_ptr = to_ptr(map);
-        GLOBAL_JNI_ID.store(m_ptr, SeqCst);
-    });
-    let m_ptr = GLOBAL_JNI_ID.load(SeqCst);
-    to_status_use::<JniIdMap>(m_ptr)
-}
-fn get_id(key: &str) -> Option<usize> {
-    let map = get_global_map().unwrap();
-    map.get(key).map(|i| *i)
+#[derive(Hash, Eq, PartialEq)]
+struct Key(&'static str);
+
+fn get_id(key: &'static str) -> Option<usize> {
+    GLOBAL_CACHE.get(&Key(key))
 }
 
 fn set_id(key: &'static str, ptr: usize) -> Result<()> {
-    let map = get_global_map()?;
-    map.insert(key, ptr);
+    GLOBAL_CACHE.insert(Key(key), ptr);
     Ok(())
 }
 
@@ -49,31 +37,30 @@ macro_rules! get_id_fn {
 }
 
 get_id_fn! { get_jni_field_id(JFieldID, jfieldID) }
-get_id_fn! { get_jni_method_id(JMethodID, jmethodID) }
-get_id_fn! { get_jni_static_field_id(JStaticFieldID, jfieldID) }
+// get_id_fn! { get_jni_method_id(JMethodID, jmethodID) }
+// get_id_fn! { get_jni_static_field_id(JStaticFieldID, jfieldID) }
 get_id_fn! { get_jni_static_method_id(JStaticMethodID, jmethodID) }
 
-/// 缓存class, 目前无法使用
+
 /// ```
 /// get_jni_class("cache_key", || {
 ///     let class = env.find_class("org/spring/osu/extended/rosu/Class")?;
 ///     Ok(class.into_raw())
 /// })?;
 /// ```
-pub fn get_jni_class(_: &'static str, default: impl FnOnce() -> Result<jclass>) -> Result<jclass> {
-    // 目前的 class id 缓存无法在全局中生效 (JClass::into_row())
-    /*
-       let j = match get_id(key) {
-           None => {
-               let raw = default()?;
-               set_id(key, raw as usize)?;
-               raw
-           }
-           Some(p) => p as jclass,
-       };
-       Ok(j)
-    */
-    default()
+pub fn get_jni_class(
+    key: &'static str,
+    default: impl FnOnce() -> Result<jclass>,
+) -> Result<jclass> {
+    let j = match get_id(key) {
+        None => {
+            let raw = default()?;
+            set_id(key, raw as usize)?;
+            raw
+        }
+        Some(p) => p as jclass,
+    };
+    Ok(j)
 }
 
 pub fn throw_jni(env: &mut JNIEnv, err: NativeError) {

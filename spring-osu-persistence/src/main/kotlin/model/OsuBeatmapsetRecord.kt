@@ -9,7 +9,6 @@ import org.spring.osu.model.Beatmapset
 import org.spring.osu.model.Covers
 import org.spring.osu.persistence.OsuDatabases
 import org.spring.osu.persistence.OsuDatabases.suspendTransaction
-import org.spring.osu.persistence.model.OsuBeatmapRecord.beatmapID
 
 object OsuBeatmapsetRecord : IdTable<Long>("osu_beatmapset") {
     val beatmapsetID = long("id")

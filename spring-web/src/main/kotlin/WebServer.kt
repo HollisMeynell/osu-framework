@@ -2,10 +2,6 @@ package org.spring.web
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import dev.inmo.krontab.KronScheduler
-import dev.inmo.krontab.KrontabConfig
-import dev.inmo.krontab.doInfinity
-import dev.inmo.krontab.doWhile
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.http.*
 import io.ktor.serialization.jackson.*
@@ -23,12 +19,8 @@ import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import korlibs.time.DateTime
-import kotlinx.coroutines.launch
-import org.intellij.lang.annotations.Language
 import org.jetbrains.exposed.sql.Database
 import org.spring.core.Json
-import org.spring.core.coroutineScope
 import org.spring.osu.OsuApi
 import org.spring.osu.extended.api.OsuWebApi
 import org.spring.osu.persistence.OsuDatabases

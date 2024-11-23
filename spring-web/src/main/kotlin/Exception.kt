@@ -6,5 +6,5 @@ open class HttpTipsException(
     val cuse: Throwable? = null,
 ): RuntimeException(message, cuse)
 
-class PermissionException(): HttpTipsException(401, "Unauthorized")
-class NotFoundException(): HttpTipsException(404, "Not Found")
+class PermissionException: HttpTipsException(401, "Unauthorized")
+class NotFoundException: HttpTipsException(404, "Not Found")
