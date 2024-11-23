@@ -318,6 +318,6 @@ fn setHitResultPriority(mut env: JNIEnv, this: JObject, value: jboolean) {
 }
 
 #[jni_fn("org.spring.osu.extended.rosu.JniPerformance")]
-fn nativeCalculate(mut env: JNIEnv, this: JObject) -> jobject {
-    jni_call!([env]calculate_performance(&mut env, &this) => {JObject::null().into_raw()})
+fn nativeCalculate(mut env: JNIEnv, this: JObject, mode: jint) -> jobject {
+    jni_call!([env]calculate_performance(&mut env, &this, mode) => {JObject::null().into_raw()})
 }

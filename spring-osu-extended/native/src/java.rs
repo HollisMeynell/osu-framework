@@ -41,7 +41,6 @@ get_id_fn! { get_jni_field_id(JFieldID, jfieldID) }
 // get_id_fn! { get_jni_static_field_id(JStaticFieldID, jfieldID) }
 get_id_fn! { get_jni_static_method_id(JStaticMethodID, jmethodID) }
 
-
 /// ```
 /// get_jni_class("cache_key", || {
 ///     let class = env.find_class("org/spring/osu/extended/rosu/Class")?;

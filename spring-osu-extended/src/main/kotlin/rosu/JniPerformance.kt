@@ -46,7 +46,7 @@ class JniPerformance private constructor(
     private external fun nativeSetModsMix(mode: Byte, legacy: Int, lazer: String)
 
     external fun generateState(): JniScoreState
-    private external fun nativeCalculate(): JniPerformanceAttributes
+    private external fun nativeCalculate(modeInt: Int): JniPerformanceAttributes
 
     fun setMods(legacy: Int) {
         nativeSetMods(legacy)
@@ -114,7 +114,7 @@ class JniPerformance private constructor(
 
     fun calculate(): JniPerformanceAttributes {
         if (ready().not()) throw IllegalStateException("performance can not be used")
-        return nativeCalculate()
+        return nativeCalculate(mode.value)
     }
 
     companion object {

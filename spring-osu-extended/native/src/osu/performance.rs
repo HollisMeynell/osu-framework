@@ -9,6 +9,7 @@ use jni::JNIEnv;
 use rosu_pp::any::{HitResultPriority, PerformanceAttributes, ScoreState};
 use rosu_pp::catch::CatchDifficultyAttributes;
 use rosu_pp::mania::ManiaDifficultyAttributes;
+use rosu_pp::model::mode::GameMode;
 use rosu_pp::osu::OsuDifficultyAttributes;
 use rosu_pp::taiko::TaikoDifficultyAttributes;
 use rosu_pp::{Beatmap, Difficulty, Performance};
@@ -277,11 +278,12 @@ pub fn set_performance_difficulty(
     Ok(())
 }
 
-pub fn calculate_performance(env: &mut JNIEnv, this: &JObject) -> Result<jclass> {
+pub fn calculate_performance(env: &mut JNIEnv, this: &JObject, mode: jint) -> Result<jclass> {
     let ptr = get_object_ptr(env, this)?;
     set_object_ptr(env, this, 0)?;
     let performance = to_status::<Performance>(ptr)?;
-    let attr = performance.calculate();
+    let mode = GameMode::from(mode as u8);
+    let attr = performance.mode_or_ignore(mode).calculate();
 
     let jclass = get_jni_class(PERFORMANCE_ATTR_CLASS, || {
         let class = env.find_class("org/spring/osu/extended/rosu/JniPerformanceAttributes")?;
