@@ -39,3 +39,11 @@ allprojects {
         withJavadocJar()
     }
 }
+
+tasks.register("publishAllToLocal") {
+    dependsOn(
+        ":spring-core:publishToMavenLocal",
+        ":spring-osu-api:publishToMavenLocal",
+        ":spring-osu-extended:publishToMavenLocal",
+    )
+}
