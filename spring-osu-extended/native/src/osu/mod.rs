@@ -63,7 +63,7 @@ mod java_fu {
     }
 
     fn get_ptr_field(env: &mut JNIEnv) -> Result<JFieldID> {
-        get_jni_field_id("_ptr", || {
+        get_jni_field_id(crate::java::cache_key::PTR, || {
             let f = env.get_field_id("org/spring/osu/extended/rosu/NativeClass", "_ptr", "J")?;
             Ok(f)
         })

@@ -1,5 +1,4 @@
 use crate::NativeError::Runtime;
-use std::panic;
 use thiserror::Error;
 
 mod java;

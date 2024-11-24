@@ -1,5 +1,5 @@
 use super::java_fu::{get_object_ptr, set_object_ptr};
-use crate::java::{get_jni_class, get_jni_static_method_id};
+use crate::java::{cache_key::*, get_jni_class, get_jni_static_method_id};
 use crate::{get_mods_from_java, to_ptr, to_status, to_status_use, Result};
 use jni::objects::{JClass, JObject, JString};
 use jni::signature::ReturnType;
@@ -11,12 +11,6 @@ use rosu_pp::mania::ManiaDifficultyAttributes;
 use rosu_pp::osu::OsuDifficultyAttributes;
 use rosu_pp::taiko::TaikoDifficultyAttributes;
 use rosu_pp::Difficulty;
-
-const DIFFICULTY_ATTR_CLASS: &str = "dm_c_attr";
-const DIFFICULTY_OSU: &str = "dm_init_o";
-const DIFFICULTY_TAIKO: &str = "dm_init_t";
-const DIFFICULTY_CATCH: &str = "dm_init_c";
-const DIFFICULTY_MANAI: &str = "dm_init_m";
 
 macro_rules! set_state {
     ($($fx:ident($f:ident);)+) => {$(

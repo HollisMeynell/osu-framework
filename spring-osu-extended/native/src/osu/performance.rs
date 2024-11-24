@@ -1,4 +1,5 @@
 use super::java_fu::{get_object_ptr, set_object_ptr};
+use crate::java::cache_key::*;
 use crate::java::{get_jni_class, get_jni_field_id, get_jni_static_method_id};
 use crate::osu::difficulty::*;
 use crate::{get_mods_from_java, to_ptr, to_status, to_status_use, Result};
@@ -14,32 +15,15 @@ use rosu_pp::osu::OsuDifficultyAttributes;
 use rosu_pp::taiko::TaikoDifficultyAttributes;
 use rosu_pp::{Beatmap, Difficulty, Performance};
 
-const PERFORMANCE_STATE_MAX_COMBO: &str = "pm_state_max_combo";
 pub const PERFORMANCE_FIELD_MAX_COMBO: &str = "maxCombo";
-const PERFORMANCE_STATE_LARGE_TICK_HITS: &str = "pm_state_large_tick_hits";
 pub const PERFORMANCE_FIELD_LARGE_TICK_HITS: &str = "largeTickHits";
-const PERFORMANCE_STATE_SLIDER_END_HITS: &str = "pm_state_slider_end_hits";
 pub const PERFORMANCE_FIELD_SLIDER_END_HITS: &str = "sliderEndHits";
-const PERFORMANCE_STATE_N_GEKI: &str = "pm_state_n_geki";
 pub const PERFORMANCE_FIELD_N_GEKI: &str = "geki";
-const PERFORMANCE_STATE_N_KATU: &str = "pm_state_n_katu";
 pub const PERFORMANCE_FIELD_N_KATU: &str = "katu";
-const PERFORMANCE_STATE_N300: &str = "pm_state_n300";
 pub const PERFORMANCE_FIELD_N300: &str = "n300";
-const PERFORMANCE_STATE_N100: &str = "pm_state_n100";
 pub const PERFORMANCE_FIELD_N100: &str = "n100";
-const PERFORMANCE_STATE_N50: &str = "pm_state_n50";
 pub const PERFORMANCE_FIELD_N50: &str = "n50";
-const PERFORMANCE_STATE_MISSES: &str = "pm_state_misses";
 pub const PERFORMANCE_FIELD_MISSES: &str = "misses";
-
-const PERFORMANCE_STATE: &str = "pm_create_state";
-const PERFORMANCE_ATTR_OSU: &str = "pm_create_attr_o";
-const PERFORMANCE_ATTR_TAIKO: &str = "pm_create_attr_t";
-const PERFORMANCE_ATTR_CATCH: &str = "pm_create_attr_c";
-const PERFORMANCE_ATTR_MANAI: &str = "pm_create_attr_m";
-const PERFORMANCE_ATTR_CLASS: &str = "pm_c_attr";
-const PERFORMANCE_CLASS: &str = "pm_c_perf";
 
 pub fn generate_state(env: &mut JNIEnv, obj: &JObject) -> Result<jobject> {
     let ptr = get_object_ptr(env, obj)?;
@@ -74,12 +58,11 @@ pub fn generate_state(env: &mut JNIEnv, obj: &JObject) -> Result<jobject> {
             i: data.misses as jint,
         },
     ];
-
-    let jclass = get_jni_class(PERFORMANCE_CLASS, || {
+    let jclass = get_jni_class(PERFORMANCE_STATE_CLASS, || {
         let class = env.find_class("org/spring/osu/extended/rosu/JniPerformance")?;
         Ok(class.into_raw())
     })?;
-    let method = get_jni_static_method_id(PERFORMANCE_STATE, || {
+    let method = get_jni_static_method_id(PERFORMANCE_STATE_CREATE, || {
         let class = unsafe { JClass::from_raw(jclass) };
         let method = env.get_static_method_id(
             class,

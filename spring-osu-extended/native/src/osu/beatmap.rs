@@ -1,3 +1,4 @@
+use crate::java::cache_key::*;
 use crate::java::get_jni_field_id;
 use crate::osu::java_fu::{get_bytes, get_object_ptr, set_object_ptr};
 use crate::{to_ptr, to_status_use, Result};
@@ -6,15 +7,6 @@ use jni::sys::{jboolean, jbyte, JNI_TRUE};
 use jni::JNIEnv;
 use rosu_pp::model::mode::GameMode;
 use rosu_pp::{Beatmap, GameMods};
-
-static BEATMAP_FIELD_AR: &str = "bm_f_ar";
-static BEATMAP_FIELD_OD: &str = "bm_f_od";
-static BEATMAP_FIELD_CS: &str = "bm_f_cs";
-static BEATMAP_FIELD_HP: &str = "bm_f_hp";
-static BEATMAP_FIELD_MD: &str = "bm_f_mode";
-static BEATMAP_FIELD_BPM: &str = "bm_f_bpm";
-static BEATMAP_FIELD_SM: &str = "bm_f_SM";
-static BEATMAP_FIELD_ST: &str = "bm_f_ST";
 
 pub fn get_beatmap_from_data(env: &mut JNIEnv, this: &JObject, map: JByteArray) -> Result<()> {
     let data = get_bytes(env, &map)?;

@@ -5,23 +5,55 @@ use jni::JNIEnv;
 use mini_moka::sync::Cache;
 use std::sync::LazyLock;
 
-static GLOBAL_CACHE: LazyLock<Cache<Key, usize>> = LazyLock::new(|| Cache::new(50));
+pub(crate) mod cache_key {
+    pub const PTR: u32 = 0;
 
-#[derive(Hash, Eq, PartialEq)]
-struct Key(&'static str);
+    pub const BEATMAP_FIELD_AR: u32 = 10;
+    pub const BEATMAP_FIELD_OD: u32 = 11;
+    pub const BEATMAP_FIELD_CS: u32 = 12;
+    pub const BEATMAP_FIELD_HP: u32 = 13;
+    pub const BEATMAP_FIELD_MD: u32 = 14;
+    pub const BEATMAP_FIELD_BPM: u32 = 15;
+    pub const BEATMAP_FIELD_SM: u32 = 16;
+    pub const BEATMAP_FIELD_ST: u32 = 17;
 
-fn get_id(key: &'static str) -> Option<usize> {
-    GLOBAL_CACHE.get(&Key(key))
+    pub const DIFFICULTY_ATTR_CLASS: u32 = 50;
+    pub const DIFFICULTY_OSU: u32 = 51;
+    pub const DIFFICULTY_TAIKO: u32 = 52;
+    pub const DIFFICULTY_CATCH: u32 = 53;
+    pub const DIFFICULTY_MANAI: u32 = 54;
+
+    pub const PERFORMANCE_STATE_CLASS: u32 = 100;
+    pub const PERFORMANCE_STATE_MAX_COMBO: u32 = 101;
+    pub const PERFORMANCE_STATE_LARGE_TICK_HITS: u32 = 100;
+    pub const PERFORMANCE_STATE_SLIDER_END_HITS: u32 = 103;
+    pub const PERFORMANCE_STATE_N_GEKI: u32 = 104;
+    pub const PERFORMANCE_STATE_N_KATU: u32 = 105;
+    pub const PERFORMANCE_STATE_N300: u32 = 106;
+    pub const PERFORMANCE_STATE_N100: u32 = 107;
+    pub const PERFORMANCE_STATE_N50: u32 = 108;
+    pub const PERFORMANCE_STATE_MISSES: u32 = 109;
+    pub const PERFORMANCE_STATE_CREATE: u32 = 110;
+    pub const PERFORMANCE_ATTR_OSU: u32 = 111;
+    pub const PERFORMANCE_ATTR_TAIKO: u32 = 112;
+    pub const PERFORMANCE_ATTR_CATCH: u32 = 113;
+    pub const PERFORMANCE_ATTR_MANAI: u32 = 114;
+    pub const PERFORMANCE_ATTR_CLASS: u32 = 115;
+}
+static GLOBAL_CACHE: LazyLock<Cache<u32, usize>> = LazyLock::new(|| Cache::new(50));
+
+fn get_id(key: u32) -> Option<usize> {
+    GLOBAL_CACHE.get(&key)
 }
 
-fn set_id(key: &'static str, ptr: usize) -> Result<()> {
-    GLOBAL_CACHE.insert(Key(key), ptr);
+fn set_id(key: u32, ptr: usize) -> Result<()> {
+    GLOBAL_CACHE.insert(key, ptr);
     Ok(())
 }
 
 macro_rules! get_id_fn {
     ($fx:ident($t:ident, $r:ident)) => {
-        pub fn $fx(key: &'static str, default: impl FnOnce() -> Result<$t>) -> Result<$t> {
+        pub fn $fx(key: u32, default: impl FnOnce() -> Result<$t>) -> Result<$t> {
             let j = match get_id(key) {
                 None => {
                     let f = default()?.into_raw();
@@ -47,10 +79,7 @@ get_id_fn! { get_jni_static_method_id(JStaticMethodID, jmethodID) }
 ///     Ok(class.into_raw())
 /// })?;
 /// ```
-pub fn get_jni_class(
-    key: &'static str,
-    default: impl FnOnce() -> Result<jclass>,
-) -> Result<jclass> {
+pub fn get_jni_class(key: u32, default: impl FnOnce() -> Result<jclass>) -> Result<jclass> {
     let j = match get_id(key) {
         None => {
             let raw = default()?;
