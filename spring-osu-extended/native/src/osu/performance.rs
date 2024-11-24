@@ -60,7 +60,8 @@ pub fn generate_state(env: &mut JNIEnv, obj: &JObject) -> Result<jobject> {
     ];
     let jclass = get_jni_class(PERFORMANCE_STATE_CLASS, || {
         let class = env.find_class("org/spring/osu/extended/rosu/JniPerformance")?;
-        Ok(class.into_raw())
+        let class = env.new_global_ref(class)?;
+        Ok(class.as_raw() as jclass)
     })?;
     let method = get_jni_static_method_id(PERFORMANCE_STATE_CREATE, || {
         let class = unsafe { JClass::from_raw(jclass) };
@@ -270,7 +271,8 @@ pub fn calculate_performance(env: &mut JNIEnv, this: &JObject, mode: jint) -> Re
 
     let jclass = get_jni_class(PERFORMANCE_ATTR_CLASS, || {
         let class = env.find_class("org/spring/osu/extended/rosu/JniPerformanceAttributes")?;
-        Ok(class.into_raw())
+        let class = env.new_global_ref(class)?;
+        Ok(class.as_raw() as jclass)
     })?;
 
     let obj: Result<JObject> = match attr {
