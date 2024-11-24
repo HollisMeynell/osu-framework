@@ -1,5 +1,5 @@
-use std::panic;
 use crate::NativeError::Runtime;
+use std::panic;
 use thiserror::Error;
 
 mod java;
@@ -72,11 +72,6 @@ pub fn to_status_use<T>(p: i64) -> Result<&'static mut T> {
 #[inline]
 #[warn(unused_must_use)]
 fn to_status<T>(p: i64) -> Result<Box<T>> {
-    let panic_result = panic::catch_unwind(|| {});
-    match panic_result {
-        Ok(_) => {}
-        Err(e) => { println!("some panic: {e:?}"); }
-    }
     let point = p as *mut T;
     check_ptr(point)?;
     unsafe {
