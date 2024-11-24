@@ -58,23 +58,18 @@ pub fn generate_state(env: &mut JNIEnv, obj: &JObject) -> Result<jobject> {
             i: data.misses as jint,
         },
     ];
-    let jclass = get_jni_class(PERFORMANCE_STATE_CLASS, || {
-        let class = env.find_class("org/spring/osu/extended/rosu/JniPerformance")?;
-        let class = env.new_global_ref(class)?;
-        Ok(class.as_raw() as jclass)
-    })?;
+    let global = get_jni_class(PERFORMANCE_STATE_CLASS, env, "org/spring/osu/extended/rosu/JniPerformance")?;
+    let jclass = <&JClass>::from(global.as_obj());
     let method = get_jni_static_method_id(PERFORMANCE_STATE_CREATE, || {
-        let class = unsafe { JClass::from_raw(jclass) };
         let method = env.get_static_method_id(
-            class,
+            jclass,
             "createState",
             "(IIIIIIIII)Lorg/spring/osu/extended/rosu/JniScoreState;",
         )?;
         Ok(method)
     })?;
-    let class = unsafe { JClass::from_raw(jclass) };
     let object =
-        unsafe { env.call_static_method_unchecked(class, method, ReturnType::Object, args)? }
+        unsafe { env.call_static_method_unchecked(jclass, method, ReturnType::Object, args)? }
             .l()?;
     Ok(object.into_raw())
 }
@@ -269,16 +264,11 @@ pub fn calculate_performance(env: &mut JNIEnv, this: &JObject, mode: jint) -> Re
     let mode = GameMode::from(mode as u8);
     let attr = performance.mode_or_ignore(mode).calculate();
 
-    let jclass = get_jni_class(PERFORMANCE_ATTR_CLASS, || {
-        let class = env.find_class("org/spring/osu/extended/rosu/JniPerformanceAttributes")?;
-        let class = env.new_global_ref(class)?;
-        Ok(class.as_raw() as jclass)
-    })?;
-
+    let global = get_jni_class(PERFORMANCE_ATTR_CLASS, env, "org/spring/osu/extended/rosu/JniPerformanceAttributes")?;
+    let class = <&JClass>::from(global.as_obj());
     let obj: Result<JObject> = match attr {
         PerformanceAttributes::Osu(data) => {
             let method = get_jni_static_method_id(PERFORMANCE_ATTR_OSU, || {
-                let class = unsafe { JClass::from_raw(jclass) };
                 let field = env.get_static_method_id(
                     class,
                     "createOsu",
@@ -300,7 +290,6 @@ pub fn calculate_performance(env: &mut JNIEnv, this: &JObject, mode: jint) -> Re
                 },
                 jvalue { l: attr },
             ];
-            let class = unsafe { JClass::from_raw(jclass) };
             let obj = unsafe {
                 env.call_static_method_unchecked(class, method, ReturnType::Object, args)?
             };
@@ -308,7 +297,6 @@ pub fn calculate_performance(env: &mut JNIEnv, this: &JObject, mode: jint) -> Re
         }
         PerformanceAttributes::Taiko(data) => {
             let method = get_jni_static_method_id(PERFORMANCE_ATTR_TAIKO, || {
-                let class = unsafe { JClass::from_raw(jclass) };
                 let field = env.get_static_method_id(
                     class,
                     "createTaiko",
@@ -331,7 +319,6 @@ pub fn calculate_performance(env: &mut JNIEnv, this: &JObject, mode: jint) -> Re
                 },
                 jvalue { l: attr },
             ];
-            let class = unsafe { JClass::from_raw(jclass) };
             let obj = unsafe {
                 env.call_static_method_unchecked(class, method, ReturnType::Object, args)?
             };
@@ -339,7 +326,6 @@ pub fn calculate_performance(env: &mut JNIEnv, this: &JObject, mode: jint) -> Re
         }
         PerformanceAttributes::Catch(data) => {
             let method = get_jni_static_method_id(PERFORMANCE_ATTR_CATCH, || {
-                let class = unsafe { JClass::from_raw(jclass) };
                 let field = env.get_static_method_id(
                     class,
                     "createCatch",
@@ -349,7 +335,6 @@ pub fn calculate_performance(env: &mut JNIEnv, this: &JObject, mode: jint) -> Re
             })?;
             let attr = generate_difficulty_attributes_catch(env, &data.difficulty)?.as_raw();
             let args = &[jvalue { d: data.pp }, jvalue { l: attr }];
-            let class = unsafe { JClass::from_raw(jclass) };
             let obj = unsafe {
                 env.call_static_method_unchecked(class, method, ReturnType::Object, args)?
             };
@@ -357,7 +342,6 @@ pub fn calculate_performance(env: &mut JNIEnv, this: &JObject, mode: jint) -> Re
         }
         PerformanceAttributes::Mania(data) => {
             let method = get_jni_static_method_id(PERFORMANCE_ATTR_MANAI, || {
-                let class = unsafe { JClass::from_raw(jclass) };
                 let field = env.get_static_method_id(
                     class,
                     "createMania",
@@ -373,7 +357,6 @@ pub fn calculate_performance(env: &mut JNIEnv, this: &JObject, mode: jint) -> Re
                 },
                 jvalue { l: attr },
             ];
-            let class = unsafe { JClass::from_raw(jclass) };
             let obj = unsafe {
                 env.call_static_method_unchecked(class, method, ReturnType::Object, args)?
             };

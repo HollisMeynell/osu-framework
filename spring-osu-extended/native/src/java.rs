@@ -1,6 +1,6 @@
 use crate::{NativeError, Result};
-use jni::objects::{JFieldID, JStaticMethodID};
-use jni::sys::{jboolean, jclass, jfieldID, jmethodID, JNI_TRUE};
+use jni::objects::{GlobalRef, JFieldID, JStaticMethodID};
+use jni::sys::{jboolean, jfieldID, jmethodID, JNI_TRUE};
 use jni::JNIEnv;
 use mini_moka::sync::Cache;
 use std::sync::LazyLock;
@@ -40,24 +40,19 @@ pub(crate) mod cache_key {
     pub const PERFORMANCE_ATTR_MANAI: u32 = 114;
     pub const PERFORMANCE_ATTR_CLASS: u32 = 115;
 }
-static GLOBAL_CACHE: LazyLock<Cache<u32, usize>> = LazyLock::new(|| Cache::new(50));
 
-fn get_id(key: u32) -> Option<usize> {
-    GLOBAL_CACHE.get(&key)
-}
+static GLOBAL_CLASS_CACHE: LazyLock<Cache<u32, GlobalRef>> = LazyLock::new(|| Cache::new(15));
 
-fn set_id(key: u32, ptr: usize) -> Result<()> {
-    GLOBAL_CACHE.insert(key, ptr);
-    Ok(())
-}
+static GLOBAL_JNI_ID_CACHE: LazyLock<Cache<u32, usize>> = LazyLock::new(|| Cache::new(30));
+
 
 macro_rules! get_id_fn {
     ($fx:ident($t:ident, $r:ident)) => {
         pub fn $fx(key: u32, default: impl FnOnce() -> Result<$t>) -> Result<$t> {
-            let j = match get_id(key) {
+            let j = match GLOBAL_JNI_ID_CACHE.get(&key) {
                 None => {
                     let f = default()?.into_raw();
-                    set_id(key, f.clone() as usize)?;
+                    GLOBAL_JNI_ID_CACHE.insert(key, f as usize);
                     f
                 }
                 Some(p) => p as $r,
@@ -74,19 +69,21 @@ get_id_fn! { get_jni_field_id(JFieldID, jfieldID) }
 get_id_fn! { get_jni_static_method_id(JStaticMethodID, jmethodID) }
 
 /// ```
-/// get_jni_class("cache_key", || {
+/// val global = get_jni_class("cache_key", || {
 ///     let class = env.find_class("org/spring/osu/extended/rosu/Class")?;
-///     Ok(class.into_raw())
+///     Ok(class))
 /// })?;
+/// <&JClass>::from(global.as_obj())
 /// ```
-pub fn get_jni_class(key: u32, default: impl FnOnce() -> Result<jclass>) -> Result<jclass> {
-    let j = match get_id(key) {
+pub fn get_jni_class(key: u32, env:&mut JNIEnv, sig: &str) -> Result<GlobalRef> {
+    let j = match GLOBAL_CLASS_CACHE.get(&key) {
         None => {
-            let raw = default()?;
-            set_id(key, raw as usize)?;
+            let class = env.find_class(sig)?;
+            let raw = env.new_global_ref(class)?;
+            GLOBAL_CLASS_CACHE.insert(key, raw.clone());
             raw
         }
-        Some(p) => p as jclass,
+        Some(p) => p ,
     };
     Ok(j)
 }
