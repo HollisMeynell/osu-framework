@@ -55,7 +55,7 @@ object LazerApi {
                     append("ruleset", mode.describe)
                 }
                 if (legacyOnly) append("legacy_only", "1") else append("legacy_only", "0")
-                mods.forEach { m -> append("mods[]", m.type) }
+                mods.forEach { m -> append("mods[]", m.acronym) }
             }
         }
     }
@@ -108,7 +108,7 @@ object LazerApi {
                     append("ruleset", mode.describe)
                 }
                 type?.let { append("type", it) }
-                mods.forEach { m -> append("mods[]", m.type) }
+                mods.forEach { m -> append("mods[]", m.acronym) }
             }
         }
     }
@@ -134,7 +134,7 @@ object LazerApi {
                     append("mode", mode.describe)
                     append("ruleset", mode.describe)
                 }
-                mods.forEach { m -> append("mods[]", m.type) }
+                mods.forEach { m -> append("mods[]", m.acronym) }
                 type?.let { append("type", it) }
             }
         }
