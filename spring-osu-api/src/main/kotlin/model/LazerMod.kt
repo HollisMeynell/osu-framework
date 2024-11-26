@@ -141,6 +141,7 @@ sealed class LazerMod {
         init {
             retries?.let { this.retries = it }
         }
+
         companion object : Mod, ValueMod {
             override val type: String = "EZ"
             override val mode: Set<OsuMode> = setOf(OsuMode.Osu, OsuMode.Taiko, OsuMode.Catch, OsuMode.Mania)
@@ -301,7 +302,7 @@ sealed class LazerMod {
         init {
             restart?.let { this.restart = it }
         }
-        
+
         companion object : Mod, ValueMod {
             override val type: String = "SD"
             override val mode: Set<OsuMode> = setOf(OsuMode.Osu, OsuMode.Taiko, OsuMode.Catch, OsuMode.Mania)
@@ -467,7 +468,7 @@ sealed class LazerMod {
         private data class Value(
             @JsonProperty("only_fade_approach_circles") var onlyFadeApproachCircles: Boolean? = null,
         )
-        
+
         init {
             onlyFadeApproachCircles?.let { this.onlyFadeApproachCircles = it }
         }
@@ -529,7 +530,7 @@ sealed class LazerMod {
             @JsonProperty("size_multiplier") var sizeMultiplier: Float? = null,
             @JsonProperty("combo_based_size") var comboBasedSize: Boolean? = null,
         )
-        
+
         init {
             followDelay?.let { this.followDelay = it }
             sizeMultiplier?.let { this.sizeMultiplier = it }
@@ -622,7 +623,7 @@ sealed class LazerMod {
             @JsonProperty("accuracy_judge_mode") var accuracyJudgeMode: String? = null,
             @JsonProperty("restart") var restart: Boolean? = null,
         )
-        
+
         init {
             minimumAccuracy?.let { this.minimumAccuracy = it }
             accuracyJudgeMode?.let { this.accuracyJudgeMode = it }
