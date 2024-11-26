@@ -14,13 +14,13 @@ class JniPerformance private constructor(
     private external fun initByBeatmapWithState(ptr: Long, state: JniScoreState)
 
     private external fun initByOsuDifficultyAttributes(ptr: Long)
-    private external fun initByOsuDifficultyAttributesWithState(ptr: Long, state: JniScoreState)
+    private external fun initByOsuDifficultyAttributesWithState(ptr: Long, state: ByteArray)
     private external fun initByTaikoDifficultyAttributes(ptr: Long)
-    private external fun initByTaikoDifficultyAttributesWithState(ptr: Long, state: JniScoreState)
+    private external fun initByTaikoDifficultyAttributesWithState(ptr: Long, state: ByteArray)
     private external fun initByCatchDifficultyAttributes(ptr: Long)
-    private external fun initByCatchDifficultyAttributesWithState(ptr: Long, state: JniScoreState)
+    private external fun initByCatchDifficultyAttributesWithState(ptr: Long, state: ByteArray)
     private external fun initByManiaDifficultyAttributes(ptr: Long)
-    private external fun initByManiaDifficultyAttributesWithState(ptr: Long, state: JniScoreState)
+    private external fun initByManiaDifficultyAttributesWithState(ptr: Long, state: ByteArray)
 
     external fun setCombo(value: Int)
     external fun setGeki(value: Int)
@@ -32,13 +32,12 @@ class JniPerformance private constructor(
     external fun setLargeTick(value: Int)
     external fun setSliderEnds(value: Int)
     external fun setPassedObjects(value: Int)
-
-    external fun setLazer(value: Boolean)
     external fun setHardrock(value: Boolean)
     external fun setClockRate(value: Double)
     external fun setHitResultPriority(value: Boolean)
 
-    private external fun nativeSetState(state: JniScoreState)
+    private external fun nativeSetLazer(lazer: Boolean)
+    private external fun nativeSetState(state: ByteArray)
     private external fun nativeSetDifficulty(ptr: Long)
     private external fun nativeSetMods(legacy: Int)
     private external fun nativeSetAccuracy(acc: Double)
@@ -47,6 +46,11 @@ class JniPerformance private constructor(
 
     external fun generateState(): JniScoreState
     private external fun nativeCalculate(modeInt: Int): JniPerformanceAttributes
+
+
+    fun setLazer(value: Boolean) = nativeSetLazer(value)
+
+    fun isLazer(value: Boolean) = nativeSetLazer(value)
 
     fun setMods(legacy: Int) {
         nativeSetMods(legacy)
@@ -95,7 +99,7 @@ class JniPerformance private constructor(
     }
 
     fun setState(state: JniScoreState) {
-        nativeSetState(state)
+        nativeSetState(state.serialize())
     }
 
     fun setDifficulty(state: JniDifficulty) {
@@ -118,6 +122,7 @@ class JniPerformance private constructor(
     }
 
     companion object {
+        @JvmOverloads
         fun createByBeatmap(beatmap: JniBeatmap, state: JniScoreState? = null): JniPerformance {
             if (beatmap.ready().not()) throw IllegalArgumentException("beatmap can not be used")
             return JniPerformance(beatmap.mode).apply {
@@ -129,19 +134,21 @@ class JniPerformance private constructor(
             }
         }
 
+        @JvmOverloads
         fun createByDifficultyAttributes(
             difficulty: JniDifficultyAttributes,
             state: JniScoreState? = null
         ): JniPerformance {
             val performance = JniPerformance(OsuMode.Default)
-            if ((difficulty as NativeClass).ready().not()) throw IllegalArgumentException("difficulty can not be used")
-            when (difficulty as JniDifficultyAttributes) {
+            if (difficulty is NativeClass && difficulty.ready().not())
+                throw IllegalArgumentException("difficulty can not be used")
+            when (difficulty) {
                 is OsuDifficultyAttributes -> {
                     performance.mode = OsuMode.Osu
                     if (state == null) {
                         performance.initByOsuDifficultyAttributes(difficulty.getPtr())
                     } else {
-                        performance.initByOsuDifficultyAttributesWithState(difficulty.getPtr(), state)
+                        performance.initByOsuDifficultyAttributesWithState(difficulty.getPtr(), state.serialize())
                     }
                 }
 
@@ -150,7 +157,7 @@ class JniPerformance private constructor(
                     if (state == null) {
                         performance.initByTaikoDifficultyAttributes(difficulty.getPtr())
                     } else {
-                        performance.initByTaikoDifficultyAttributesWithState(difficulty.getPtr(), state)
+                        performance.initByTaikoDifficultyAttributesWithState(difficulty.getPtr(), state.serialize())
                     }
                 }
 
@@ -159,7 +166,7 @@ class JniPerformance private constructor(
                     if (state == null) {
                         performance.initByCatchDifficultyAttributes(difficulty.getPtr())
                     } else {
-                        performance.initByCatchDifficultyAttributesWithState(difficulty.getPtr(), state)
+                        performance.initByCatchDifficultyAttributesWithState(difficulty.getPtr(), state.serialize())
                     }
                 }
 
@@ -168,36 +175,11 @@ class JniPerformance private constructor(
                     if (state == null) {
                         performance.initByManiaDifficultyAttributes(difficulty.getPtr())
                     } else {
-                        performance.initByManiaDifficultyAttributesWithState(difficulty.getPtr(), state)
+                        performance.initByManiaDifficultyAttributesWithState(difficulty.getPtr(), state.serialize())
                     }
                 }
             }
             return performance
-        }
-
-        @JvmStatic
-        fun createState(
-            maxCombo: Int = 0,
-            largeTickHits: Int = 0,
-            sliderEndHits: Int = 0,
-            geki: Int = 0,
-            katu: Int = 0,
-            n300: Int = 0,
-            n100: Int = 0,
-            n50: Int = 0,
-            misses: Int = 0,
-        ): JniScoreState {
-            return JniScoreState(
-                maxCombo,
-                largeTickHits,
-                sliderEndHits,
-                geki,
-                katu,
-                n300,
-                n100,
-                n50,
-                misses
-            )
         }
     }
 }

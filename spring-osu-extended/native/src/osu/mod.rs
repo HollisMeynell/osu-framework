@@ -26,7 +26,7 @@ mod java_fu {
     use rosu_pp::mania::ManiaDifficultyAttributes;
     use rosu_pp::osu::OsuDifficultyAttributes;
     use rosu_pp::taiko::TaikoDifficultyAttributes;
-    use rosu_pp::{Beatmap, Difficulty, Performance};
+    use rosu_pp::{Beatmap, Difficulty, GradualPerformance, Performance};
 
     #[warn(unused_must_use)]
     pub fn release_by_type(ptr: i64, type_val: i8) -> Result<()> {
@@ -52,6 +52,7 @@ mod java_fu {
                 5 TaikoDifficultyAttributes,
                 6 CatchDifficultyAttributes,
                 7 ManiaDifficultyAttributes,
+                8 GradualPerformance,
             }
         }
         Ok(())
@@ -79,6 +80,11 @@ mod java_fu {
             .get_field_unchecked(obj, f_id, ReturnType::Primitive(Primitive::Long))
             .or_else(|e| throw(format!("can not get point [{e:?}]")))?;
         Ok(result.j()?)
+    }
+    pub fn release_object(env: &mut JNIEnv, obj: &JObject) -> Result<()> {
+        let field = get_ptr_field(env)?;
+        env.set_field_unchecked(obj, field, JValueGen::Long(0))?;
+        Ok(())
     }
 }
 
@@ -135,7 +141,7 @@ set_difficulty_state!(nativeSetAr:set_difficulty_ar);
 set_difficulty_state!(nativeSetOd:set_difficulty_od);
 set_difficulty_state!(nativeSetCs:set_difficulty_cs);
 set_difficulty_state!(nativeSetHp:set_difficulty_hp);
-set_difficulty_state!(setLazer > set_difficulty_is_lazer);
+set_difficulty_state!(nativeSetLazer > set_difficulty_is_lazer);
 set_difficulty_state!(setHardrock > set_difficulty_is_hardrock);
 
 #[jni_fn("org.spring.osu.extended.rosu.JniDifficulty")]
@@ -179,7 +185,7 @@ fn nativeSetModsMix(mut env: JNIEnv, this: JObject, mode: jbyte, legacy: jint, l
 }
 
 #[jni_fn("org.spring.osu.extended.rosu.JniPerformance")]
-fn nativeSetState(mut env: JNIEnv, this: JObject, state: JObject) {
+fn nativeSetState(mut env: JNIEnv, this: JObject, state: JByteArray) {
     jni_call!([env]set_performance_state(&mut env, &this, &state))
 }
 
@@ -218,7 +224,32 @@ fn initDifficulty(
 
 #[jni_fn("org.spring.osu.extended.rosu.JniDifficulty")]
 fn nativeCalculate(mut env: JNIEnv, this: JObject, beatmap: jlong) -> jobject {
-    jni_call!([env]difficulty_calculate(&mut env, &this, beatmap) => {JObject::null().into_raw()})
+    jni_call!([env]difficulty_calculate(&mut env, &this, beatmap) => { JObject::null().into_raw() })
+}
+
+#[jni_fn("org.spring.osu.extended.rosu.JniDifficulty")]
+fn nativeTransformToGradualPerformance(mut env: JNIEnv, this: JObject, beatmap: jlong) -> jobject {
+    jni_call!([env]gradual_performance(&mut env, &this, beatmap) => { JObject::null().into_raw() })
+}
+
+#[jni_fn("org.spring.osu.extended.rosu.JniGradualPerformance")]
+fn remainingLength(mut env: JNIEnv, this: JObject) -> jint {
+    jni_call!([env]gradual_len(&mut env, &this) => { 0 })
+}
+
+#[jni_fn("org.spring.osu.extended.rosu.JniGradualPerformance")]
+fn nativeNext(mut env: JNIEnv, this: JObject, state: JByteArray) -> jobject {
+    jni_call!([env]gradual_next(&mut env, &this, &state) => { JObject::null().into_raw() })
+}
+
+#[jni_fn("org.spring.osu.extended.rosu.JniGradualPerformance")]
+fn nativeLast(mut env: JNIEnv, this: JObject, state: JByteArray) -> jobject {
+    jni_call!([env]gradual_last(&mut env, &this, &state) => { JObject::null().into_raw() })
+}
+
+#[jni_fn("org.spring.osu.extended.rosu.JniGradualPerformance")]
+fn nativeNextSome(mut env: JNIEnv, this: JObject, state: JByteArray, n: jint) -> jobject {
+    jni_call!([env]gradual_nth(&mut env, &this, &state, n) => { JObject::null().into_raw() })
 }
 
 macro_rules! init_performance {
@@ -232,7 +263,7 @@ macro_rules! init_performance {
     )+};
     ($(+$fx:ident>$call:ident;)+) => {$(
         #[jni_fn("org.spring.osu.extended.rosu.JniPerformance")]
-        fn $fx<'local>(mut env: JNIEnv, this: JObject, ptr: jlong, state:JObject) {
+        fn $fx<'local>(mut env: JNIEnv, this: JObject, ptr: jlong, state:JByteArray) {
             jni_call! {
                 [env]$call(&mut env, &this, ptr, &state)
             }
@@ -278,7 +309,7 @@ init_performance! {
 }
 
 #[jni_fn("org.spring.osu.extended.rosu.JniPerformance")]
-fn setLazer(mut env: JNIEnv, this: JObject, value: jboolean) {
+fn nativeSetLazer(mut env: JNIEnv, this: JObject, value: jboolean) {
     jni_call! {
         [env]set_performance_is_lazer(&mut env, &this, value.is_true())
     }

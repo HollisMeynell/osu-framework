@@ -1,6 +1,6 @@
 use super::java_fu::{get_object_ptr, set_object_ptr};
 use crate::java::{cache_key::*, get_jni_class, get_jni_static_method_id};
-use crate::{get_mods_from_java, to_ptr, to_status, to_status_use, Result};
+use crate::{get_class, get_mods_from_java, to_ptr, to_status, to_status_use, Result};
 use jni::objects::{GlobalRef, JClass, JObject, JString};
 use jni::signature::ReturnType;
 use jni::sys::{jbyte, jdouble, jfloat, jint, jlong, jobject, jvalue};
@@ -118,7 +118,7 @@ pub fn generate_difficulty_attributes_osu<'l>(
     data: &OsuDifficultyAttributes,
 ) -> Result<JObject<'l>> {
     let global = get_difficulty_attributes_class(env)?;
-    let jclass = <&JClass>::from(global.as_obj());
+    let jclass = get_class!(global);
     let args = &[
         jvalue { d: data.aim },
         jvalue { d: data.speed },
@@ -148,7 +148,8 @@ pub fn generate_difficulty_attributes_osu<'l>(
         )?;
         Ok(method)
     })?;
-    let obj = unsafe { env.call_static_method_unchecked(jclass, method, ReturnType::Object, args)? };
+    let obj =
+        unsafe { env.call_static_method_unchecked(jclass, method, ReturnType::Object, args)? };
     Ok(obj.l()?)
 }
 
@@ -157,7 +158,7 @@ pub fn generate_difficulty_attributes_taiko<'l>(
     data: &TaikoDifficultyAttributes,
 ) -> Result<JObject<'l>> {
     let global = get_difficulty_attributes_class(env)?;
-    let jclass = <&JClass>::from(global.as_obj());
+    let jclass = get_class!(global);
     let args = &[
         jvalue { d: data.stamina },
         jvalue { d: data.rhythm },
@@ -186,7 +187,8 @@ pub fn generate_difficulty_attributes_taiko<'l>(
         )?;
         Ok(method)
     })?;
-    let obj = unsafe { env.call_static_method_unchecked(jclass, method, ReturnType::Object, args)? };
+    let obj =
+        unsafe { env.call_static_method_unchecked(jclass, method, ReturnType::Object, args)? };
     Ok(obj.l()?)
 }
 
@@ -195,7 +197,7 @@ pub fn generate_difficulty_attributes_catch<'l>(
     data: &CatchDifficultyAttributes,
 ) -> Result<JObject<'l>> {
     let global = get_difficulty_attributes_class(env)?;
-    let jclass = <&JClass>::from(global.as_obj());
+    let jclass = get_class!(global);
     let args = &[
         jvalue { d: data.stars },
         jvalue { d: data.ar },
@@ -221,7 +223,8 @@ pub fn generate_difficulty_attributes_catch<'l>(
         )?;
         Ok(method)
     })?;
-    let obj = unsafe { env.call_static_method_unchecked(jclass, method, ReturnType::Object, args)? };
+    let obj =
+        unsafe { env.call_static_method_unchecked(jclass, method, ReturnType::Object, args)? };
     Ok(obj.l()?)
 }
 
@@ -230,7 +233,7 @@ pub fn generate_difficulty_attributes_mania<'l>(
     data: &ManiaDifficultyAttributes,
 ) -> Result<JObject<'l>> {
     let global = get_difficulty_attributes_class(env)?;
-    let jclass = <&JClass>::from(global.as_obj());
+    let jclass = get_class!(global);
     let args = &[
         jvalue { d: data.stars },
         jvalue { d: data.hit_window },
@@ -253,12 +256,17 @@ pub fn generate_difficulty_attributes_mania<'l>(
         )?;
         Ok(method)
     })?;
-    let obj = unsafe { env.call_static_method_unchecked(jclass, method, ReturnType::Object, args)? };
+    let obj =
+        unsafe { env.call_static_method_unchecked(jclass, method, ReturnType::Object, args)? };
     Ok(obj.l()?)
 }
 
 fn get_difficulty_attributes_class(env: &mut JNIEnv) -> Result<GlobalRef> {
-    get_jni_class(DIFFICULTY_ATTR_CLASS, env, "org/spring/osu/extended/rosu/JniDifficultyAttributes")
+    get_jni_class(
+        DIFFICULTY_ATTR_CLASS,
+        env,
+        "org/spring/osu/extended/rosu/JniDifficultyAttributes",
+    )
 }
 
 pub fn generate_difficulty_attributes<'l>(

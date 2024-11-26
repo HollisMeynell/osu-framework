@@ -3,18 +3,33 @@ package org.spring.osu.model
 import com.fasterxml.jackson.annotation.JsonProperty
 
 data class LazerScoreStatistics(
+    /**
+     * mania MAX
+     */
     @JsonProperty("perfect")
     var perfect: Int = 0,
 
+    /**
+     * n300
+     */
     @JsonProperty("great")
     var great: Int = 0,
 
+    /**
+     * mania n200
+     */
     @JsonProperty("good")
     var good: Int = 0,
 
+    /**
+     * n100
+     */
     @JsonProperty("ok")
     var ok: Int = 0,
 
+    /**
+     * n50
+     */
     @JsonProperty("meh")
     var meh: Int = 0,
 

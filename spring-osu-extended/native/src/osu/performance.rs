@@ -1,10 +1,11 @@
-use super::java_fu::{get_object_ptr, set_object_ptr};
+use super::java_fu::{get_object_ptr, release_object, set_object_ptr};
 use crate::java::cache_key::*;
-use crate::java::{get_jni_class, get_jni_field_id, get_jni_static_method_id};
+use crate::java::{get_jni_class, get_jni_method_id, get_jni_static_method_id};
 use crate::osu::difficulty::*;
-use crate::{get_mods_from_java, to_ptr, to_status, to_status_use, Result};
-use jni::objects::{JClass, JObject, JString};
-use jni::signature::{Primitive, ReturnType};
+use crate::{get_class, get_mods_from_java, to_ptr, to_status, to_status_use, Result};
+use bytes::{Buf, Bytes};
+use jni::objects::{JByteArray, JClass, JObject, JString};
+use jni::signature::ReturnType;
 use jni::sys::{jbyte, jclass, jint, jlong, jobject, jvalue};
 use jni::JNIEnv;
 use rosu_pp::any::{HitResultPriority, PerformanceAttributes, ScoreState};
@@ -13,57 +14,55 @@ use rosu_pp::mania::ManiaDifficultyAttributes;
 use rosu_pp::model::mode::GameMode;
 use rosu_pp::osu::OsuDifficultyAttributes;
 use rosu_pp::taiko::TaikoDifficultyAttributes;
-use rosu_pp::{Beatmap, Difficulty, Performance};
-
-pub const PERFORMANCE_FIELD_MAX_COMBO: &str = "maxCombo";
-pub const PERFORMANCE_FIELD_LARGE_TICK_HITS: &str = "largeTickHits";
-pub const PERFORMANCE_FIELD_SLIDER_END_HITS: &str = "sliderEndHits";
-pub const PERFORMANCE_FIELD_N_GEKI: &str = "geki";
-pub const PERFORMANCE_FIELD_N_KATU: &str = "katu";
-pub const PERFORMANCE_FIELD_N300: &str = "n300";
-pub const PERFORMANCE_FIELD_N100: &str = "n100";
-pub const PERFORMANCE_FIELD_N50: &str = "n50";
-pub const PERFORMANCE_FIELD_MISSES: &str = "misses";
+use rosu_pp::{Beatmap, Difficulty, GradualPerformance, Performance};
 
 pub fn generate_state(env: &mut JNIEnv, obj: &JObject) -> Result<jobject> {
     let ptr = get_object_ptr(env, obj)?;
     let performance = to_status_use::<Performance>(ptr)?;
-    let data = performance.generate_state();
+    let score_state = performance.generate_state();
+    generate_java_state(env, score_state)
+}
+
+pub fn generate_java_state(env: &mut JNIEnv, score_state: ScoreState) -> Result<jobject> {
     let args = &[
         jvalue {
-            i: data.max_combo as jint,
+            i: score_state.max_combo as jint,
         },
         jvalue {
-            i: data.osu_large_tick_hits as jint,
+            i: score_state.osu_large_tick_hits as jint,
         },
         jvalue {
-            i: data.slider_end_hits as jint,
+            i: score_state.slider_end_hits as jint,
         },
         jvalue {
-            i: data.n_geki as jint,
+            i: score_state.n_geki as jint,
         },
         jvalue {
-            i: data.n_katu as jint,
+            i: score_state.n_katu as jint,
         },
         jvalue {
-            i: data.n300 as jint,
+            i: score_state.n300 as jint,
         },
         jvalue {
-            i: data.n100 as jint,
+            i: score_state.n100 as jint,
         },
         jvalue {
-            i: data.n50 as jint,
+            i: score_state.n50 as jint,
         },
         jvalue {
-            i: data.misses as jint,
+            i: score_state.misses as jint,
         },
     ];
-    let global = get_jni_class(PERFORMANCE_STATE_CLASS, env, "org/spring/osu/extended/rosu/JniPerformance")?;
-    let jclass = <&JClass>::from(global.as_obj());
+    let global = get_jni_class(
+        PERFORMANCE_STATE_CLASS,
+        env,
+        "org/spring/osu/extended/rosu/JniScoreState",
+    )?;
+    let jclass = get_class!(global);
     let method = get_jni_static_method_id(PERFORMANCE_STATE_CREATE, || {
         let method = env.get_static_method_id(
             jclass,
-            "createState",
+            "create",
             "(IIIIIIIII)Lorg/spring/osu/extended/rosu/JniScoreState;",
         )?;
         Ok(method)
@@ -74,43 +73,21 @@ pub fn generate_state(env: &mut JNIEnv, obj: &JObject) -> Result<jobject> {
     Ok(object.into_raw())
 }
 
-fn parse_java_state(env: &mut JNIEnv, this: &JObject) -> Result<ScoreState> {
-    let mut state = ScoreState::default();
+pub fn parse_java_state(env: &mut JNIEnv, state: &JByteArray) -> Result<ScoreState> {
+    let mut array = Bytes::from(env.convert_byte_array(state)?);
 
-    macro_rules! get_state_field {
-        ($([$key:expr]$jf:expr=>$rf:ident,)+) => {$(
-            let field_id = get_jni_field_id($key, || {
-                let class = env.get_object_class(this)?;
-                let field_id = env.get_field_id(class, $jf, "I")?;
-                Ok(field_id)
-            })?;
-            state.$rf = env.get_field_unchecked(
-                this,
-                field_id,
-                ReturnType::Primitive(Primitive::Int)
-            )?.i()? as u32;
-        )+};
-    }
-    get_state_field! {
-        [PERFORMANCE_STATE_MAX_COMBO]
-        PERFORMANCE_FIELD_MAX_COMBO         => max_combo,
-        [PERFORMANCE_STATE_LARGE_TICK_HITS]
-        PERFORMANCE_FIELD_LARGE_TICK_HITS   => osu_large_tick_hits,
-        [PERFORMANCE_STATE_SLIDER_END_HITS]
-        PERFORMANCE_FIELD_SLIDER_END_HITS   => slider_end_hits,
-        [PERFORMANCE_STATE_N_GEKI]
-        PERFORMANCE_FIELD_N_GEKI            => n_geki,
-        [PERFORMANCE_STATE_N_KATU]
-        PERFORMANCE_FIELD_N_KATU            => n_katu,
-        [PERFORMANCE_STATE_N300]
-        PERFORMANCE_FIELD_N300              => n300,
-        [PERFORMANCE_STATE_N100]
-        PERFORMANCE_FIELD_N100              => n100,
-        [PERFORMANCE_STATE_N50]
-        PERFORMANCE_FIELD_N50               => n50,
-        [PERFORMANCE_STATE_MISSES]
-        PERFORMANCE_FIELD_MISSES            => misses,
-    }
+    let state = ScoreState {
+        max_combo: array.get_i32() as u32,
+        osu_large_tick_hits: array.get_i32() as u32,
+        slider_end_hits: array.get_i32() as u32,
+        n_geki: array.get_i32() as u32,
+        n_katu: array.get_i32() as u32,
+        n300: array.get_i32() as u32,
+        n100: array.get_i32() as u32,
+        n50: array.get_i32() as u32,
+        misses: array.get_i32() as u32,
+    };
+
     Ok(state)
 }
 
@@ -133,7 +110,7 @@ macro_rules! init_performance {
             env: &mut JNIEnv,
             this: &JObject,
             ptr: jlong,
-            state: &JObject,
+            state: &JByteArray,
         ) -> Result<()> {
             let from = to_status_use::<$ty>(ptr)?;
             let state = parse_java_state(env, state)?;
@@ -238,7 +215,7 @@ pub fn set_performance_mods_mix(
     set_performance_attr(env, this, |performance| performance.mods(all))
 }
 
-pub fn set_performance_state(env: &mut JNIEnv, this: &JObject, state: &JObject) -> Result<()> {
+pub fn set_performance_state(env: &mut JNIEnv, this: &JObject, state: &JByteArray) -> Result<()> {
     let state = parse_java_state(env, state)?;
     set_performance_attr(env, this, |performance| performance.state(state))?;
     Ok(())
@@ -257,15 +234,14 @@ pub fn set_performance_difficulty(
     Ok(())
 }
 
-pub fn calculate_performance(env: &mut JNIEnv, this: &JObject, mode: jint) -> Result<jclass> {
-    let ptr = get_object_ptr(env, this)?;
-    set_object_ptr(env, this, 0)?;
-    let performance = to_status::<Performance>(ptr)?;
-    let mode = GameMode::from(mode as u8);
-    let attr = performance.mode_or_ignore(mode).calculate();
+fn attribute_to_object(env: &mut JNIEnv, attr: PerformanceAttributes) -> Result<jclass> {
+    let global = get_jni_class(
+        PERFORMANCE_ATTR_CLASS,
+        env,
+        "org/spring/osu/extended/rosu/JniPerformanceAttributes",
+    )?;
+    let class = get_class!(global);
 
-    let global = get_jni_class(PERFORMANCE_ATTR_CLASS, env, "org/spring/osu/extended/rosu/JniPerformanceAttributes")?;
-    let class = <&JClass>::from(global.as_obj());
     let obj: Result<JObject> = match attr {
         PerformanceAttributes::Osu(data) => {
             let method = get_jni_static_method_id(PERFORMANCE_ATTR_OSU, || {
@@ -363,5 +339,89 @@ pub fn calculate_performance(env: &mut JNIEnv, this: &JObject, mode: jint) -> Re
             Ok(obj.l()?)
         }
     };
+
     Ok(obj?.as_raw())
+}
+
+pub fn calculate_performance(env: &mut JNIEnv, this: &JObject, mode: jint) -> Result<jclass> {
+    let ptr = get_object_ptr(env, this)?;
+    release_object(env, this)?;
+    let performance = to_status::<Performance>(ptr)?;
+    let mode = GameMode::from(mode as u8);
+    let attr = performance.mode_or_ignore(mode).calculate();
+    attribute_to_object(env, attr)
+}
+
+pub fn gradual_performance(
+    env: &mut JNIEnv,
+    this: &JObject,
+    beatmap_ptr: jlong,
+) -> Result<jobject> {
+    let beatmap = to_status_use(beatmap_ptr)?;
+    let difficulty_ptr = get_object_ptr(env, this)?;
+    let difficulty = to_status::<Difficulty>(difficulty_ptr)?;
+    release_object(env, this)?;
+
+    let gradual = difficulty.gradual_performance(beatmap);
+    let global = get_jni_class(
+        GRADUAL_PERFORMANCE_CLASS,
+        env,
+        "org/spring/osu/extended/rosu/JniGradualPerformance",
+    )?;
+    let class = get_class!(global);
+    let method = get_jni_method_id(GRADUAL_PERFORMANCE_INIT, || {
+        let method = env.get_method_id(
+            class,
+            "<init>",
+            "(Lorg/spring/osu/extended/rosu/JniScoreState;)V",
+        )?;
+        Ok(method)
+    })?;
+
+    let state = generate_java_state(env, ScoreState::new())?;
+    let obj = unsafe { env.new_object_unchecked(class, method, &[jvalue { l: state }]) }?;
+    set_object_ptr(env, &obj, to_ptr(gradual))?;
+    Ok(obj.into_raw())
+}
+
+pub fn gradual_len(env: &mut JNIEnv, this: &JObject) -> Result<jint> {
+    let ptr = get_object_ptr(env, this)?;
+    let gradual = to_status_use::<GradualPerformance>(ptr)?;
+    Ok(gradual.len() as i32)
+}
+
+fn gradual_action(
+    env: &mut JNIEnv,
+    this: &JObject,
+    state: &JByteArray,
+    fun: impl FnOnce(&mut GradualPerformance, ScoreState) -> Option<PerformanceAttributes>,
+) -> Result<jobject> {
+    let state = parse_java_state(env, state)?;
+    let ptr = get_object_ptr(env, this)?;
+    let gradual = to_status_use::<GradualPerformance>(ptr)?;
+    let attr = fun(gradual, state);
+    let obj = match attr {
+        Some(data) => attribute_to_object(env, data)?,
+        None => JObject::null().into_raw(),
+    };
+    Ok(obj)
+}
+
+pub fn gradual_next(env: &mut JNIEnv, this: &JObject, state: &JByteArray) -> Result<jobject> {
+    gradual_action(env, this, state, |gradual, state| gradual.next(state))
+}
+
+pub fn gradual_last(env: &mut JNIEnv, this: &JObject, state: &JByteArray) -> Result<jobject> {
+    gradual_action(env, this, state, |gradual, state| gradual.last(state))
+}
+
+pub fn gradual_nth(
+    env: &mut JNIEnv,
+    this: &JObject,
+    state: &JByteArray,
+    n: jint,
+) -> Result<jobject> {
+    gradual_action(env, this, state, |gradual, state| {
+        gradual.nth(state, n as usize)
+    })
 }

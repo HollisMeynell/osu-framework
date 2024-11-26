@@ -1,4 +1,5 @@
 @file:Suppress("unused")
+
 package org.spring.osu.extended.rosu
 
 import org.spring.core.toJson
@@ -78,7 +79,12 @@ class JniDifficulty(
     }
 
     fun isLazer(bool: Boolean) {
-        setLazer(bool)
+        nativeSetLazer(bool)
+        isLazer = bool
+    }
+
+    fun setLazer(bool: Boolean) {
+        nativeSetLazer(bool)
         isLazer = bool
     }
 
@@ -122,6 +128,7 @@ class JniDifficulty(
         } ?: throw IllegalArgumentException("unknown mode")
     }
 
+    @JvmOverloads
     fun setMods(legacy: Int, json: String, mode: OsuMode? = this.mode) {
         mode?.let {
             nativeSetModsMix(it.value.toByte(), legacy, json)
@@ -134,6 +141,7 @@ class JniDifficulty(
         } ?: throw IllegalArgumentException("unknown mode")
     }
 
+    @JvmOverloads
     fun setMods(legacy: Int, mods: Collection<LazerMod>, mode: OsuMode? = this.mode) {
         mode?.let {
             nativeSetModsMix(it.value.toByte(), legacy, mods.toJson())
@@ -152,23 +160,27 @@ class JniDifficulty(
         clockRate: Double = this.clockRate ?: -1.0,
     )
 
-    fun calculate(beatmap: JniBeatmap): JniDifficultyAttributes {
-        return nativeCalculate(beatmap.getPtr())
-    }
+    fun calculate(beatmap: JniBeatmap): JniDifficultyAttributes =
+        nativeCalculate(beatmap.getPtr())
+
+
+    fun createGradualPerformance(beatmap: JniBeatmap): JniGradualPerformance =
+        nativeTransformToGradualPerformance(beatmap.getPtr())
 
     private external fun nativeSetAr(value: Float, withMods: Boolean)
     private external fun nativeSetOd(value: Float, withMods: Boolean)
     private external fun nativeSetCs(value: Float, withMods: Boolean)
     private external fun nativeSetHp(value: Float, withMods: Boolean)
-    private external fun setLazer(bool: Boolean)
     private external fun setHardrock(bool: Boolean)
     private external fun setPassObject(sum: Int)
+    private external fun nativeSetLazer(bool: Boolean)
     private external fun nativeSetMods(legacy: Int)
     private external fun nativeSetModsByStr(mode: Byte, lazer: String)
     private external fun nativeSetModsMix(mode: Byte, legacy: Int, lazer: String)
     private external fun nativeSetClockRate(value: Double)
 
     private external fun nativeCalculate(beatmap: Long): JniDifficultyAttributes
+    private external fun nativeTransformToGradualPerformance(beatmap: Long): JniGradualPerformance
 
     init {
         initDifficulty(withMods, isLazer, isAllNull())

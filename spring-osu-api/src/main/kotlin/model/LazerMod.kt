@@ -111,17 +111,6 @@ sealed class LazerMod {
     @get:JsonProperty("settings")
     abstract var settings: Any?
 
-    @JsonIgnore
-    fun isSettingNull(): Boolean {
-        if (settings == null) return true
-        return settings?.let { s ->
-            s::class.memberProperties.all {
-                it.isAccessible = true
-                it.getter.call(s) == null
-            }
-        } ?: true
-    }
-
     class Easy(
         retries: Float? = null,
     ) : LazerMod() {
@@ -2207,9 +2196,4 @@ sealed class LazerMod {
             override val incompatible: Set<Mod> = setOf(Key1, Key2, Key3, Key4, Key5, Key6, Key7, Key8, Key9)
         }
     }
-}
-
-fun main() {
-    val m = LazerMod.Easy()
-    println(m.toJson())
 }
