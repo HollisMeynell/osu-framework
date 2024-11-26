@@ -151,7 +151,7 @@ object OsuApi {
                 if (mods.contains(OsuMod.None))
                     append("mods[]", "NM")
                 else
-                    mods.forEach { m -> append("mods[]", m.mod) }
+                    mods.forEach { m -> append("mods[]", m.acronym) }
             }
         }
         node = node.get("attributes")
@@ -325,7 +325,7 @@ object OsuApi {
                 if (mods.contains(OsuMod.None))
                     append("mods[]", "NM")
                 else
-                    mods.forEach { m -> append("mods[]", m.mod) }
+                    mods.forEach { m -> append("mods[]", m.acronym) }
 
             }
         }
@@ -382,7 +382,7 @@ object OsuApi {
                 if (mods.contains(OsuMod.None))
                     append("mods[]", "NM")
                 else
-                    mods.forEach { m -> append("mods[]", m.mod) }
+                    mods.forEach { m -> append("mods[]", m.acronym) }
             }
         }
     }

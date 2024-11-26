@@ -11,7 +11,7 @@ import org.spring.core.Json
 import org.spring.core.jsonList
 import java.util.*
 
-enum class OsuMod(val value: Int, val mod: String) {
+enum class OsuMod(val value: Int, val acronym: String) {
     None(0, "NM"),
 
     NoFail(1, "NF"),
@@ -116,41 +116,41 @@ enum class OsuMod(val value: Int, val mod: String) {
         fun getMod(mod: String): OsuMod {
             val modName = mod.trim().uppercase()
             return when (modName) {
-                None.mod -> None
-                NoFail.mod -> NoFail
-                Easy.mod -> Easy
-                TouchDevice.mod -> TouchDevice
-                Hidden.mod -> Hidden
-                HardRock.mod -> HardRock
-                SuddenDeath.mod -> SuddenDeath
-                DoubleTime.mod -> DoubleTime
-                Relax.mod -> Relax
-                HalfTime.mod -> HalfTime
-                Nightcore.mod -> Nightcore
-                Flashlight.mod -> Flashlight
-                Autoplay.mod -> Autoplay
-                SpunOut.mod -> SpunOut
-                Autopilot.mod -> Autopilot
-                Perfect.mod -> Perfect
-                Key4.mod -> Key4
-                Key5.mod -> Key5
-                Key6.mod -> Key6
-                Key7.mod -> Key7
-                Key8.mod -> Key8
-                FadeIn.mod -> FadeIn
-                Random.mod -> Random
-                Cinema.mod -> Cinema
-                TargetPractice.mod -> TargetPractice
-                Key9.mod -> Key9
-                KeyCoop.mod -> KeyCoop
-                Key1.mod -> Key1
-                Key3.mod -> Key3
-                Key2.mod -> Key2
-                ScoreV2.mod -> ScoreV2
-                Mirror.mod -> Mirror
-                KeyMod.mod -> KeyMod
-                FreeMod.mod -> FreeMod
-                ScoreIncreaseMods.mod -> ScoreIncreaseMods
+                None.acronym -> None
+                NoFail.acronym -> NoFail
+                Easy.acronym -> Easy
+                TouchDevice.acronym -> TouchDevice
+                Hidden.acronym -> Hidden
+                HardRock.acronym -> HardRock
+                SuddenDeath.acronym -> SuddenDeath
+                DoubleTime.acronym -> DoubleTime
+                Relax.acronym -> Relax
+                HalfTime.acronym -> HalfTime
+                Nightcore.acronym -> Nightcore
+                Flashlight.acronym -> Flashlight
+                Autoplay.acronym -> Autoplay
+                SpunOut.acronym -> SpunOut
+                Autopilot.acronym -> Autopilot
+                Perfect.acronym -> Perfect
+                Key4.acronym -> Key4
+                Key5.acronym -> Key5
+                Key6.acronym -> Key6
+                Key7.acronym -> Key7
+                Key8.acronym -> Key8
+                FadeIn.acronym -> FadeIn
+                Random.acronym -> Random
+                Cinema.acronym -> Cinema
+                TargetPractice.acronym -> TargetPractice
+                Key9.acronym -> Key9
+                KeyCoop.acronym -> KeyCoop
+                Key1.acronym -> Key1
+                Key3.acronym -> Key3
+                Key2.acronym -> Key2
+                ScoreV2.acronym -> ScoreV2
+                Mirror.acronym -> Mirror
+                KeyMod.acronym -> KeyMod
+                FreeMod.acronym -> FreeMod
+                ScoreIncreaseMods.acronym -> ScoreIncreaseMods
                 else -> Other
             }
         }
@@ -280,7 +280,7 @@ enum class OsuMod(val value: Int, val mod: String) {
     internal class OsuModSerializer :
         StdSerializer<OsuMod>(ModListType) {
         override fun serialize(value: OsuMod?, gen: JsonGenerator, provider: SerializerProvider) {
-            gen.writeString(value?.mod)
+            gen.writeString(value?.acronym)
         }
     }
 
@@ -296,7 +296,7 @@ enum class OsuMod(val value: Int, val mod: String) {
         StdSerializer<List<OsuMod>>(ModListType) {
         override fun serialize(value: List<OsuMod>?, gen: JsonGenerator, provider: SerializerProvider) {
             gen.writeStartArray()
-            value?.forEach { gen.writeString(it.mod) }
+            value?.forEach { gen.writeString(it.acronym) }
             gen.writeEndArray()
         }
     }

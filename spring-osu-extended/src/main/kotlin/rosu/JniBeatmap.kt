@@ -52,6 +52,7 @@ class JniBeatmap private constructor() : NativeClass(0) {
         return JniDifficulty(mode = mode)
     }
 
+    @JvmOverloads
     fun createPerformance(state: JniScoreState? = null): JniPerformance {
         return JniPerformance.createByBeatmap(this, state)
     }

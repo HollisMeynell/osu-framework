@@ -4,9 +4,11 @@ sealed interface JniDifficultyAttributes : AutoCloseable {
     fun getStarRating(): Double
     fun getMaxCombo(): Int
 
-
     fun createPerformance(state: JniScoreState? = null): JniPerformance {
         return JniPerformance.createByDifficultyAttributes(this, state)
+    }
+    fun createPerformance(): JniPerformance {
+        return JniPerformance.createByDifficultyAttributes(this)
     }
 
     companion object {
