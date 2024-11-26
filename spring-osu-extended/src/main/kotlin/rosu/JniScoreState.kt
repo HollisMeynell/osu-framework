@@ -13,6 +13,7 @@ data class JniScoreState @JvmOverloads constructor(
     var n50: Int = 0,
     var misses: Int = 0,
 ) {
+
     fun serialize(): ByteArray {
         val data = ByteArray(36)
         fun writeInt(index: Int, value: Int) {
@@ -33,6 +34,7 @@ data class JniScoreState @JvmOverloads constructor(
         writeInt(8, misses)
         return data
     }
+
     companion object {
         @JvmStatic
         fun create(state: LazerScoreStatistics, maxCombo: Int) = JniScoreState(

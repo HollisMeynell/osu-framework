@@ -11,7 +11,7 @@ class JniPerformance private constructor(
 ) : NativeClass(2) {
 
     private external fun initByBeatmap(ptr: Long)
-    private external fun initByBeatmapWithState(ptr: Long, state: JniScoreState)
+    private external fun initByBeatmapWithState(ptr: Long, state: ByteArray)
 
     private external fun initByOsuDifficultyAttributes(ptr: Long)
     private external fun initByOsuDifficultyAttributesWithState(ptr: Long, state: ByteArray)
@@ -129,7 +129,7 @@ class JniPerformance private constructor(
                 if (state == null) {
                     initByBeatmap(beatmap.getPtr())
                 } else {
-                    initByBeatmapWithState(beatmap.getPtr(), state)
+                    initByBeatmapWithState(beatmap.getPtr(), state.serialize())
                 }
             }
         }
