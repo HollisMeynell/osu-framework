@@ -7,6 +7,7 @@ sealed interface JniDifficultyAttributes : AutoCloseable {
     fun createPerformance(state: JniScoreState? = null): JniPerformance {
         return JniPerformance.createByDifficultyAttributes(this, state)
     }
+
     fun createPerformance(): JniPerformance {
         return JniPerformance.createByDifficultyAttributes(this)
     }
@@ -21,6 +22,13 @@ sealed interface JniDifficultyAttributes : AutoCloseable {
             speedNoteCount: Double,
             aimDifficultStrainCount: Double,
             speedDifficultStrainCount: Double,
+            ar: Double,
+            od: Double,
+            hp: Double,
+            nCircles: Int,
+            nSliders: Int,
+            nLargeTicks: Int,
+            nSpinners: Int,
             stars: Double,
             maxCombo: Int,
         ): JniDifficultyAttributes =
@@ -32,6 +40,13 @@ sealed interface JniDifficultyAttributes : AutoCloseable {
                 speedNoteCount,
                 aimDifficultStrainCount,
                 speedDifficultStrainCount,
+                ar,
+                od,
+                hp,
+                nCircles,
+                nSliders,
+                nLargeTicks,
+                nSpinners,
                 stars,
                 maxCombo
             )
@@ -45,6 +60,7 @@ sealed interface JniDifficultyAttributes : AutoCloseable {
             peak: Double,
             greatHitWindow: Double,
             okHitWindow: Double,
+            monoStaminaFactor: Double,
             stars: Double,
             maxCombo: Int,
             isConvert: Boolean,
@@ -56,6 +72,7 @@ sealed interface JniDifficultyAttributes : AutoCloseable {
                 peak,
                 greatHitWindow,
                 okHitWindow,
+                monoStaminaFactor,
                 stars,
                 maxCombo,
                 isConvert
@@ -79,10 +96,11 @@ sealed interface JniDifficultyAttributes : AutoCloseable {
             stars: Double,
             hitWindow: Double,
             nObjects: Int,
+            nHoldNotes: Int,
             maxCombo: Int,
             isConvert: Boolean,
         ): JniDifficultyAttributes =
-            ManiaDifficultyAttributes(stars, hitWindow, nObjects, maxCombo, isConvert)
+            ManiaDifficultyAttributes(stars, hitWindow, nObjects, nHoldNotes, maxCombo, isConvert)
 
     }
 }
@@ -95,6 +113,13 @@ data class OsuDifficultyAttributes(
     val speedNoteCount: Double = 0.0,
     val aimDifficultStrainCount: Double = 0.0,
     val speedDifficultStrainCount: Double = 0.0,
+    val ar: Double = 0.0,
+    val od: Double = 0.0,
+    val hp: Double = 0.0,
+    val nCircles: Int = 0,
+    val nSliders: Int = 0,
+    val nLargeTicks: Int = 0,
+    val nSpinners: Int = 0,
     val stars: Double = 0.0,
     @get:JvmName("maxCombo")
     val maxCombo: Int = 0,
@@ -110,6 +135,7 @@ data class TaikoDifficultyAttributes(
     val peak: Double = 0.0,
     val greatHitWindow: Double = 0.0,
     val okHitWindow: Double = 0.0,
+    val monoStaminaFactor: Double = 0.0,
     val stars: Double = 0.0,
     @get:JvmName("maxCombo")
     val maxCombo: Int = 0,
@@ -136,6 +162,7 @@ data class ManiaDifficultyAttributes(
     val stars: Double = 0.0,
     val hitWindow: Double = 0.0,
     val nObjects: Int = 0,
+    val nHoldNotes: Int = 0,
     @get:JvmName("maxCombo")
     val maxCombo: Int = 0,
     val isConvert: Boolean = false,

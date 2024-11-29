@@ -61,10 +61,12 @@ pub fn set_beatmap_field(env: &mut JNIEnv, this: &JObject, map: &Beatmap) -> Res
     let bpm = JValueGen::Double(map.bpm());
     let sm = JValueGen::Double(map.slider_multiplier);
     let st = JValueGen::Double(map.slider_tick_rate);
+    let objects = JValueGen::Int(map.hit_objects.len() as i32);
     set_beatmap! { BEATMAP_FIELD_MD["modeValue", "I", mode]}
     set_beatmap! { BEATMAP_FIELD_BPM["bpm", "D",bpm]}
     set_beatmap! { BEATMAP_FIELD_SM["sliderMultiplier", "D",sm]}
     set_beatmap! { BEATMAP_FIELD_ST["sliderTickTate", "D",st]}
+    set_beatmap! { BEATMAP_FIELD_OBJS["objects", "I", objects]}
     Ok(())
 }
 

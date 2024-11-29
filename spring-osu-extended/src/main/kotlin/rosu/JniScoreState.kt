@@ -1,6 +1,8 @@
 package org.spring.osu.extended.rosu
 
+import org.spring.osu.OsuMode
 import org.spring.osu.model.LazerScoreStatistics
+import org.spring.osu.model.ScoreStatistics
 
 data class JniScoreState @JvmOverloads constructor(
     var maxCombo: Int = 0,
@@ -37,17 +39,33 @@ data class JniScoreState @JvmOverloads constructor(
 
     companion object {
         @JvmStatic
-        fun create(state: LazerScoreStatistics, maxCombo: Int) = JniScoreState(
+        fun create(state: ScoreStatistics, maxCombo: Int) = JniScoreState(
             maxCombo,
-            state.largeTickHit,
-            state.sliderTailHit,
-            state.perfect,
-            state.good,
-            state.great,
-            state.ok,
-            state.meh,
-            state.miss,
+            0,
+            0,
+            state.countGeki,
+            state.countKatu,
+            state.count300,
+            state.count100,
+            state.count50,
+            state.countMiss,
         )
+
+        @JvmStatic
+        fun create(state: LazerScoreStatistics, maxCombo: Int, mode: OsuMode):JniScoreState {
+            val old = state.toScoreStatistics(mode)
+            return JniScoreState(
+                maxCombo,
+                state.largeTickHit,
+                state.sliderTailHit,
+                old.countGeki,
+                old.countKatu,
+                old.count300,
+                old.count100,
+                old.count50,
+                old.countMiss,
+            )
+        }
 
         @JvmStatic
         fun create(

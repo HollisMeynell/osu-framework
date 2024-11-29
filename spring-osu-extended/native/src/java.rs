@@ -16,6 +16,7 @@ pub(crate) mod cache_key {
     pub const BEATMAP_FIELD_BPM: u32 = 15;
     pub const BEATMAP_FIELD_SM: u32 = 16;
     pub const BEATMAP_FIELD_ST: u32 = 17;
+    pub const BEATMAP_FIELD_OBJS: u32 = 18;
 
     pub const DIFFICULTY_ATTR_CLASS: u32 = 50;
     pub const DIFFICULTY_OSU: u32 = 51;

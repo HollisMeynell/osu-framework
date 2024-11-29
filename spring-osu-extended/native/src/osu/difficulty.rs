@@ -135,6 +135,13 @@ pub fn generate_difficulty_attributes_osu<'l>(
         jvalue {
             d: data.speed_difficult_strain_count,
         },
+        jvalue { d: data.ar },
+        jvalue { d: data.od },
+        jvalue { d: data.hp },
+        jvalue { i: data.n_circles as i32 },
+        jvalue { i: data.n_sliders as i32 },
+        jvalue { i: data.n_large_ticks as i32 },
+        jvalue { i: data.n_spinners as i32 },
         jvalue { d: data.stars },
         jvalue {
             i: data.max_combo as i32,
@@ -144,7 +151,7 @@ pub fn generate_difficulty_attributes_osu<'l>(
         let method = env.get_static_method_id(
             jclass,
             "createOsu",
-            "(DDDDDDDDI)Lorg/spring/osu/extended/rosu/JniDifficultyAttributes;",
+            "(DDDDDDDDDDIIIIDI)Lorg/spring/osu/extended/rosu/JniDifficultyAttributes;",
         )?;
         Ok(method)
     })?;
@@ -170,6 +177,7 @@ pub fn generate_difficulty_attributes_taiko<'l>(
         jvalue {
             d: data.ok_hit_window,
         },
+        jvalue { d: data.mono_stamina_factor },
         jvalue { d: data.stars },
         jvalue {
             i: data.max_combo as i32,
@@ -183,7 +191,7 @@ pub fn generate_difficulty_attributes_taiko<'l>(
         let method = env.get_static_method_id(
             jclass,
             "createTaiko",
-            "(DDDDDDDIZ)Lorg/spring/osu/extended/rosu/JniDifficultyAttributes;",
+            "(DDDDDDDDIZ)Lorg/spring/osu/extended/rosu/JniDifficultyAttributes;",
         )?;
         Ok(method)
     })?;
@@ -241,6 +249,9 @@ pub fn generate_difficulty_attributes_mania<'l>(
             i: data.n_objects as i32,
         },
         jvalue {
+            i: data.n_hold_notes as i32,
+        },
+        jvalue {
             i: data.max_combo as i32,
         },
         jvalue {
@@ -252,7 +263,7 @@ pub fn generate_difficulty_attributes_mania<'l>(
         let method = env.get_static_method_id(
             jclass,
             "createMania",
-            "(DDIIZ)Lorg/spring/osu/extended/rosu/JniDifficultyAttributes;",
+            "(DDiIIZ)Lorg/spring/osu/extended/rosu/JniDifficultyAttributes;",
         )?;
         Ok(method)
     })?;

@@ -16,6 +16,7 @@ import org.spring.osu.model.*
 
 object OsuApi {
     val lazer = LazerApi
+
     /********************************* Oauth ******************************************/
 
     @JvmStatic

@@ -20,7 +20,7 @@ object LazerApi {
         includeFails: Boolean = false,
         auth: UserAuth? = null,
     ): List<LazerScore> {
-        return ApiRequest.request(auth,true) {
+        return ApiRequest.request(auth, true) {
             url.appendPathSegments("users", user.toString(), "scores", type.type)
             url.parameters.apply {
                 if (mode != Default) {
@@ -34,6 +34,7 @@ object LazerApi {
             }
         }
     }
+
     /**
      * @param beatmap [beatmap] beatmap id
      * @param user [user] user id

@@ -2,13 +2,12 @@ package org.spring.osu.extended.api
 
 import com.fasterxml.jackson.databind.JsonNode
 import io.ktor.client.*
-import io.ktor.client.call.body
+import io.ktor.client.call.*
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.utils.io.ByteWriteChannel
-import io.ktor.utils.io.copyAndClose
+import io.ktor.utils.io.*
 import io.ktor.utils.io.jvm.javaio.*
 import org.spring.core.json
 import org.spring.osu.extended.Replay
@@ -86,6 +85,18 @@ object OsuWebApi {
         }
 
         return replay ?: throw Exception("Download replay failed.")
+    }
+
+    suspend fun doDownloadOsuFile(bid: Long): ByteArray {
+        val response = client.get {
+            url.path("osu/$bid")
+        }
+
+        if (response.status.isSuccess().not()) {
+            throw Exception("Download osu file failed [${response.status.description}]")
+        }
+
+        return response.readRawBytes()
     }
 
     suspend fun doDownloadAvatar(account: OsuWebAccount, user: Long): ByteArray {

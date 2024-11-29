@@ -43,6 +43,9 @@ class JniBeatmap private constructor() : NativeClass(0) {
     var sliderTickTate: Double = 0.0
         private set
 
+    var objects: Int = 0
+        private set
+
     fun convertInPlace(mode: OsuMode): Boolean {
         modeValue = mode.value
         return convertInPlace(modeValue.toByte())

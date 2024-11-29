@@ -15,8 +15,10 @@ sealed class NativeClass(
     type: Byte
 ) : AutoCloseable {
     private val _type: Byte = type
+
     @Suppress("LeakingThis")
     private val _c = cleaner.register(this, this::release)
+
     private var _ptr: Long = 0
 
     protected fun release() {
