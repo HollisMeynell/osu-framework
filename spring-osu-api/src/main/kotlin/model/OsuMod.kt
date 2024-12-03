@@ -242,9 +242,9 @@ enum class OsuMod(val value: Int, val acronym: String) {
                 else 0.75f
 
                 od = if (ms < 14) {
-                    (80 - ms) / 6
-                } else {
                     11f
+                } else {
+                    (80 - ms) / 6
                 }
             }
             return od

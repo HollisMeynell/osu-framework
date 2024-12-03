@@ -1,4 +1,5 @@
 @file:Suppress("unused")
+
 package org.spring.osu.extended.rosu
 
 
@@ -50,6 +51,8 @@ class JniBeatmap private constructor() : NativeClass(0) {
         modeValue = mode.value
         return convertInPlace(modeValue.toByte())
     }
+
+    fun setGameMode(mode: OsuMode) = convertInPlace(mode)
 
     fun createDifficulty(): JniDifficulty {
         return JniDifficulty(mode = mode)

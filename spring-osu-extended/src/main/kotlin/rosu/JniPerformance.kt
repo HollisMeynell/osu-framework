@@ -1,4 +1,5 @@
 @file:Suppress("unused")
+
 package org.spring.osu.extended.rosu
 
 import org.spring.core.toJson
@@ -36,6 +37,10 @@ class JniPerformance private constructor(
     external fun setClockRate(value: Double)
     external fun setHitResultPriority(value: Boolean)
 
+    private external fun nativeSetAr(ar: Float, withMods: Boolean)
+    private external fun nativeSetOd(od: Float, withMods: Boolean)
+    private external fun nativeSetCs(cs: Float, withMods: Boolean)
+    private external fun nativeSetHp(hp: Float, withMods: Boolean)
     private external fun nativeSetLazer(lazer: Boolean)
     private external fun nativeSetState(state: ByteArray)
     private external fun nativeSetDifficulty(ptr: Long)
@@ -43,14 +48,26 @@ class JniPerformance private constructor(
     private external fun nativeSetAccuracy(acc: Double)
     private external fun nativeSetModsByStr(mode: Byte, lazer: String)
     private external fun nativeSetModsMix(mode: Byte, legacy: Int, lazer: String)
-
+    private external fun convertInPlace(mode: Byte)
     external fun generateState(): JniScoreState
-    private external fun nativeCalculate(modeInt: Int): JniPerformanceAttributes
+    private external fun nativeCalculate(): JniPerformanceAttributes
 
 
     fun setLazer(value: Boolean) = nativeSetLazer(value)
 
     fun isLazer(value: Boolean) = nativeSetLazer(value)
+
+    fun convertInPlace(mode: OsuMode): Boolean {
+        if (this.mode != OsuMode.Osu && this.mode != mode) {
+            return false
+        }
+        if (this.mode == mode) return true
+        this.mode = mode
+        convertInPlace(mode.value.toByte())
+        return true
+    }
+
+    fun setGameMode(mode: OsuMode) = convertInPlace(mode)
 
     fun setMods(legacy: Int) {
         nativeSetMods(legacy)
@@ -118,7 +135,7 @@ class JniPerformance private constructor(
 
     fun calculate(): JniPerformanceAttributes {
         if (ready().not()) throw IllegalStateException("performance can not be used")
-        return nativeCalculate(mode.value)
+        return nativeCalculate()
     }
 
     companion object {

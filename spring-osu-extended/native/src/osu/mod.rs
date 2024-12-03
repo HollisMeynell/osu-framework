@@ -2,6 +2,7 @@ mod beatmap;
 mod difficulty;
 mod mods;
 mod performance;
+mod gradual;
 
 use crate::java::{throw_jni, JavaBoolean};
 use crate::jni_call;
@@ -14,9 +15,12 @@ use jni::sys::{jboolean, jbyte, jdouble, jfloat, jint, jlong, jobject, JNI_FALSE
 use jni::JNIEnv;
 use jni_macro::jni_fn;
 use rosu_pp::any::HitResultPriority;
+use gradual::*;
 
 mod java_fu {
     use crate::java::get_jni_field_id;
+    use crate::osu::difficulty::DifficultySetter;
+    use crate::osu::performance::PerformanceSetter;
     use crate::{throw, to_status, Result};
     use jni::objects::{JByteArray, JFieldID, JObject, JValueGen};
     use jni::signature::{Primitive, ReturnType};
@@ -26,7 +30,7 @@ mod java_fu {
     use rosu_pp::mania::ManiaDifficultyAttributes;
     use rosu_pp::osu::OsuDifficultyAttributes;
     use rosu_pp::taiko::TaikoDifficultyAttributes;
-    use rosu_pp::{Beatmap, Difficulty, GradualPerformance, Performance};
+    use rosu_pp::{Beatmap, GradualPerformance};
 
     #[warn(unused_must_use)]
     pub fn release_by_type(ptr: i64, type_val: i8) -> Result<()> {
@@ -45,8 +49,8 @@ mod java_fu {
         release_status! {
             type_val, ptr {
                 0 Beatmap,
-                1 Difficulty,
-                2 Performance,
+                1 DifficultySetter,
+                2 PerformanceSetter,
                 3 ScoreState,
                 4 OsuDifficultyAttributes,
                 5 TaikoDifficultyAttributes,
@@ -121,9 +125,9 @@ fn convertInPlace(mut env: JNIEnv, this: JObject, mode_byte: jbyte) -> jboolean 
 macro_rules! set_difficulty_state {
     ($fx:ident:$t:ident) => {
         #[jni_fn("org.spring.osu.extended.rosu.JniDifficulty")]
-        fn $fx(mut env: JNIEnv, this: JObject, value: jfloat, is_lazer: jboolean) {
+        fn $fx(mut env: JNIEnv, this: JObject, value: jfloat, with_mods: jboolean) {
             jni_call! {
-                [env]$t(&mut env, &this, value, is_lazer.is_true())
+                [env]$t(&mut env, &this, value, with_mods.is_true())
             }
         }
     };
@@ -167,6 +171,11 @@ fn nativeSetModsByStr(mut env: JNIEnv, this: JObject, mode: jbyte, lazer: JStrin
 #[jni_fn("org.spring.osu.extended.rosu.JniDifficulty")]
 fn nativeSetModsMix(mut env: JNIEnv, this: JObject, mode: jbyte, legacy: jint, lazer: JString) {
     jni_call!([env]set_difficulty_mods_mix(&mut env, &this, mode, legacy, &lazer))
+}
+
+#[jni_fn("org.spring.osu.extended.rosu.JniPerformance")]
+fn convertInPlace(mut env: JNIEnv, this: JObject, mode_byte: jbyte) {
+    jni_call!([env]set_performance_game_mode(&mut env, &this, mode_byte))
 }
 
 #[jni_fn("org.spring.osu.extended.rosu.JniPerformance")]
@@ -277,6 +286,14 @@ macro_rules! init_performance {
             }
         }
     )+};
+    ($(~$fx:ident>$call:ident;)+) => {$(
+        #[jni_fn("org.spring.osu.extended.rosu.JniPerformance")]
+        fn $fx(mut env: JNIEnv, this: JObject, value: jfloat, with_mods: jboolean) {
+            jni_call! {
+                [env]$call(&mut env, &this, value, with_mods.is_true())
+            }
+        }
+    )+};
 }
 
 init_performance! {
@@ -306,6 +323,13 @@ init_performance! {
     |setLargeTick > set_performance_large_tick;
     |setSliderEnds > set_performance_slider_ends;
     |setPassedObjects > set_performance_passed_objects;
+}
+
+init_performance! {
+    ~nativeSetAr > set_performance_ar;
+    ~nativeSetOd > set_performance_od;
+    ~nativeSetCs > set_performance_cs;
+    ~nativeSetHp > set_performance_hp;
 }
 
 #[jni_fn("org.spring.osu.extended.rosu.JniPerformance")]
@@ -349,6 +373,6 @@ fn setHitResultPriority(mut env: JNIEnv, this: JObject, value: jboolean) {
 }
 
 #[jni_fn("org.spring.osu.extended.rosu.JniPerformance")]
-fn nativeCalculate(mut env: JNIEnv, this: JObject, mode: jint) -> jobject {
-    jni_call!([env]calculate_performance(&mut env, &this, mode) => {JObject::null().into_raw()})
+fn nativeCalculate(mut env: JNIEnv, this: JObject) -> jobject {
+    jni_call!([env]calculate_performance(&mut env, &this) => {JObject::null().into_raw()})
 }

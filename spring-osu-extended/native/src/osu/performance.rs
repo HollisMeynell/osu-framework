@@ -1,6 +1,7 @@
+use std::ops::Not;
 use super::java_fu::{get_object_ptr, release_object, set_object_ptr};
 use crate::java::cache_key::*;
-use crate::java::{get_jni_class, get_jni_method_id, get_jni_static_method_id};
+use crate::java::{get_jni_class, get_jni_static_method_id};
 use crate::osu::difficulty::*;
 use crate::{get_class, get_mods_from_java, to_ptr, to_status, to_status_use, Result};
 use bytes::{Buf, Bytes};
@@ -14,7 +15,135 @@ use rosu_pp::mania::ManiaDifficultyAttributes;
 use rosu_pp::model::mode::GameMode;
 use rosu_pp::osu::OsuDifficultyAttributes;
 use rosu_pp::taiko::TaikoDifficultyAttributes;
-use rosu_pp::{Beatmap, Difficulty, GradualPerformance, Performance};
+use rosu_pp::{Beatmap, Difficulty, GameMods, Performance};
+
+struct PerformanceValue {
+    mode: Option<GameMode>,
+    mods: Option<GameMods>,
+    difficulty: Option<Difficulty>,
+    passed_objects: Option<u32>,
+    clock_rate: Option<f64>,
+    ar: Option<(f32, bool)>,
+    od: Option<(f32, bool)>,
+    cs: Option<(f32, bool)>,
+    hp: Option<(f32, bool)>,
+    hardrock_offsets: Option<bool>,
+    state: Option<ScoreState>,
+    accuracy: Option<f64>,
+    misses: Option<u32>,
+    combo: Option<u32>,
+    hitresult_priority: Option<HitResultPriority>,
+    lazer: Option<bool>,
+    large_tick_hits: Option<u32>,
+    n_slider_ends: Option<u32>,
+    n300: Option<u32>,
+    n100: Option<u32>,
+    n50: Option<u32>,
+    n_katu: Option<u32>,
+    n_geki: Option<u32>,
+}
+
+impl Default for PerformanceValue {
+    fn default() -> Self {
+        Self {
+            mode: None,
+            mods: None,
+            difficulty: None,
+            passed_objects: None,
+            clock_rate: None,
+            ar: None,
+            od: None,
+            cs: None,
+            hp: None,
+            hardrock_offsets: None,
+            state: None,
+            accuracy: None,
+            misses: None,
+            combo: None,
+            hitresult_priority: None,
+            lazer: None,
+            large_tick_hits: None,
+            n_slider_ends: None,
+            n300: None,
+            n100: None,
+            n50: None,
+            n_katu: None,
+            n_geki: None,
+        }
+    }
+}
+
+pub(crate) struct PerformanceSetter<'map> {
+    value: Option<PerformanceValue>,
+    cache: Option<Performance<'map>>,
+    changed: bool,
+}
+
+impl PerformanceSetter<'_> {
+    fn get_performance(&mut self) -> Result<Performance> {
+        let mut performance = if let Some(data) = self.cache.take() {
+            data
+        } else {
+            return Err("performance is released".into())
+        };
+
+        if self.changed.not() {
+            return Ok(performance);
+        }
+
+        let values = self.value.get_or_insert_with(PerformanceValue::default);
+        macro_rules! set_performance {
+            ($($key:ident,)+) => {$(
+                if let Some(v) = values.$key {
+                    performance = performance.$key(v);
+                }
+            )+};
+            ($(+$key:ident,)+) => {$(
+                if let Some((v, with_mods)) = values.$key {
+                    performance = performance.$key(v, with_mods);
+                }
+            )+};
+            ($(>$key:ident,)+) => {$(
+                if let Some(v) = &values.$key {
+                    performance = performance.$key(v.clone());
+                }
+            )+};
+        }
+        set_performance! {
+            passed_objects,
+            clock_rate,hardrock_offsets,
+            accuracy,
+            misses,
+            combo,
+            lazer,
+            large_tick_hits,
+            n_slider_ends,
+            n300,
+            n100,
+            n50,
+            n_katu,
+            n_geki,
+        }
+        set_performance! {
+            >difficulty,
+            >state,
+            >hitresult_priority,
+        }
+        set_performance! {
+            +ar,
+            +od,
+            +cs,
+            +hp,
+        }
+        if let Some(mode) = values.mode {
+            performance = performance.mode_or_ignore(mode);
+        }
+        if let Some(mods) = &values.mods {
+            performance = performance.mods(mods.clone());
+        }
+        Ok(performance)
+    }
+}
 
 pub fn generate_state(env: &mut JNIEnv, obj: &JObject) -> Result<jobject> {
     let ptr = get_object_ptr(env, obj)?;
@@ -100,8 +229,13 @@ macro_rules! init_performance {
         ) -> Result<()> {
             let from = to_status_use::<$ty>(ptr)?;
             let performance = Performance::new(from.clone());
-            let performance_ptr = to_ptr(performance);
-            set_object_ptr(env, this, performance_ptr)?;
+            let setter = PerformanceSetter {
+                value: None,
+                cache: Some(performance),
+                changed: false,
+            };
+            let ptr = to_ptr(setter);
+            set_object_ptr(env, this, ptr)?;
             Ok(())
         }
     )+};
@@ -114,9 +248,16 @@ macro_rules! init_performance {
         ) -> Result<()> {
             let from = to_status_use::<$ty>(ptr)?;
             let state = parse_java_state(env, state)?;
-            let performance = Performance::new(from.clone()).state(state);
-            let performance_ptr = to_ptr(performance);
-            set_object_ptr(env, this, performance_ptr)?;
+            let performance = Performance::new(from.clone()).state(state.clone());
+            let mut value = PerformanceValue::default();
+            value.state = Some(state);
+            let setter = PerformanceSetter {
+                value: Some(value),
+                cache: Some(performance),
+                changed: false,
+            };
+            let ptr = to_ptr(setter);
+            set_object_ptr(env, this, ptr)?;
             Ok(())
         }
     )+};
@@ -141,28 +282,35 @@ init_performance! {
 fn set_performance_attr(
     env: &mut JNIEnv,
     this: &JObject,
-    f: impl FnOnce(Box<Performance>) -> Performance,
+    f: impl FnOnce(&mut PerformanceValue),
 ) -> Result<()> {
     let ptr = get_object_ptr(env, this)?;
-    let performance = to_status(ptr)?;
-    let performance = f(performance);
-    let ptr = to_ptr(performance);
-    set_object_ptr(env, this, ptr)?;
+    let setter = to_status_use::<PerformanceSetter>(ptr)?;
+    let value = setter.value.get_or_insert_with(PerformanceValue::default);
+    f(value);
+    setter.changed = true;
     Ok(())
 }
 
 macro_rules! set_state {
     ($($fx:ident($f:ident);)+) => { $(
         pub fn $fx(env: &mut JNIEnv, this: &JObject, value:jint) -> Result<()> {
-            set_performance_attr(env, this, |performance| {
-                performance.$f(value as u32)
+            set_performance_attr(env, this, |v| {
+                v.$f = Some(value as u32)
             })
         }
     )+};
     ($($fx:ident[$f:ident:$t:ty];)+) => { $(
         pub fn $fx(env: &mut JNIEnv, this: &JObject, value:$t) -> Result<()> {
-            set_performance_attr(env, this, |performance| {
-                performance.$f(value)
+            set_performance_attr(env, this, |v| {
+                v.$f = Some(value)
+            })
+        }
+    )+};
+    ($($fx:ident{$f:ident};)+) => { $(
+        pub fn $fx(env: &mut JNIEnv, this: &JObject, value: f32, with_mods: bool) -> Result<()> {
+            set_performance_attr(env, this, |v| {
+                v.$f = Some((value, with_mods))
             })
         }
     )+};
@@ -183,15 +331,26 @@ set_state! {
 
 set_state! {
     set_performance_is_lazer[lazer:bool];
-    set_performance_is_hardrock[lazer:bool];
+    set_performance_is_hardrock[hardrock_offsets:bool];
     set_performance_clock_rate[clock_rate:f64];
     set_performance_accuracy[accuracy:f64];
     set_performance_hitresult_priority[hitresult_priority:HitResultPriority];
 }
 
+set_state! {
+    set_performance_ar{ar};
+    set_performance_od{od};
+    set_performance_cs{cs};
+    set_performance_hp{hp};
+}
+
+pub fn set_performance_game_mode(env: &mut JNIEnv, this: &JObject, mode: jbyte) -> Result<()> {
+    let mode = GameMode::from(mode as u8);
+    set_performance_attr(env, this, |v| v.mode = Some(mode))
+}
 pub fn set_performance_mods_bitflag(env: &mut JNIEnv, this: &JObject, legacy: jint) -> Result<()> {
     let legacy = get_mods_from_java!(legacy);
-    set_performance_attr(env, this, |performance| performance.mods(legacy))
+    set_performance_attr(env, this, |v| v.mods = Some(legacy))
 }
 
 pub fn set_performance_mods_lazer(
@@ -201,7 +360,7 @@ pub fn set_performance_mods_lazer(
     lazer: &JString,
 ) -> Result<()> {
     let lazer = get_mods_from_java!(env, mode, lazer)?;
-    set_performance_attr(env, this, |performance| performance.mods(lazer))
+    set_performance_attr(env, this, |v| v.mods = Some(lazer))
 }
 
 pub fn set_performance_mods_mix(
@@ -212,12 +371,12 @@ pub fn set_performance_mods_mix(
     lazer: &JString,
 ) -> Result<()> {
     let all = get_mods_from_java!(env, mode, legacy, lazer)?;
-    set_performance_attr(env, this, |performance| performance.mods(all))
+    set_performance_attr(env, this, |v| v.mods = Some(all))
 }
 
 pub fn set_performance_state(env: &mut JNIEnv, this: &JObject, state: &JByteArray) -> Result<()> {
     let state = parse_java_state(env, state)?;
-    set_performance_attr(env, this, |performance| performance.state(state))?;
+    set_performance_attr(env, this, |v| v.state = Some(state))?;
     Ok(())
 }
 
@@ -227,14 +386,14 @@ pub fn set_performance_difficulty(
     difficulty: jlong,
 ) -> Result<()> {
     let ptr = difficulty;
-    let difficulty = to_status_use::<Difficulty>(ptr)?;
-    set_performance_attr(env, this, |performance| {
-        performance.difficulty(difficulty.clone())
+    let difficulty_setter = to_status_use::<DifficultySetter>(ptr)?;
+    set_performance_attr(env, this, |setter| {
+        setter.difficulty = Some(difficulty_setter.get_difficulty().clone())
     })?;
     Ok(())
 }
 
-fn attribute_to_object(env: &mut JNIEnv, attr: PerformanceAttributes) -> Result<jclass> {
+pub(super) fn attribute_to_object(env: &mut JNIEnv, attr: PerformanceAttributes) -> Result<jclass> {
     let global = get_jni_class(
         PERFORMANCE_ATTR_CLASS,
         env,
@@ -343,85 +502,11 @@ fn attribute_to_object(env: &mut JNIEnv, attr: PerformanceAttributes) -> Result<
     Ok(obj?.as_raw())
 }
 
-pub fn calculate_performance(env: &mut JNIEnv, this: &JObject, mode: jint) -> Result<jclass> {
+pub fn calculate_performance(env: &mut JNIEnv, this: &JObject) -> Result<jclass> {
     let ptr = get_object_ptr(env, this)?;
     release_object(env, this)?;
-    let performance = to_status::<Performance>(ptr)?;
-    let mode = GameMode::from(mode as u8);
-    let attr = performance.mode_or_ignore(mode).calculate();
+    let mut setter = to_status::<PerformanceSetter>(ptr)?;
+    let attr = setter.get_performance()?.calculate();
+    release_object(env, this)?;
     attribute_to_object(env, attr)
-}
-
-pub fn gradual_performance(
-    env: &mut JNIEnv,
-    this: &JObject,
-    beatmap_ptr: jlong,
-) -> Result<jobject> {
-    let beatmap = to_status_use(beatmap_ptr)?;
-    let difficulty_ptr = get_object_ptr(env, this)?;
-    let difficulty = to_status::<Difficulty>(difficulty_ptr)?;
-    release_object(env, this)?;
-
-    let gradual = difficulty.gradual_performance(beatmap);
-    let global = get_jni_class(
-        GRADUAL_PERFORMANCE_CLASS,
-        env,
-        "org/spring/osu/extended/rosu/JniGradualPerformance",
-    )?;
-    let class = get_class!(global);
-    let method = get_jni_method_id(GRADUAL_PERFORMANCE_INIT, || {
-        let method = env.get_method_id(
-            class,
-            "<init>",
-            "(Lorg/spring/osu/extended/rosu/JniScoreState;)V",
-        )?;
-        Ok(method)
-    })?;
-
-    let state = generate_java_state(env, ScoreState::new())?;
-    let obj = unsafe { env.new_object_unchecked(class, method, &[jvalue { l: state }]) }?;
-    set_object_ptr(env, &obj, to_ptr(gradual))?;
-    Ok(obj.into_raw())
-}
-
-pub fn gradual_len(env: &mut JNIEnv, this: &JObject) -> Result<jint> {
-    let ptr = get_object_ptr(env, this)?;
-    let gradual = to_status_use::<GradualPerformance>(ptr)?;
-    Ok(gradual.len() as i32)
-}
-
-fn gradual_action(
-    env: &mut JNIEnv,
-    this: &JObject,
-    state: &JByteArray,
-    fun: impl FnOnce(&mut GradualPerformance, ScoreState) -> Option<PerformanceAttributes>,
-) -> Result<jobject> {
-    let state = parse_java_state(env, state)?;
-    let ptr = get_object_ptr(env, this)?;
-    let gradual = to_status_use::<GradualPerformance>(ptr)?;
-    let attr = fun(gradual, state);
-    let obj = match attr {
-        Some(data) => attribute_to_object(env, data)?,
-        None => JObject::null().into_raw(),
-    };
-    Ok(obj)
-}
-
-pub fn gradual_next(env: &mut JNIEnv, this: &JObject, state: &JByteArray) -> Result<jobject> {
-    gradual_action(env, this, state, |gradual, state| gradual.next(state))
-}
-
-pub fn gradual_last(env: &mut JNIEnv, this: &JObject, state: &JByteArray) -> Result<jobject> {
-    gradual_action(env, this, state, |gradual, state| gradual.last(state))
-}
-
-pub fn gradual_nth(
-    env: &mut JNIEnv,
-    this: &JObject,
-    state: &JByteArray,
-    n: jint,
-) -> Result<jobject> {
-    gradual_action(env, this, state, |gradual, state| {
-        gradual.nth(state, n as usize)
-    })
 }
