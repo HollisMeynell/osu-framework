@@ -97,7 +97,6 @@ pub fn throw_jni(env: &mut JNIEnv, err: NativeError) {
     if env.exception_check().expect("check error.") {
         env.exception_describe().expect("show");
     }
-    env.exception_clear().expect("clear error.");
     env.throw_new("Ljava/lang/Exception;", err.err_info())
         .expect("error!");
 }

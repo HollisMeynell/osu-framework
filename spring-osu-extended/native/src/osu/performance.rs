@@ -514,6 +514,5 @@ pub fn calculate_performance(env: &mut JNIEnv, this: &JObject) -> Result<jclass>
     release_object(env, this)?;
     let mut setter = to_status::<PerformanceSetter>(ptr)?;
     let attr = setter.get_performance()?.calculate();
-    release_object(env, this)?;
     attribute_to_object(env, attr)
 }
