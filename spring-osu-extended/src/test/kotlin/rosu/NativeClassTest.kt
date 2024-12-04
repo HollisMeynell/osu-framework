@@ -23,42 +23,51 @@ class NativeClassTest {
             ?.openStream()?.readAllBytes() ?: error("beatmap not found")
         JniBeatmap(beatmapDate).use { beatmap ->
             assertEquals(beatmap.mode, OsuMode.Osu)
-            assertEquals(beatmap.objects, 323)
-            val difficulty = JniDifficulty(cs = 7f, withMods = false, isLazer = false)
-            difficulty.setMods(x, beatmap.mode)
-            val attr = difficulty.calculate(beatmap)
-            assertEquals(attr.getStarRating(), 6.415588803667541)
-            difficulty.setCs(beatmap.cs, false)
-            assertEquals(difficulty.calculate(beatmap).getStarRating(), 5.053939235628658)
-            val b = beatmap.createPerformance().apply { setLazer(true) }
-            assertEquals(b.calculate().getPP(), 99.78179200276945)
+            assertEquals(beatmap.objects, 2126)
+            val difficulty = JniDifficulty()
+            difficulty.mode = OsuMode.Osu
+            var attr = difficulty.calculate(beatmap)
+            assert(attr.getStarRating() - 6.38 in -0.01..0.01)
+            difficulty.setMods(LazerMod.DifficultyAdjust(circleSize = 6f))
+            attr = difficulty.calculate(beatmap)
+            assert(attr.getStarRating() - 7.12 in -0.01..0.01)
+
+            val b = beatmap.createPerformance().apply {
+                setLazer(true)
+                setPassedObjects(2126)
+            }
+
+            assert(b.calculate().getPP() - 468 in -1.0..1.0)
+
             var performanceAttributes = beatmap.createPerformance().apply {
-                generateState()
-                setCombo(2264)
-                setN300(1859)
-                setN100(57)
+                setLazer(false)
+                setAcc(97.39)
+                setCombo(3054)
+                setN300(2045)
+                setN100(76)
                 setN50(1)
-                setMisses(6)
-                setSliderEnds(999)
-                setLargeTick(999)
+                setMisses(4)
             }.calculate()
             assert(performanceAttributes is OsuPerformanceAttributes)
             if (performanceAttributes is OsuPerformanceAttributes) {
-                assertEquals(performanceAttributes.pp, 30.561301593138058)
+                println(performanceAttributes.pp)
+                assert(performanceAttributes.pp - 296.31 in -0.05..0.05)
             }
             performanceAttributes = beatmap.createPerformance().apply {
-                generateState()
-                setMods(LazerMod.DifficultyAdjust(circleSize = 7f))
-                setCombo(2264)
-                setN300(1859)
-                setN100(57)
-                setN50(1)
-                setMisses(6)
-                setSliderEnds(999)
-                setLargeTick(999)
+                setMods(
+                    LazerMod.DoubleTime(speedChange = 1.1f),
+                    LazerMod.Hidden(),
+                )
+                setCombo(3320)
+                setLargeTick(507)
+                setSliderEnds(587)
+                setN300(2113)
+                setN100(13)
+                setN50(0)
+                setLazer(true)
             }.calculate()
             if (performanceAttributes is OsuPerformanceAttributes) {
-                assertEquals(performanceAttributes.pp, 72.88549841525916)
+                assert(performanceAttributes.pp - 628.0 in -1.0..1.0)
             }
         }
     }

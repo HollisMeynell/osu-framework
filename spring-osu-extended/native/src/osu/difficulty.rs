@@ -368,7 +368,7 @@ pub fn generate_difficulty_attributes_mania<'l>(
         let method = env.get_static_method_id(
             jclass,
             "createMania",
-            "(DDiIIZ)Lorg/spring/osu/extended/rosu/JniDifficultyAttributes;",
+            "(DDIIIZ)Lorg/spring/osu/extended/rosu/JniDifficultyAttributes;",
         )?;
         Ok(method)
     })?;
