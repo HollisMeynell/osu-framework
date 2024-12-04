@@ -8,6 +8,7 @@ dependencies {
     api(libs.hoplite)
     api(libs.hoplite.toml)
     api(libs.hikari)
+    api(libs.ktor.client.cio)
     api(libs.ktor.server.auth)
     api(libs.ktor.server.core)
     api(libs.ktor.server.cio)

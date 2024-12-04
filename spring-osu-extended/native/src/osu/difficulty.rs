@@ -46,7 +46,7 @@ pub(crate) struct DifficultySetter {
 }
 
 impl DifficultySetter {
-    pub fn get_difficulty(&mut self) -> &mut Difficulty{
+    pub fn get_difficulty(&mut self) -> &mut Difficulty {
         let difficulty = self.get_cache();
         self.cache.insert(difficulty)
     }
@@ -55,7 +55,7 @@ impl DifficultySetter {
         self.get_cache()
     }
 
-    fn get_cache(&mut self) -> Difficulty{
+    fn get_cache(&mut self) -> Difficulty {
         let setter = self;
         let mut difficulty = if let Some(difficulty) = setter.cache.take() {
             difficulty
@@ -63,22 +63,22 @@ impl DifficultySetter {
             Difficulty::new()
         };
         if !setter.changed {
-            return difficulty
+            return difficulty;
         }
         if setter.values.is_some() || setter.mods.is_some() {
             if let Some(values) = &setter.values {
                 macro_rules! set_value {
-                (>$key:ident) => {
-                    if let Some((value, with_mode)) = values.$key {
-                        difficulty = difficulty.$key(value, with_mode);
-                    }
-                };
-                ($key:ident) => {
-                    if let Some(value) = values.$key {
-                        difficulty = difficulty.$key(value);
-                    }
-                };
-            }
+                    (>$key:ident) => {
+                        if let Some((value, with_mode)) = values.$key {
+                            difficulty = difficulty.$key(value, with_mode);
+                        }
+                    };
+                    ($key:ident) => {
+                        if let Some(value) = values.$key {
+                            difficulty = difficulty.$key(value);
+                        }
+                    };
+                }
                 set_value!(>ar);
                 set_value!(>od);
                 set_value!(>cs);
@@ -159,11 +159,7 @@ pub fn set_difficulty_mods_mix(
 }
 
 #[inline]
-fn set_difficulty_mods(
-    env: &mut JNIEnv,
-    this: &JObject,
-    mods: GameMods,
-) -> Result<()> {
+fn set_difficulty_mods(env: &mut JNIEnv, this: &JObject, mods: GameMods) -> Result<()> {
     let ptr = get_object_ptr(env, this)?;
     let setter = to_status_use::<DifficultySetter>(ptr)?;
     setter.mods = Some(mods);
@@ -237,10 +233,18 @@ pub fn generate_difficulty_attributes_osu<'l>(
         jvalue { d: data.ar },
         jvalue { d: data.od },
         jvalue { d: data.hp },
-        jvalue { i: data.n_circles as i32 },
-        jvalue { i: data.n_sliders as i32 },
-        jvalue { i: data.n_large_ticks as i32 },
-        jvalue { i: data.n_spinners as i32 },
+        jvalue {
+            i: data.n_circles as i32,
+        },
+        jvalue {
+            i: data.n_sliders as i32,
+        },
+        jvalue {
+            i: data.n_large_ticks as i32,
+        },
+        jvalue {
+            i: data.n_spinners as i32,
+        },
         jvalue { d: data.stars },
         jvalue {
             i: data.max_combo as i32,
@@ -276,7 +280,9 @@ pub fn generate_difficulty_attributes_taiko<'l>(
         jvalue {
             d: data.ok_hit_window,
         },
-        jvalue { d: data.mono_stamina_factor },
+        jvalue {
+            d: data.mono_stamina_factor,
+        },
         jvalue { d: data.stars },
         jvalue {
             i: data.max_combo as i32,

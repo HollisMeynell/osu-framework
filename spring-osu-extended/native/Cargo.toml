@@ -23,7 +23,7 @@ members = [
 [dependencies]
 jni-macro = { version = "0.0.1", path = "jni_macro" }
 jni = "0.21.1"
-rosu-pp = { git = "https://github.com/MaxOhn/rosu-pp.git", branch = "main" }
+rosu-pp = "2.0.0"
 rosu-mods = { version = "0.2.0", features = ["serde"] }
 thiserror = "2.0.3"
 serde = "1.0"

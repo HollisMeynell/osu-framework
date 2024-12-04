@@ -13,7 +13,7 @@
 - [x] 基础api: match
 - [x] 扩展osu api: web (实现谱面下载 / 主页查询)
 - [x] 扩展osu api: 比赛持续动态监听 (非irc)
-- [ ] 扩展osu api: 星级/pp 计算 (进行中)
+- [x] 扩展osu api: [星级/pp 计算](spring-osu-extended/) (基于 [rosu-pp](https://github.com/MaxOhn/rosu-pp))
 - [ ] 扩展osu api: irc 连接
 - [ ] 扩展osu api: 收藏夹编辑
 

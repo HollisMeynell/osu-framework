@@ -7,6 +7,7 @@ import org.spring.osu.model.ScoreStatistics
 data class JniScoreState @JvmOverloads constructor(
     var maxCombo: Int = 0,
     var largeTickHits: Int = 0,
+    var smallTickHits: Int = 0,
     var sliderEndHits: Int = 0,
     var geki: Int = 0,
     var katu: Int = 0,
@@ -27,13 +28,14 @@ data class JniScoreState @JvmOverloads constructor(
         }
         writeInt(0, maxCombo)
         writeInt(1, largeTickHits)
-        writeInt(2, sliderEndHits)
-        writeInt(3, geki)
-        writeInt(4, katu)
-        writeInt(5, n300)
-        writeInt(6, n100)
-        writeInt(7, n50)
-        writeInt(8, misses)
+        writeInt(2, smallTickHits)
+        writeInt(3, sliderEndHits)
+        writeInt(4, geki)
+        writeInt(5, katu)
+        writeInt(6, n300)
+        writeInt(7, n100)
+        writeInt(8, n50)
+        writeInt(9, misses)
         return data
     }
 
@@ -41,6 +43,7 @@ data class JniScoreState @JvmOverloads constructor(
         @JvmStatic
         fun create(state: ScoreStatistics, maxCombo: Int) = JniScoreState(
             maxCombo,
+            0,
             0,
             0,
             state.countGeki,
@@ -57,6 +60,7 @@ data class JniScoreState @JvmOverloads constructor(
             return JniScoreState(
                 maxCombo,
                 state.largeTickHit,
+                state.smallTickHit,
                 state.sliderTailHit,
                 old.countGeki,
                 old.countKatu,
@@ -71,6 +75,7 @@ data class JniScoreState @JvmOverloads constructor(
         fun create(
             maxCombo: Int = 0,
             largeTickHits: Int = 0,
+            smallTickHits: Int = 0,
             sliderEndHits: Int = 0,
             geki: Int = 0,
             katu: Int = 0,
@@ -82,6 +87,7 @@ data class JniScoreState @JvmOverloads constructor(
             return JniScoreState(
                 maxCombo,
                 largeTickHits,
+                smallTickHits,
                 sliderEndHits,
                 geki,
                 katu,

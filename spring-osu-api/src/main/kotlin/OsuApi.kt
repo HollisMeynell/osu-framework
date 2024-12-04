@@ -7,9 +7,11 @@ import com.fasterxml.jackson.databind.JsonNode
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.utils.io.ByteWriteChannel
-import io.ktor.utils.io.copyAndClose
-import org.spring.core.*
+import io.ktor.utils.io.*
+import org.spring.core.json
+import org.spring.core.jsonList
+import org.spring.core.log
+import org.spring.core.synchronizedRun
 import org.spring.osu.ApiRequest.setAuth
 import org.spring.osu.OsuMode.*
 import org.spring.osu.model.*
@@ -138,7 +140,7 @@ object OsuApi {
     suspend fun getBeatmapAttributes(
         beatmap: Long,
         mode: OsuMode = Default,
-        mods: List<OsuMod> = emptyList(),
+        mods: List<OsuMod>? = null,
         auth: UserAuth? = null,
     ): BeatmapDifficultyAttributes {
 
@@ -149,10 +151,13 @@ object OsuApi {
                 if (mode != Default) {
                     append("ruleset", mode.describe)
                 }
-                if (mods.contains(OsuMod.None))
+                if (mods.isNullOrEmpty()) {
+                    // do nothing
+                } else if (mods.contains(OsuMod.None)) {
                     append("mods[]", "NM")
-                else
+                } else {
                     mods.forEach { m -> append("mods[]", m.acronym) }
+                }
             }
         }
         node = node.get("attributes")

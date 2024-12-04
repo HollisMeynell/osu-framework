@@ -3,6 +3,7 @@ package org.spring.web
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.github.oshai.kotlinlogging.KotlinLogging
+import io.ktor.client.*
 import io.ktor.http.*
 import io.ktor.serialization.jackson.*
 import io.ktor.server.application.Application
@@ -27,6 +28,7 @@ import org.spring.osu.persistence.OsuDatabases
 import org.spring.web.databases.OsuAuth
 
 object WebServer {
+    lateinit var httpClient: HttpClient
     private val log = KotlinLogging.logger { }
 
     fun initServer(wait: Boolean = true) {
@@ -50,6 +52,9 @@ object WebServer {
         val proxy = config.proxy?.toProxy() ?: config.osu.proxy?.toProxy()
         OsuWebApi.init(proxy)
         OsuApi.init(config.osu)
+
+        // init http client
+        WebClient.initClient(config.proxy)
 
         // start server
         val server = embeddedServer(CIO, port = config.server.port) {

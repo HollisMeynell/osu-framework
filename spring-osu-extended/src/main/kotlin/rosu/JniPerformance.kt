@@ -31,6 +31,7 @@ class JniPerformance private constructor(
     external fun setN50(value: Int)
     external fun setMisses(value: Int)
     external fun setLargeTick(value: Int)
+    external fun setSmallTick(value: Int)
     external fun setSliderEnds(value: Int)
     external fun setPassedObjects(value: Int)
     external fun setHardrock(value: Boolean)

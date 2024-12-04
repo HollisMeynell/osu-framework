@@ -1,10 +1,16 @@
 package org.spring.web.service
 
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import io.ktor.utils.io.*
 import org.spring.osu.OsuApi
 import org.spring.osu.OsuMode
 import org.spring.osu.model.Beatmap
 import org.spring.osu.model.OsuMod
 import org.spring.osu.model.User
+import org.spring.web.HttpTipsException
+import org.spring.web.WebClient
 import org.spring.web.WebConfig
 
 object YasunaoriService {
@@ -21,28 +27,68 @@ object YasunaoriService {
         if (uid == null && name == null) {
             return YasunaoriUserInfo("uid 与 name 不能同时为空.")
         }
-        return try {
-            val user = OsuApi.getUser(user = uid, name = name, mode = osuMode)
-            YasunaoriUserInfo(user)
-        } catch (e: Exception) {
-            YasunaoriUserInfo("获取用户信息失败: ${e.message}")
-        }
+        val user = OsuApi.getUser(user = uid, name = name, mode = osuMode)
+        return YasunaoriUserInfo(user)
     }
 
     fun getAvatarUrl(user: Long): String {
-        return "$AVATAR_URL_PREFIX$user"
+        val id = zipNumber(user)
+        return "$AVATAR_URL_PREFIX$id"
     }
 
-    suspend fun getBeatmap(bid: Long?, mods: String?, mode: String?) : YasunaoriBeatmapInfo {
+    suspend fun outAvatar(uid: String, out: suspend ByteReadChannel.() -> Unit) {
+        val id = unzipNumber(uid)
+        val request = WebClient.proxyClient.prepareRequest {
+            url("https://a.ppy.sh/$id")
+        }
+
+        request.execute {
+            if (!it.status.isSuccess()) {
+                val message = it.bodyAsText()
+                throw HttpTipsException(message = message)
+            }
+            it.bodyAsChannel().out()
+        }
+    }
+
+    private fun zipNumber(n: Long): String {
+        val sb = StringBuilder()
+        var number = n
+        var mod: Int
+        var c: Char
+        while (number > 0) {
+            mod = (number % 62).toInt()
+            c = when {
+                mod < 10 -> '0' + mod
+                mod < 36 -> 'a' + mod - 10
+                else -> 'A' + mod - 36
+            }
+            sb.append(c)
+            number /= 62
+        }
+        return sb.reverse().toString()
+    }
+
+    private fun unzipNumber(s: String): Long {
+        var result = 0L
+        for (c in s) {
+            result = result * 62 + when (c) {
+                in '0'..'9' -> c - '0'
+                in 'a'..'z' -> c - 'a' + 10
+                in 'A'..'Z' -> c - 'A' + 36
+                else -> 0
+            }
+        }
+        return result
+    }
+
+    suspend fun getBeatmap(bid: Long?, mods: String?, mode: String?): YasunaoriBeatmapInfo {
         if (bid == null) {
             return YasunaoriBeatmapInfo("bid 不能为空")
         }
         val osuMode = OsuMode.getMode(mode)
-        val beatmapInfo = try {
-            OsuApi.getBeatmap(bid)
-        } catch (e: Exception) {
-            return YasunaoriBeatmapInfo("获取谱面信息失败: ${e.message}")
-        }
+        val beatmapInfo = OsuApi.getBeatmap(bid)
+
         val stats = YasunaoriBeatmapInfo.Stats(
             length = beatmapInfo.totalLength,
             bpm = beatmapInfo.bpm!!,
@@ -52,20 +98,11 @@ object YasunaoriService {
             hp = beatmapInfo.drain!!,
         )
         val difficulty = if (mods != null || osuMode != beatmapInfo.mode) {
-            val modList = mods?.let {
-                val m = try {
-                    OsuMod.getAllMod(it.toInt())
-                } catch (e: NumberFormatException) {
-                    OsuMod.getAllMod(it)
-                }
-                stats.setMods(m)
-                return@let m
-            } ?: emptyList()
-            val attr = try {
-                OsuApi.getBeatmapAttributes(bid, mode = osuMode, mods = modList)
-            } catch (e: Exception) {
-                return YasunaoriBeatmapInfo("获取谱面属性失败: ${e.message}")
+            if (osuMode != beatmapInfo.mode && beatmapInfo.mode != OsuMode.Osu) {
+                return YasunaoriBeatmapInfo("该谱面不支持转换为该模式")
             }
+            val modList = mods?.let { OsuMod.getAllMod(it) }
+            val attr = OsuApi.getBeatmapAttributes(bid, osuMode, modList)
             YasunaoriBeatmapInfo.Difficulty(
                 star = attr.starRating,
                 name = beatmapInfo.version,
@@ -103,6 +140,7 @@ data class YasunaoriUserInfo(
         globalRank = null,
         countryRank = null,
     )
+
     constructor(user: User) : this(
         id = user.id,
         username = user.username,
@@ -140,6 +178,7 @@ data class YasunaoriBeatmapInfo(
         stats = stats,
         difficulty = difficulty,
     )
+
     constructor(error: String) : this(
         error = error,
         id = null,
@@ -154,6 +193,7 @@ data class YasunaoriBeatmapInfo(
         stats = null,
         difficulty = null,
     )
+
     data class Stats(
         var length: Int,
         var bpm: Float,

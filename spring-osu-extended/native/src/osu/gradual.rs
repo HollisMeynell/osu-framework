@@ -65,11 +65,19 @@ fn gradual_action(
     Ok(obj)
 }
 
-pub fn gradual_next(env: &mut JNIEnv, this: &JObject, state: &JByteArray) -> crate::Result<jobject> {
+pub fn gradual_next(
+    env: &mut JNIEnv,
+    this: &JObject,
+    state: &JByteArray,
+) -> crate::Result<jobject> {
     gradual_action(env, this, state, |gradual, state| gradual.next(state))
 }
 
-pub fn gradual_last(env: &mut JNIEnv, this: &JObject, state: &JByteArray) -> crate::Result<jobject> {
+pub fn gradual_last(
+    env: &mut JNIEnv,
+    this: &JObject,
+    state: &JByteArray,
+) -> crate::Result<jobject> {
     gradual_action(env, this, state, |gradual, state| gradual.last(state))
 }
 

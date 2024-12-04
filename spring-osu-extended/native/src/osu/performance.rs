@@ -1,4 +1,3 @@
-use std::ops::Not;
 use super::java_fu::{get_object_ptr, release_object, set_object_ptr};
 use crate::java::cache_key::*;
 use crate::java::{get_jni_class, get_jni_static_method_id};
@@ -16,6 +15,7 @@ use rosu_pp::model::mode::GameMode;
 use rosu_pp::osu::OsuDifficultyAttributes;
 use rosu_pp::taiko::TaikoDifficultyAttributes;
 use rosu_pp::{Beatmap, Difficulty, GameMods, Performance};
+use std::ops::Not;
 
 struct PerformanceValue {
     mode: Option<GameMode>,
@@ -35,7 +35,8 @@ struct PerformanceValue {
     hitresult_priority: Option<HitResultPriority>,
     lazer: Option<bool>,
     large_tick_hits: Option<u32>,
-    n_slider_ends: Option<u32>,
+    small_tick_hits: Option<u32>,
+    slider_end_hits: Option<u32>,
     n300: Option<u32>,
     n100: Option<u32>,
     n50: Option<u32>,
@@ -63,7 +64,8 @@ impl Default for PerformanceValue {
             hitresult_priority: None,
             lazer: None,
             large_tick_hits: None,
-            n_slider_ends: None,
+            small_tick_hits: None,
+            slider_end_hits: None,
             n300: None,
             n100: None,
             n50: None,
@@ -84,7 +86,7 @@ impl PerformanceSetter<'_> {
         let mut performance = if let Some(data) = self.cache.take() {
             data
         } else {
-            return Err("performance is released".into())
+            return Err("performance is released".into());
         };
 
         if self.changed.not() {
@@ -117,7 +119,7 @@ impl PerformanceSetter<'_> {
             combo,
             lazer,
             large_tick_hits,
-            n_slider_ends,
+            slider_end_hits,
             n300,
             n100,
             n50,
@@ -161,6 +163,9 @@ pub fn generate_java_state(env: &mut JNIEnv, score_state: ScoreState) -> Result<
             i: score_state.osu_large_tick_hits as jint,
         },
         jvalue {
+            i: score_state.osu_small_tick_hits as jint,
+        },
+        jvalue {
             i: score_state.slider_end_hits as jint,
         },
         jvalue {
@@ -192,7 +197,7 @@ pub fn generate_java_state(env: &mut JNIEnv, score_state: ScoreState) -> Result<
         let method = env.get_static_method_id(
             jclass,
             "create",
-            "(IIIIIIIII)Lorg/spring/osu/extended/rosu/JniScoreState;",
+            "(IIIIIIIIII)Lorg/spring/osu/extended/rosu/JniScoreState;",
         )?;
         Ok(method)
     })?;
@@ -208,6 +213,7 @@ pub fn parse_java_state(env: &mut JNIEnv, state: &JByteArray) -> Result<ScoreSta
     let state = ScoreState {
         max_combo: array.get_i32() as u32,
         osu_large_tick_hits: array.get_i32() as u32,
+        osu_small_tick_hits: array.get_i32() as u32,
         slider_end_hits: array.get_i32() as u32,
         n_geki: array.get_i32() as u32,
         n_katu: array.get_i32() as u32,
@@ -325,7 +331,8 @@ set_state! {
     set_performance_n50(n50);
     set_performance_misses(misses);
     set_performance_large_tick(large_tick_hits);
-    set_performance_slider_ends(n_slider_ends);
+    set_performance_small_tick(small_tick_hits);
+    set_performance_slider_ends(slider_end_hits);
     set_performance_passed_objects(passed_objects);
 }
 

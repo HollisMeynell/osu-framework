@@ -1,21 +1,21 @@
 mod beatmap;
 mod difficulty;
+mod gradual;
 mod mods;
 mod performance;
-mod gradual;
 
 use crate::java::{throw_jni, JavaBoolean};
 use crate::jni_call;
 use crate::osu::performance::*;
 use beatmap::*;
 use difficulty::*;
+use gradual::*;
 use java_fu::*;
 use jni::objects::{JByteArray, JClass, JObject, JString};
 use jni::sys::{jboolean, jbyte, jdouble, jfloat, jint, jlong, jobject, JNI_FALSE};
 use jni::JNIEnv;
 use jni_macro::jni_fn;
 use rosu_pp::any::HitResultPriority;
-use gradual::*;
 
 mod java_fu {
     use crate::java::get_jni_field_id;
@@ -321,6 +321,7 @@ init_performance! {
     |setN50 > set_performance_n50;
     |setMisses > set_performance_misses;
     |setLargeTick > set_performance_large_tick;
+    |setSmallTick > set_performance_small_tick;
     |setSliderEnds > set_performance_slider_ends;
     |setPassedObjects > set_performance_passed_objects;
 }

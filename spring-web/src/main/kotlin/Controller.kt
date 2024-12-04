@@ -1,7 +1,6 @@
 package org.spring.web
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -9,12 +8,14 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.jvm.javaio.*
+import io.ktor.utils.io.jvm.javaio.copyTo
 import org.spring.web.service.UserService
 import org.spring.web.service.YasunaoriService
+import org.spring.web.service.YasunaoriUserInfo
 
 
 private val log = KotlinLogging.logger { }
-private val client = HttpClient()
+private val client = WebClient.client
 
 fun Route.userController() = route("user") {
     get("login") {
@@ -67,33 +68,34 @@ fun Route.yasunaori() = route("yasunaori") {
     get("user") {
         val uid = call.getData<Long>("uid")
         val name = call.getData<String>("name")
-
-        call.respond(YasunaoriService.getUser(uid, name, call.getData("mode")))
+        val response = try {
+            YasunaoriService.getUser(uid, name, call.getData("mode"))
+        } catch (e: Exception) {
+            YasunaoriUserInfo("获取用户信息失败: ${e.message}")
+        }
+        call.respond(response)
     }
 
     get("beatmap/{bid}") {
         val bid = call.getData<Long>("bid")
         val mods = call.getData<String>("mods")
         val mode = call.getData<String>("mode")
-        call.respond(YasunaoriService.getBeatmap(bid, mods, mode))
+        val response = try {
+            YasunaoriService.getBeatmap(bid, mods, mode)
+        } catch (e: Exception) {
+            YasunaoriUserInfo("获取谱面信息失败: ${e.message}")
+        }
+        call.respond(response)
     }
 
     get("avatar/{id}") {
-        val id = call.getData<Long>("id")!!
+        val id = call.getData<String>("id")!!
         call.respondBytesWriter(
             contentType = ContentType.Image.JPEG
         ) {
             val out = this
-            val request = client.prepareRequest {
-                url("https://a.ppy.sh/$id")
-            }
-
-            request.execute {
-                if (!it.status.isSuccess()) {
-                    val message = it.bodyAsText()
-                    throw HttpTipsException(message = message)
-                }
-                it.bodyAsChannel().copyTo(out)
+            YasunaoriService.outAvatar(id) {
+                copyTo(out)
             }
         }
     }
