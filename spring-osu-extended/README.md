@@ -7,6 +7,18 @@
 
 for other usage examples, please refer to the [rosu-pp](https://github.com/MaxOhn/rosu-pp)
 
+[package calculation method](#example)
+
+> All objects that implement `AutoCloseable` can safely call `.close()` multiple times **in a single thread**.
+>  
+> !!! warning: `JniDifficulty.createGradualPerformance()` and `JniPerformance.calculate()` consume the self ownership of the object,
+> 
+> so it can only be called once.
+>
+> after being called, object cannot be used again. Additionally, there's no need to call `.close()` afterward.
+> 
+> calling `.close()` won't cause any exception, as it will handle the situation automatically.
+
 - get beatmap
 
 kotlin code:
@@ -112,6 +124,36 @@ when(result) {
     }
     is TaikoPerformanceAttributes -> {}
     // ...
+}
+```
+
+### example
+
+```kotlin
+fun calculate(
+    beatmapLocalPath: Path,
+    isLazer: Boolean,
+    gameMode: OsuMode,
+    mods: List<OsuMod>,
+    score: JniScoreState,
+): JniPerformanceAttributes {
+    val closeableList = ArrayList<AutoCloseable>(2)
+    return try {
+        val beatmap = JniBeatmap(beatmapLocalPath)
+        closeableList.add(beatmap)
+        val performance = beatmap.createPerformance().apply {
+            setLazer(isLazer)
+            setState(score)
+            setMods(mods)
+            if (beatmap.mode != gameMode) {
+                convertInPlace(gameMode)
+            }
+        }
+        closeableList.add(performance)
+        performance.calculate()
+    } finally {
+        closeableList.forEach { it.close() }
+    }
 }
 ```
 
