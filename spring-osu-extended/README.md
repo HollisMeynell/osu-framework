@@ -9,15 +9,11 @@ for other usage examples, please refer to the [rosu-pp](https://github.com/MaxOh
 
 [package calculation method](#example)
 
-> All objects that implement `AutoCloseable` can safely call `.close()` multiple times **in a single thread**.
->  
-> !!! warning: `JniDifficulty.createGradualPerformance()` and `JniPerformance.calculate()` consume the self ownership of the object,
-> 
-> so it can only be called once.
->
-> after being called, object cannot be used again. Additionally, there's no need to call `.close()` afterward.
-> 
-> calling `.close()` won't cause any exception, as it will handle the situation automatically.
+All objects that implement `AutoCloseable` can safely call `.close()` multiple times **in a single thread**.
+ 
+!!! warning: `JniDifficulty.createGradualPerformance()` and `JniPerformance.calculate()` consume the self ownership of the object, so it can only be called once.
+
+After being called, object cannot be used again. Additionally, there's no need to call `.close()` afterward, although calling `.close()` won't cause any exception, as it will handle the situation automatically.
 
 - get beatmap
 
