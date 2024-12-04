@@ -81,16 +81,39 @@ pub(crate) struct PerformanceSetter<'map> {
     changed: bool,
 }
 
-impl PerformanceSetter<'_> {
-    fn get_performance(&mut self) -> Result<Performance> {
+impl<'map> PerformanceSetter<'map> {
+    fn get_performance(&mut self) -> Result<&mut Performance<'map>> {
+        let performance = match self.get_cache() {
+            Some(performance) => {
+                performance
+            }
+            None => {
+                return Err("performance is released".into());
+            }
+        };
+        Ok(self.cache.insert(performance))
+    }
+
+    fn try_to_performance(&mut self) -> Result<Performance<'map>> {
+        match self.get_cache() {
+            None => {
+                Err("performance is released".into())
+            }
+            Some(performance) => {
+                Ok(performance)
+            }
+        }
+    }
+
+    fn get_cache(&mut self) -> Option<Performance<'map>>{
         let mut performance = if let Some(data) = self.cache.take() {
             data
         } else {
-            return Err("performance is released".into());
+            return None;
         };
 
         if self.changed.not() {
-            return Ok(performance);
+            return Some(performance);
         }
 
         let values = self.value.get_or_insert_with(PerformanceValue::default);
@@ -143,14 +166,14 @@ impl PerformanceSetter<'_> {
         if let Some(mods) = &values.mods {
             performance = performance.mods(mods.clone());
         }
-        Ok(performance)
+        Some(performance)
     }
 }
 
 pub fn generate_state(env: &mut JNIEnv, obj: &JObject) -> Result<jobject> {
     let ptr = get_object_ptr(env, obj)?;
-    let performance = to_status_use::<Performance>(ptr)?;
-    let score_state = performance.generate_state();
+    let performance = to_status_use::<PerformanceSetter>(ptr)?;
+    let score_state = performance.get_performance()?.generate_state();
     generate_java_state(env, score_state)
 }
 
@@ -513,6 +536,6 @@ pub fn calculate_performance(env: &mut JNIEnv, this: &JObject) -> Result<jclass>
     let ptr = get_object_ptr(env, this)?;
     release_object(env, this)?;
     let mut setter = to_status::<PerformanceSetter>(ptr)?;
-    let attr = setter.get_performance()?.calculate();
+    let attr = setter.try_to_performance()?.calculate();
     attribute_to_object(env, attr)
 }

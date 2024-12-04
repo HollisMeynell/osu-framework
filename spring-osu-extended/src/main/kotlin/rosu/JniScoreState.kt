@@ -18,7 +18,7 @@ data class JniScoreState @JvmOverloads constructor(
 ) {
 
     fun serialize(): ByteArray {
-        val data = ByteArray(36)
+        val data = ByteArray(40)
         fun writeInt(index: Int, value: Int) {
             val offset = index * 4
             data[offset] = (value ushr 24).toByte()
