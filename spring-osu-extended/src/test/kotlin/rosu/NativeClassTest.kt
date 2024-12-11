@@ -7,6 +7,8 @@ import org.spring.osu.extended.rosu.JniBeatmap
 import org.spring.osu.extended.rosu.JniDifficulty
 import org.spring.osu.extended.rosu.OsuPerformanceAttributes
 import org.spring.osu.model.LazerMod
+import kotlin.math.pow
+import kotlin.math.round
 import kotlin.test.assertEquals
 
 class NativeClassTest {
@@ -17,7 +19,10 @@ class NativeClassTest {
             LazerMod.DoubleTime(speedChange = 1.3f),
             LazerMod.Hidden(),
         )
-        assertEquals(x.toJson(), """[{"acronym":"DA","settings":{"approach_rate":7.0}},{"acronym":"DT","settings":{"speed_change":1.3}},{"acronym":"HD"}]""")
+        assertEquals(
+            x.toJson(),
+            """[{"acronym":"DA","settings":{"approach_rate":7.0}},{"acronym":"DT","settings":{"speed_change":1.3}},{"acronym":"HD"}]"""
+        )
 
         val beatmapDate = this::class.java.getResource("/beatmap/map.osu")
             ?.openStream()?.readAllBytes() ?: error("beatmap not found")
@@ -27,17 +32,17 @@ class NativeClassTest {
             val difficulty = JniDifficulty()
             difficulty.mode = OsuMode.Osu
             var attr = difficulty.calculate(beatmap)
-            assert(attr.getStarRating() - 6.38 in -0.01..0.01)
+            assertEquals(attr.getStarRating().roundN(2) , 6.38)
             difficulty.setMods(LazerMod.DifficultyAdjust(circleSize = 6f))
             attr = difficulty.calculate(beatmap)
-            assert(attr.getStarRating() - 7.12 in -0.01..0.01)
+            assertEquals(attr.getStarRating().roundN(2) , 7.12 )
 
             val b = beatmap.createPerformance().apply {
                 setLazer(true)
                 setPassedObjects(2126)
             }
 
-            assert(b.calculate().getPP() - 468 in -1.0..1.0)
+            assertEquals(b.calculate().getPP().roundN(0), 468.0)
 
             var performanceAttributes = beatmap.createPerformance().apply {
                 setLazer(false)
@@ -50,8 +55,7 @@ class NativeClassTest {
             }.calculate()
             assert(performanceAttributes is OsuPerformanceAttributes)
             if (performanceAttributes is OsuPerformanceAttributes) {
-                println(performanceAttributes.pp)
-                assert(performanceAttributes.pp - 296.31 in -0.05..0.05)
+                assertEquals(performanceAttributes.pp.roundN(2), 296.31)
             }
             performanceAttributes = beatmap.createPerformance().apply {
                 setMods(
@@ -67,8 +71,17 @@ class NativeClassTest {
                 setLazer(true)
             }.calculate()
             if (performanceAttributes is OsuPerformanceAttributes) {
-                assert(performanceAttributes.pp - 628.0 in -1.0..1.0)
+                assertEquals(performanceAttributes.pp.roundN(0), 628.0)
             }
+        }
+    }
+
+    private fun Double.roundN(i: Int): Double {
+        return if (i <= 0) {
+            round(this)
+        } else {
+            val p = 10.0.pow(i)
+            round(this * p) / p
         }
     }
 }

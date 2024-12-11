@@ -18,19 +18,22 @@ object UserService {
         )
     )
 
-    suspend fun login(code: String): LoginUserDto {
+    suspend fun login(code: String): DataVo<LoginUserDto> {
         val auth = OsuAuth(refreshToken = code)
         OsuApi.refreshUserAuth(auth)
+        val role = if (Jwt.isAdmin(auth.id)) "admin" else "user"
         val jwt = JwtUser(
             uid = auth.id!!,
             name = auth.name,
-            role = "user",
+            role = role,
         ).token(Jwt.secret)
-        return LoginUserDto(
-            uid = auth.id!!,
-            name = auth.name,
-            token = jwt,
-            admin = Jwt.isAdmin(auth.id),
+        return DataVo(
+            data = LoginUserDto(
+                uid = auth.id!!,
+                name = auth.name,
+                token = jwt,
+                admin = Jwt.isAdmin(auth.id),
+            )
         )
     }
 

@@ -134,10 +134,6 @@ object WebServer {
                     }
                 }
             }
-
-            post("f") {
-                call.getData<JwtUser>()
-            }
         }
     }
 }

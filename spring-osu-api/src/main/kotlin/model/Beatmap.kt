@@ -108,6 +108,9 @@ data class Beatmap(
 
     @JsonProperty("url")
     var url: String?,
+
+    @JsonProperty("owners")
+    var owners: List<Owner>?,
 ) {
     data class FailTimes(
         @JsonProperty("exit")
@@ -115,5 +118,13 @@ data class Beatmap(
 
         @JsonProperty("fail")
         var fail: List<Int>?,
+    )
+
+    data class Owner (
+        @JsonProperty("id")
+        var id: Long,
+
+        @JsonProperty("username")
+        var username: String,
     )
 }

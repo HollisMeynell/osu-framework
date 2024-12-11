@@ -2,17 +2,11 @@
 
 package org.spring.osu.model
 
-import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.annotation.JsonSubTypes
-import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.fasterxml.jackson.annotation.*
 import com.fasterxml.jackson.databind.JsonNode
 import org.spring.core.json
-import org.spring.core.toJson
 import org.spring.osu.OsuMode
-import kotlin.reflect.full.memberProperties
-import kotlin.reflect.jvm.isAccessible
+import org.spring.osu.model.LazerMod.DoubleTime.Value
 
 sealed interface Mod {
     val type: String
@@ -102,6 +96,7 @@ sealed interface ValueMod {
     JsonSubTypes.Type(value = LazerMod.Key8::class, name = "8K"),
     JsonSubTypes.Type(value = LazerMod.Key9::class, name = "9K"),
     JsonSubTypes.Type(value = LazerMod.Key10::class, name = "10K"),
+    JsonSubTypes.Type(value = LazerMod.Bloom::class, name = "BM"),
 )
 @JsonInclude(JsonInclude.Include.NON_NULL)
 sealed class LazerMod {
@@ -540,7 +535,7 @@ sealed class LazerMod {
         companion object : Mod, ValueMod {
             override val type: String = "FL"
             override val mode: Set<OsuMode> = setOf(OsuMode.Osu, OsuMode.Taiko, OsuMode.Catch, OsuMode.Mania)
-            override val incompatible: Set<Mod> = setOf(Blinds, FadeIn, Hidden, Cover)
+            override val incompatible: Set<Mod> = setOf(Blinds, FadeIn, Hidden, Cover, Bloom)
             override val value: Int = 1024
         }
     }
@@ -1602,7 +1597,7 @@ sealed class LazerMod {
         companion object : Mod {
             override val type: String = "NS"
             override val mode: Set<OsuMode> = setOf(OsuMode.Osu, OsuMode.Catch)
-            override val incompatible: Set<Mod> = setOf()
+            override val incompatible: Set<Mod> = setOf(Bloom)
 
         }
     }
@@ -1858,8 +1853,54 @@ sealed class LazerMod {
         companion object : Mod, ValueMod {
             override val type: String = "TD"
             override val mode: Set<OsuMode> = setOf(OsuMode.Osu)
-            override val incompatible: Set<Mod> = setOf(Autoplay, Cinema, Autopilot)
+            override val incompatible: Set<Mod> = setOf(Autoplay, Cinema, Autopilot, Bloom)
             override val value: Int = 4
+        }
+    }
+
+    class Bloom(
+        maxSizeComboCount: Int? = null,
+        maxCursorSize: Float? = null,
+    ) : LazerMod() {
+        @get:JsonProperty("acronym")
+        override val acronym: String = type
+
+        @get:JsonProperty("settings")
+        override var settings: Any? = null
+
+        @JsonProperty("settings")
+        private fun setSettings(node: JsonNode) {
+            settings = node.json<Value>()
+        }
+
+        @get:JsonIgnore
+        @set:JsonIgnore
+        var maxSizeComboCount: Int?
+            get() = settings?.let { (it as Value).maxSizeComboCount }
+            set(v) {
+                if (settings == null) settings = Value(maxSizeComboCount = v)
+                else (settings as Value).maxSizeComboCount = v
+            }
+
+        @get:JsonIgnore
+        @set:JsonIgnore
+        var maxCursorSize: Float?
+            get() = settings?.let { (it as Value).maxCursorSize }
+            set(v) {
+                if (settings == null) settings = Value(maxCursorSize = v)
+                else (settings as Value).maxCursorSize = v
+            }
+
+
+        private data class Value(
+            @JsonProperty("max_size_combo_count") var maxSizeComboCount: Int? = null,
+            @JsonProperty("max_cursor_size") var maxCursorSize: Float? = null,
+        )
+
+        companion object : Mod {
+            override val type: String = "BM"
+            override val mode: Set<OsuMode> = setOf(OsuMode.Osu)
+            override val incompatible: Set<Mod> = setOf(NoScope, TouchDevice, Flashlight)
         }
     }
 
