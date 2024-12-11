@@ -49,7 +49,7 @@ const config: Config = {
           sidebarPath: './sidebars.ts',
           routeBasePath: '/d',
           editUrl:
-            'https://github.com/HollisMeynell/osu-framework/tree/master/',
+            'https://github.com/HollisMeynell/osu-framework/tree/master/docs/',
         },
         blog: {
           showReadingTime: true,
@@ -58,7 +58,7 @@ const config: Config = {
             xslt: true,
           },
           editUrl:
-            'https://github.com/HollisMeynell/osu-framework/tree/master/',
+            'https://github.com/HollisMeynell/osu-framework/tree/master/docs/',
           onInlineTags: 'warn',
           onInlineAuthors: 'warn',
           onUntruncatedBlogPosts: 'warn',
