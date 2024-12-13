@@ -1,6 +1,8 @@
 .box {
   margin: 0 1rem;
-
+  &:hover {
+    color: var(--ifm-color-primary);
+  }
   div {
     user-select: none;
     cursor: pointer;

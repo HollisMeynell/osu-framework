@@ -10,11 +10,9 @@ import SearchBar from '@theme/SearchBar';
 import NavbarMobileSidebarToggle from '@theme/Navbar/MobileSidebar/Toggle';
 import NavbarLogo from '@theme/Navbar/Logo';
 import NavbarSearch from '@theme/Navbar/Search';
-import setEasterEggTriggered from '@site/src/components/other/egg';
-import clickBoomEffect from '@site/src/components/other/boom';
 
 import styles from './styles.module.css';
-import ShadowBox from "@site/src/components/ShadowBox";
+import MusicSwitch from "@site/src/components/ShadowBox";
 
 function useNavbarItems() {
   return useThemeConfig().navbar.items as NavbarItemConfig[];
@@ -64,15 +62,6 @@ export default function NavbarContent(): JSX.Element {
 
   const searchBarItem = items.find((item) => item.type === 'search');
 
-  useEffect(() => {
-    const boom = clickBoomEffect();
-    const easterEgg = setEasterEggTriggered();
-    return () => {
-      boom();
-      easterEgg();
-    };
-  }, []);
-
   return (
     <NavbarContentLayout
       left={
@@ -85,7 +74,7 @@ export default function NavbarContent(): JSX.Element {
       right={
         <>
           <NavbarItems items={rightItems} />
-          <ShadowBox/>
+          <MusicSwitch/>
           <NavbarColorModeToggle className={styles.colorModeToggle} />
           {!searchBarItem && (
             <NavbarSearch>

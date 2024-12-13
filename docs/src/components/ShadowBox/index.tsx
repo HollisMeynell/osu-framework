@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './styles.module.scss';
 import {useAppDispatch} from "@site/src/store";
 
-export default function ShadowBox({}) {
+export default function MusicSwitch({}) {
     const dispatch = useAppDispatch();
 
     const showMusic = () => {
