@@ -6,7 +6,7 @@ export default function MusicSwitch({}) {
     const dispatch = useAppDispatch();
 
     const showMusic = () => {
-        dispatch({type: 'music/change'})
+        dispatch({type: 'music/change'});
     }
 
     return <div className={styles.box}>
