@@ -29,15 +29,6 @@
     --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
 
-html:root[data-rgb='true'] {
-    --color: 315;
-    animation-name: colorChange;
-    animation-duration: 4s;
-    animation-iteration-count: infinite;
-
-
-}
-
 * {
     font-family: "JetBrains Mono", "Blueaka", serif !important;
 }

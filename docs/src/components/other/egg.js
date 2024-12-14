@@ -1,3 +1,5 @@
+import clickBoomEffect from "@site/src/components/other/boom";
+
 const keyboardKey = {
     up: "ArrowUp",
     down: "ArrowDown",
@@ -27,16 +29,11 @@ function easterEggTrigger(keyboardEvent) {
             nowIndex = 0;
             doSomeThing();
         } else {
-            tips()
+            tips();
         }
     } else {
         nowIndex = 0;
     }
-}
-
-function doSomeThing () {
-    document.documentElement.setAttribute("data-rgb", "true");
-    unregister();
 }
 
 let boomAudioElement;
@@ -45,17 +42,32 @@ function getAudioElement() {
     if (!boomAudioElement) {
         boomAudioElement = document.createElement('audio');
         boomAudioElement.volume = 0.3;
+        boomAudioElement.src = "/audio/boom.wav";
         document.body.appendChild(boomAudioElement);
     }
     return boomAudioElement;
 }
 
+function doSomeThing () {
+    debugger
+    const audio = document.createElement('audio');
+    audio.volume = 0.3;
+    audio.src = "/audio/start.mp3";
+    document.body.appendChild(audio);
+    audio.load();
+
+    audio.currentTime = 0;
+    audio.play().catch(e=>console.error(e));
+
+    clickBoomEffect();
+
+    unregister();
+    audio.remove();
+}
+
 function tips() {
     const audio = getAudioElement();
-    if (audio.src !== "/audio/boom.wav") {
-        audio.src = "/audio/boom.wav";
-        audio.load();
-    }
+
     if (!audio.paused) {
         audio.pause();
     }

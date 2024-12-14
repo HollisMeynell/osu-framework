@@ -7,8 +7,6 @@ export default function clickBoomEffect() {
     let option = true;
 
     let balls = [];
-    let longPressed = false;
-    let longPress;
     let multiplier = 5;
     let width, height;
     let ctx;
@@ -53,25 +51,12 @@ export default function clickBoomEffect() {
 
     function alwaysBoom() {
         const down = (e) => {
-            if (!check(e.target)) return;
             pushBalls(randBetween(6, 9), e.clientX, e.clientY);
-            longPress = setTimeout(function () {
-                longPressed = true;
-            }, 500);
-        }
-        const up = (e) => {
-            clearInterval(longPress);
-            if (longPressed === true) {
-                pushBalls(randBetween(6, 9 + Math.ceil(multiplier)), e.clientX, e.clientY);
-                longPressed = false;
-            }
         }
         window.addEventListener("mousedown", down, false);
-        window.addEventListener("mouseup", up, false);
 
         return () => {
             window.removeEventListener("mousedown", down);
-            window.removeEventListener("mouseup", up);
         }
     }
 
@@ -101,11 +86,8 @@ export default function clickBoomEffect() {
             this.x = x;
             this.y = y;
             this.angle = Math.PI * 2 * Math.random();
-            if (longPressed) {
-                this.multiplier = randBetween(5, 9 + (multiplier / 2));
-            } else {
-                this.multiplier = randBetween(5, 9);
-            }
+
+            this.multiplier = randBetween(5, 9);
             this.vx = (this.multiplier + Math.random() * 0.5) * Math.cos(this.angle);
             this.vy = (this.multiplier + Math.random() * 0.5) * Math.sin(this.angle);
             this.r = randBetween(8, 12) + 3 * Math.random();
@@ -149,9 +131,7 @@ export default function clickBoomEffect() {
             ctx.fill();
             b.update(deltaTime / 16.7);
         }
-        if (longPressed) {
-            multiplier += 0.2;
-        } else if (multiplier >= 0) {
+        if (multiplier >= 0) {
             multiplier -= 0.4;
         }
         removeBall();
@@ -167,21 +147,6 @@ export default function clickBoomEffect() {
                 balls.splice(i, 1);
             }
         }
-    }
-
-    /**
-     *
-     * @param {EventTarget|Element} el
-     */
-    function check(el) {
-        let dom = el;
-        while (dom != null) {
-            if (dom.matches('.ant-popover-inner,.ant-float-btn,button,a')) {
-                return false;
-            }
-            dom = dom.parentElement;
-        }
-        return true
     }
 
     return () => {
