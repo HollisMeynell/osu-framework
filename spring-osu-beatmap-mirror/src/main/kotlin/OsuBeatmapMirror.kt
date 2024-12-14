@@ -29,6 +29,9 @@ object OsuBeatmapMirror {
         Path(config.basePath)
     }
 
+    /**
+     * if file found and not need update, return false
+     */
     private suspend fun shouldUpdate(bid: Long, channel: Array<Beatmapset?>? = null): Boolean {
         val record = OsuFileRecord.getByBid(bid) ?: return true
         val status = record.status
@@ -239,5 +242,13 @@ object OsuBeatmapMirror {
         digestMD5.update(data)
         val result = digestMD5.digest()
         return result.joinToString("") { it.toUByte().toString(16).padStart(2, '0') }
+    }
+}
+
+fun main() {
+    for (i in 0..100) {
+        println(
+            "$i% { --color: ${i*3.6}; } "
+        )
     }
 }

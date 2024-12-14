@@ -118,6 +118,7 @@ object OsuBeatmapRecord : IdTable<Long>("osu_beatmap") {
             playCount = null,
             ranked = statusVal,
             url = null,
+            owners = null,
         )
     }
 

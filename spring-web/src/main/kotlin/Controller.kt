@@ -4,10 +4,13 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.server.auth.*
+import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.jvm.javaio.copyTo
+import org.spring.web.service.MirrorService
 import org.spring.web.service.UserService
 import org.spring.web.service.YasunaoriService
 import org.spring.web.service.YasunaoriUserInfo
@@ -34,7 +37,12 @@ fun Route.public() = route("public") {
     get("getOauthUrl") {
         call.respond(UserService.oauthUrl())
     }
+
     post("proxy/{key?}") {
+        val key = call.getDataNullable<String>("key")
+        if (key != WebConfig.Instance.server.secret) {
+            throw HttpTipsException(403, "no permission")
+        }
         val p = call.getData<ProxyDto>()
         val response = client.prepareRequest {
             method = HttpMethod.parse(p.method)
@@ -65,8 +73,8 @@ fun Route.public() = route("public") {
 
 fun Route.yasunaori() = route("yasunaori") {
     get("user") {
-        val uid = call.getData<Long>("uid")
-        val name = call.getData<String>("name")
+        val uid = call.getDataNullable<Long>("uid")
+        val name = call.getDataNullable<String>("name")
         val response = try {
             YasunaoriService.getUser(uid, name, call.getData("mode"))
         } catch (e: Exception) {
@@ -77,8 +85,8 @@ fun Route.yasunaori() = route("yasunaori") {
 
     get("beatmap/{bid}") {
         val bid = call.getData<Long>("bid")
-        val mods = call.getData<String>("mods")
-        val mode = call.getData<String>("mode")
+        val mods = call.getDataNullable<String>("mods")
+        val mode = call.getDataNullable<String>("mode")
         val response = try {
             YasunaoriService.getBeatmap(bid, mods, mode)
         } catch (e: Exception) {
@@ -88,7 +96,7 @@ fun Route.yasunaori() = route("yasunaori") {
     }
 
     get("avatar/{id}") {
-        val id = call.getData<String>("id")!!
+        val id = call.getData<String>("id")
         call.respondBytesWriter(
             contentType = ContentType.Image.JPEG
         ) {
@@ -96,6 +104,22 @@ fun Route.yasunaori() = route("yasunaori") {
             YasunaoriService.outAvatar(id) {
                 copyTo(out)
             }
+        }
+    }
+}
+
+fun Route.mirror() = route("mirror") {
+    get("fileName/{type}/{bid}") {
+        val bid = call.getData<Long>("bid")
+        val type = call.getData<String>("type")
+        val file = MirrorService.getFileName(bid, type)
+        call.respond(file)
+    }
+
+    authenticate {
+        post("upload/map/{sid}") {
+            val read = call.receiveChannel()
+            MirrorService.updateFile(3, read)
         }
     }
 }

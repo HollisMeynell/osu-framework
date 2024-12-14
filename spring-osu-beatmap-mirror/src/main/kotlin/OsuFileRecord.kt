@@ -1,12 +1,8 @@
 package org.spring.osu.beatmap.mirror
 
 import org.jetbrains.exposed.dao.id.IdTable
-import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.batchUpsert
-import org.jetbrains.exposed.sql.deleteWhere
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.javatime.timestamp
-import org.jetbrains.exposed.sql.selectAll
-import org.jetbrains.exposed.sql.upsert
 import org.spring.osu.persistence.OsuDatabases
 import org.spring.osu.persistence.OsuDatabases.suspendTransaction
 import java.io.BufferedReader
@@ -132,7 +128,7 @@ data class OsuFileRecord(
             }
         }
 
-        fun toEntity(it: ResultRow) = OsuFileRecord (
+        fun toEntity(it: ResultRow) = OsuFileRecord(
             bid = it[bid],
             sid = it[sid],
             name = it[name],
@@ -144,6 +140,15 @@ data class OsuFileRecord(
             status = it[status],
             last = OffsetDateTime.ofInstant(it[last], ZoneOffset.systemDefault())
         )
+
+        fun getType(name: String): Type? {
+            return when (name) {
+                "bg" -> Type.Background
+                "song" -> Type.Audio
+                "osufile" -> Type.OsuFile
+                else -> null
+            }
+        }
     }
 
     suspend fun save() {

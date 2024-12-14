@@ -118,6 +118,7 @@ object WebServer {
                 userController()
                 public()
                 yasunaori()
+                mirror()
                 authenticate {
                     get("selfInfo") {
                         val u = call.authentication.principal<JwtUser>()

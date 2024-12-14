@@ -18,7 +18,7 @@ typealias FieldVal = List<Pair<KProperty1<*, *>, Param?>>
 val typeCache = ConcurrentHashMap<FieldKey, FieldVal>()
 val bodyMethods = setOf(HttpMethod.Post, HttpMethod.Put, HttpMethod.Patch)
 
-inline fun <reified T : Any> ApplicationCall.getData(name: String): T? {
+inline fun <reified T : Any> ApplicationCall.getDataNullable(name: String): T? {
     return if (isSimpleType<T>()) {
         try {
             parameters[name]?.toType<T>()
@@ -27,6 +27,17 @@ inline fun <reified T : Any> ApplicationCall.getData(name: String): T? {
         }
     } else {
         null
+    }
+}
+inline fun <reified T : Any> ApplicationCall.getData(name: String): T {
+    return if (isSimpleType<T>()) {
+        try {
+            parameters[name]?.toType<T>() ?: throw HttpTipsException(400, "must get $name")
+        } catch (e: Exception) {
+            throw HttpTipsException(400, "unable to parse $name")
+        }
+    } else {
+        throw HttpTipsException(500, "unable to parse $name")
     }
 }
 
