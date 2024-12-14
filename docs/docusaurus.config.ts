@@ -155,6 +155,10 @@ const config: Config = {
       additionalLanguages: ['java', 'javadoc', 'kotlin', 'rust', 'csharp', 'sql', 'ini', 'json', 'toml', 'yaml']
     },
   } satisfies Preset.ThemeConfig,
+
+  future: {
+    experimental_faster: true
+  },
 };
 
 export default config;

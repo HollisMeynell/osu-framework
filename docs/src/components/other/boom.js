@@ -1,3 +1,5 @@
+
+// 性能太差, 不如不要
 export default function clickBoomEffect() {
     const randomKey = 'EZp9H8oTHv';
     if (document.body.classList.contains(randomKey)) return;
@@ -13,42 +15,34 @@ export default function clickBoomEffect() {
     const colours = ["#F73859", "#14FFEC", "#00E0FF", "#FF99FE", "#FAF15D"];
     const canvas = document.createElement("canvas");
     init();
+
     function init() {
         document.body.appendChild(canvas);
         canvas.setAttribute("style", "width: 100%; height: 100%; top: 0; left: 0; z-index: 99999; position: fixed; pointer-events: none;");
     }
-    let removeEventListener = () => {};
+
+    let removeEventListener = () => {
+    };
     if (canvas.getContext && window.addEventListener) {
         removeEventListener = addEventListener();
     } else {
         console.warn("canvas or addEventListener is unsupported!");
     }
 
-    function randomBoom(){
+    function randomBoom() {
         let timeout = 0;
         let boom = false;
         const boomRegister = () => {
             if (!option) return;
             if (!boom) {
                 boom = true;
-                window.addEventListener("mousedown", function(e) {
+                window.addEventListener("mousedown", function (e) {
                     if (!check(e.target)) return;
                     pushBalls(randBetween(6, 9), e.clientX, e.clientY);
-                    longPress = setTimeout(function(){
-                        longPressed = true;
-                    }, 500);
                     boom = false;
-                }, {once:true});
-                window.addEventListener("mouseup", function(e) {
-                    clearInterval(longPress);
-                    if (longPressed === true) {
-                        pushBalls(randBetween(6, 9 + Math.ceil(multiplier)), e.clientX, e.clientY);
-                        longPressed = false;
-                    }
-                    boom = false;
-                }, {once:true});
+                }, {once: true});
             }
-            timeout = setTimeout(boomRegister, 5*1000 + 15*1000 * Math.random());
+            timeout = setTimeout(boomRegister, 5 * 1000 + 15 * 1000 * Math.random());
         }
         boomRegister();
         return () => {
@@ -58,10 +52,10 @@ export default function clickBoomEffect() {
     }
 
     function alwaysBoom() {
-        const down = (e)  =>{
+        const down = (e) => {
             if (!check(e.target)) return;
             pushBalls(randBetween(6, 9), e.clientX, e.clientY);
-            longPress = setTimeout(function(){
+            longPress = setTimeout(function () {
                 longPressed = true;
             }, 500);
         }
@@ -84,7 +78,7 @@ export default function clickBoomEffect() {
     function addEventListener() {
         ctx = canvas.getContext("2d");
         updateSize();
-        const remove = randomBoom();
+        const remove = alwaysBoom();
         window.addEventListener('resize', updateSize, false);
         requestAnimationFrame(loop);
         return () => {
@@ -95,13 +89,13 @@ export default function clickBoomEffect() {
     }
 
 
-
     function updateSize() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         canvas.style.width = window.innerWidth + 'px';
         canvas.style.height = window.innerHeight + 'px';
     }
+
     class Ball {
         constructor(x, y) {
             this.x = x;
@@ -117,6 +111,7 @@ export default function clickBoomEffect() {
             this.r = randBetween(8, 12) + 3 * Math.random();
             this.color = colours[Math.floor(Math.random() * colours.length)];
         }
+
         update(override) {
             this.x += this.vx * override;
             this.y += this.vy * override;
@@ -125,8 +120,9 @@ export default function clickBoomEffect() {
             this.vy *= Math.pow(0.9, override);
         }
     }
+
 //  0.9 ^ 5
-//
+
     function pushBalls(count = 1, x = origin.x, y = origin.y) {
         for (let i = 0; i < count; i++) {
             balls.push(new Ball(x, y));
@@ -138,6 +134,7 @@ export default function clickBoomEffect() {
     }
 
     let lastTimestamp = performance.now();
+
     function loop(timestamp) {
         if (!option) return;
         const deltaTime = timestamp - lastTimestamp;
@@ -159,6 +156,7 @@ export default function clickBoomEffect() {
         }
         removeBall();
         lastTimestamp = timestamp;
+
         requestAnimationFrame(loop);
     }
 

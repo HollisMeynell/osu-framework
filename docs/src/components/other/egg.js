@@ -26,6 +26,8 @@ function easterEggTrigger(keyboardEvent) {
         if (nowIndex >= p.length) {
             nowIndex = 0;
             doSomeThing();
+        } else {
+            tips()
         }
     } else {
         nowIndex = 0;
@@ -33,12 +35,41 @@ function easterEggTrigger(keyboardEvent) {
 }
 
 function doSomeThing () {
-    alert("彩蛋触发");
+    document.documentElement.setAttribute("data-rgb", "true");
+    unregister();
+}
+
+let boomAudioElement;
+
+function getAudioElement() {
+    if (!boomAudioElement) {
+        boomAudioElement = document.createElement('audio');
+        boomAudioElement.volume = 0.3;
+        document.body.appendChild(boomAudioElement);
+    }
+    return boomAudioElement;
+}
+
+function tips() {
+    const audio = getAudioElement();
+    if (audio.src !== "/audio/boom.wav") {
+        audio.src = "/audio/boom.wav";
+        audio.load();
+    }
+    if (!audio.paused) {
+        audio.pause();
+    }
+    audio.currentTime = 0;
+    audio.play();
+}
+
+function unregister() {
+    document.removeEventListener("keydown", easterEggTrigger);
+    boomAudioElement.remove();
+    boomAudioElement = void 0;
 }
 
 export default function setEasterEggTriggered() {
     document.addEventListener("keydown", easterEggTrigger);
-    return () => {
-        document.removeEventListener("keydown", easterEggTrigger);
-    }
+    return unregister;
 }

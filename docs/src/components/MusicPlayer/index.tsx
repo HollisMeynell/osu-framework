@@ -9,5 +9,15 @@ export default function MusicPlayer() {
     }
 
     return <div className={styles.music} data-show={show} onClick={close}>
+        音乐
     </div>
 }
+
+interface PlayList {
+    list: number[],
+    default?: number,
+    nowPlaying?: number,
+    onChange?: (id: number) => undefined,
+    onPlay?:() => undefined,
+}
+

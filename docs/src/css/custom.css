@@ -6,41 +6,357 @@
 
 /* You can override the default Infima variables here. */
 :root {
-  --ifm-color-primary-lightest: #ffadd2;
-  --ifm-color-primary-lighter: #ff85c0;
-  --ifm-color-primary-light: #f759ab;
-  --ifm-color-primary: #eb2f96;
-  --ifm-color-primary-dark: #c41d7f;
-  --ifm-color-primary-darker: #9e1068;
-  --ifm-color-primary-darkest: #780650;
-  --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+    --ifm-color-primary-lightest: #ffadd2;
+    --ifm-color-primary-lighter: #ff85c0;
+    --ifm-color-primary-light: #f759ab;
+    --ifm-color-primary: #eb2f96;
+    --ifm-color-primary-dark: #c41d7f;
+    --ifm-color-primary-darker: #9e1068;
+    --ifm-color-primary-darkest: #780650;
+    --ifm-code-font-size: 95%;
+    --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
 [data-theme='dark'] {
-  --ifm-color-primary-lightest: #ffd591;
-  --ifm-color-primary-lighter: #ffc069;
-  --ifm-color-primary-light: #ffa940;
-  --ifm-color-primary: #fa8c16;
-  --ifm-color-primary-dark: #d46b08;
-  --ifm-color-primary-darker: #ad4e00;
-  --ifm-color-primary-darkest: #873800;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+    --ifm-color-primary-lightest: #ffd591;
+    --ifm-color-primary-lighter: #ffc069;
+    --ifm-color-primary-light: #ffa940;
+    --ifm-color-primary: #fa8c16;
+    --ifm-color-primary-dark: #d46b08;
+    --ifm-color-primary-darker: #ad4e00;
+    --ifm-color-primary-darkest: #873800;
+    --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}
+
+html:root[data-rgb='true'] {
+    --color: 315;
+    animation-name: colorChange;
+    animation-duration: 4s;
+    animation-iteration-count: infinite;
+
+
 }
 
 * {
-  font-family: "JetBrains Mono", "Blueaka", serif !important;
+    font-family: "JetBrains Mono", "Blueaka", serif !important;
 }
 
-@font-face{
-  font-family: 'JetBrains Mono';
-  font-style: normal;
-  src: url('/font/JetBrainsMono-Regular.woff2');
+@font-face {
+    font-family: 'JetBrains Mono';
+    font-style: normal;
+    src: url('/font/JetBrainsMono-Regular.woff2');
 }
 
-@font-face{
-  font-family: 'Blueaka';
-  font-style: normal;
-  src: url('/font/Blueaka.otf');
+@font-face {
+    font-family: 'Blueaka';
+    font-style: normal;
+    src: url('/font/Blueaka.otf');
+}
+
+/* 30-190 #fff */
+@keyframes colorChange {
+    0% {
+        --color: 0.0;
+    }
+    1% {
+        --color: 3.6;
+    }
+    2% {
+        --color: 7.2;
+    }
+    3% {
+        --color: 10.8;
+    }
+    4% {
+        --color: 14.4;
+    }
+    5% {
+        --color: 18.0;
+    }
+    6% {
+        --color: 21.6;
+    }
+    7% {
+        --color: 25.2;
+    }
+    8% {
+        --color: 28.8;
+    }
+    9% {
+        --color: 32.4;
+    }
+    10% {
+        --color: 36.0;
+    }
+    11% {
+        --color: 39.6;
+    }
+    12% {
+        --color: 43.2;
+    }
+    13% {
+        --color: 46.8;
+    }
+    14% {
+        --color: 50.4;
+    }
+    15% {
+        --color: 54.0;
+    }
+    16% {
+        --color: 57.6;
+    }
+    17% {
+        --color: 61.2;
+    }
+    18% {
+        --color: 64.8;
+    }
+    19% {
+        --color: 68.4;
+    }
+    20% {
+        --color: 72.0;
+    }
+    21% {
+        --color: 75.6
+    }
+    22% {
+        --color: 79.2;
+    }
+    23% {
+        --color: 82.8;
+    }
+    24% {
+        --color: 86.4;
+    }
+    25% {
+        --color: 90.0;
+    }
+    26% {
+        --color: 93.6
+    }
+    27% {
+        --color: 97.2;
+    }
+    28% {
+        --color: 100.8;
+    }
+    29% {
+        --color: 104.4;
+    }
+    30% {
+        --color: 108.0;
+    }
+    31% {
+        --color: 111.6;
+    }
+    32% {
+        --color: 115.2;
+    }
+    33% {
+        --color: 118.8;
+    }
+    34% {
+        --color: 122.4;
+    }
+    35% {
+        --color: 126.0;
+    }
+    36% {
+        --color: 129.6;
+    }
+    37% {
+        --color: 133.2;
+    }
+    38% {
+        --color: 136.8;
+    }
+    39% {
+        --color: 140.4;
+    }
+    40% {
+        --color: 144.0;
+    }
+    41% {
+        --color: 147.6;
+    }
+    42% {
+        --color: 151.2;
+    }
+    43% {
+        --color: 154.8;
+    }
+    44% {
+        --color: 158.4;
+    }
+    45% {
+        --color: 162.0;
+    }
+    46% {
+        --color: 165.6;
+    }
+    47% {
+        --color: 169.2;
+    }
+    48% {
+        --color: 172.8;
+    }
+    49% {
+        --color: 176.4;
+    }
+    50% {
+        --color: 180.0;
+    }
+    51% {
+        --color: 183.6;
+    }
+    52% {
+        --color: 187.2;
+    }
+    53% {
+        --color: 190.8;
+    }
+    54% {
+        --color: 194.4;
+    }
+    55% {
+        --color: 198.0;
+    }
+    56% {
+        --color: 201.6;
+    }
+    57% {
+        --color: 205.2;
+    }
+    58% {
+        --color: 208.8;
+    }
+    59% {
+        --color: 212.4;
+    }
+    60% {
+        --color: 216.0;
+    }
+    61% {
+        --color: 219.6;
+    }
+    62% {
+        --color: 223.2;
+    }
+    63% {
+        --color: 226.8;
+    }
+    64% {
+        --color: 230.4;
+    }
+    65% {
+        --color: 234.0;
+    }
+    66% {
+        --color: 237.6;
+    }
+    67% {
+        --color: 241.2;
+    }
+    68% {
+        --color: 244.8;
+    }
+    69% {
+        --color: 248.4;
+    }
+    70% {
+        --color: 252.0;
+    }
+    71% {
+        --color: 255.6;
+    }
+    72% {
+        --color: 259.2;
+    }
+    73% {
+        --color: 262.8;
+    }
+    74% {
+        --color: 266.4;
+    }
+    75% {
+        --color: 270.0;
+    }
+    76% {
+        --color: 273.6;
+    }
+    77% {
+        --color: 277.2;
+    }
+    78% {
+        --color: 280.8;
+    }
+    79% {
+        --color: 284.4;
+    }
+    80% {
+        --color: 288.0;
+    }
+    81% {
+        --color: 291.6;
+    }
+    82% {
+        --color: 295.2;
+    }
+    83% {
+        --color: 298.8;
+    }
+    84% {
+        --color: 302.4;
+    }
+    85% {
+        --color: 306.0;
+    }
+    86% {
+        --color: 309.6;
+    }
+    87% {
+        --color: 313.2;
+    }
+    88% {
+        --color: 316.8;
+    }
+    89% {
+        --color: 320.4;
+    }
+    90% {
+        --color: 324.0;
+    }
+    91% {
+        --color: 327.6;
+    }
+    92% {
+        --color: 331.2;
+    }
+    93% {
+        --color: 334.8;
+    }
+    94% {
+        --color: 338.4;
+    }
+    95% {
+        --color: 342.0;
+    }
+    96% {
+        --color: 345.6;
+    }
+    97% {
+        --color: 349.2;
+    }
+    98% {
+        --color: 352.8;
+    }
+    99% {
+        --color: 356.4;
+    }
+    100% {
+        --color: 360.0;
+    }
 }
