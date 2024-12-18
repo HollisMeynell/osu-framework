@@ -155,17 +155,18 @@ object OsuBeatmapMirror {
         }
 
         val beatmapsetArray = Array<Beatmapset?>(1) { null }
-        if (shouldUpdate(bid)) {
+        if (shouldUpdate(bid, beatmapsetArray)) {
             val beatmapset = beatmapsetArray[0]
-            if (beatmapset == null) {
-                val sid = OsuApi.getBeatmaps(bid).first().beatmapsetID
-                download(sid)
-            } else {
+            if (beatmapset != null) {
                 download(beatmapset.id, beatmapset)
+            } else {
+                val beatmap = OsuApi.getBeatmap(bid)
+                val sid = beatmap.beatmapsetID
+                download(sid)
             }
         }
         val path = suspendTransaction {
-            val record = OsuFileRecord.select(OsuFileRecord.name)
+            val record = OsuFileRecord.select(OsuFileRecord.sid, column)
                 .where { OsuFileRecord.bid eq bid }
                 .map { it[OsuFileRecord.sid] to it[column] }
                 .firstOrNull()
@@ -245,10 +246,3 @@ object OsuBeatmapMirror {
     }
 }
 
-fun main() {
-    for (i in 0..100) {
-        println(
-            "$i% { --color: ${i*3.6}; } "
-        )
-    }
-}

@@ -18,5 +18,5 @@ data class Nomination(
     var userID: Long,
 ) {
     @JsonIgnore
-    val rulesets: List<OsuMode>? = _rulesets?.map { OsuMode.valueOf(it) }
+    val rulesets: List<OsuMode>? = _rulesets?.map { OsuMode.getMode(it) }
 }

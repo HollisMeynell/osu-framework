@@ -5,6 +5,7 @@ import com.sksamuel.hoplite.PropertySource
 import com.sksamuel.hoplite.addResourceSource
 import org.spring.core.ProxyConfig
 import org.spring.osu.OsuApiConfig
+import org.spring.osu.beatmap.mirror.OsuBeatmapMirrorConfig
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.Path
@@ -12,6 +13,7 @@ import kotlin.io.path.Path
 data class WebConfig(
     var osu: OsuApiConfig,
     var database: DatabaseConfig,
+    var mirror: OsuBeatmapMirrorConfig,
     var proxy: ProxyConfig? = null,
     var server: ServerConfig,
 ) {

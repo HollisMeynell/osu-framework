@@ -5,12 +5,13 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.auth.*
+import io.ktor.server.http.content.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.utils.io.*
-import io.ktor.utils.io.jvm.javaio.copyTo
-import org.spring.web.service.MirrorService
+import io.ktor.utils.io.jvm.javaio.*
+import org.spring.web.service.OsuMirrorService
 import org.spring.web.service.UserService
 import org.spring.web.service.YasunaoriService
 import org.spring.web.service.YasunaoriUserInfo
@@ -112,14 +113,68 @@ fun Route.mirror() = route("mirror") {
     get("fileName/{type}/{bid}") {
         val bid = call.getData<Long>("bid")
         val type = call.getData<String>("type")
-        val file = MirrorService.getFileName(bid, type)
-        call.respond(file)
+        val file = OsuMirrorService.getFilePath(bid, type)
+        call.respond(file.fileName.toString())
+    }
+
+    /**
+     * type: bg, song, osufile
+     */
+    get("beatmap/{type}/{bid}") {
+        val type = call.getData<String>("type")
+        val bid = call.getData<Long>("bid")
+        val path = OsuMirrorService.getFilePath(bid, type)
+        call.response.header(
+            HttpHeaders.ContentDisposition,
+            ContentDisposition
+                .Attachment
+                .withParameter(ContentDisposition.Parameters.FileName, "${path.fileName}")
+                .toString()
+        )
+        call.respond(LocalPathContent(path))
+    }
+
+    get("beatmapset/{sid}") {
+        val sid = call.getData<Long>("sid")
+        val video = call.getDataNullable<Boolean>("video") ?: true
+        call.response.header(
+            HttpHeaders.ContentDisposition,
+            ContentDisposition
+                .Attachment
+                .withParameter(ContentDisposition.Parameters.FileName, "$sid.osz")
+                .toString()
+        )
+        call.respondBytesWriter {
+            OsuMirrorService.getZipOutput(sid, toOutputStream(), video)
+        }
+    }
+
+    /**
+     * 使用sid参数, 可以多个
+     */
+    get("beatmapset/all") {
+        val video = call.getDataNullable<Boolean>("video") ?: true
+        val sids = call.request
+            .queryParameters
+            .getAll("sid")
+            ?.map { it.toLong() }
+            ?: throw HttpTipsException(400, "no sid")
+        call.response.header(
+            HttpHeaders.ContentDisposition,
+            ContentDisposition
+                .Attachment
+                .withParameter(ContentDisposition.Parameters.FileName, "package.osz")
+                .toString()
+        )
+        call.respondBytesWriter {
+            OsuMirrorService.getZipOutput(sids, toOutputStream(), video)
+        }
     }
 
     authenticate {
-        post("upload/map/{sid}") {
+        post("upload/beatmap/{sid}") {
             val read = call.receiveChannel()
-            MirrorService.updateFile(3, read)
+            OsuMirrorService.updateFile(3, read)
         }
     }
 }

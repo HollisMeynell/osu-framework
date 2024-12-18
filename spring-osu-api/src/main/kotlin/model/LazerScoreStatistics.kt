@@ -133,9 +133,9 @@ data class LazerScoreStatistics(
             }
 
             Catch -> {
-                n100 = max(largeTickHit, ok)
-                n50 = max(smallTickHit, meh)
-                katu = max(smallTickHit, good)
+                n100 = ok
+                n50 = meh
+                katu = good
             }
 
             Mania -> {

@@ -22,6 +22,10 @@ cros = ["localhost:5173"]
 # (可选) 管理员的 user id
 adminUsers = [17064371]
 
+# 文件存储配置
+[mirror]
+basePath = "/path/to/osu/"
+
 # osu api 配置
 [osu]
 redirectUri = "http://localhost:8080/api/oauth"

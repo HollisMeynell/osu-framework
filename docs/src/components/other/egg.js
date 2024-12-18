@@ -73,9 +73,13 @@ function tips() {
 }
 
 function unregister() {
-    document.removeEventListener("keydown", easterEggTrigger);
-    boomAudioElement.remove();
-    boomAudioElement = void 0;
+    try {
+        document.removeEventListener("keydown", easterEggTrigger);
+        boomAudioElement.remove();
+        boomAudioElement = void 0;
+    } catch (e) {
+        // ignore
+    }
 }
 
 export default function setEasterEggTriggered() {

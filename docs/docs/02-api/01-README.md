@@ -18,7 +18,7 @@ title: "介绍"
 
 :::
 
-- 单体数据响应
+## 单体数据响应
 
 ```mermaid
 classDiagram
@@ -29,7 +29,7 @@ class Data {
 }
 ```
 
-- 列表数据响应
+## 列表数据响应
 
 ```mermaid
 classDiagram

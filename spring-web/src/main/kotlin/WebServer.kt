@@ -23,6 +23,7 @@ import io.ktor.server.routing.*
 import org.jetbrains.exposed.sql.Database
 import org.spring.core.Json
 import org.spring.osu.OsuApi
+import org.spring.osu.beatmap.mirror.OsuBeatmapMirror
 import org.spring.osu.extended.api.OsuWebApi
 import org.spring.osu.persistence.OsuDatabases
 import org.spring.web.databases.OsuAuth
@@ -52,6 +53,7 @@ object WebServer {
         val proxy = config.proxy?.toProxy() ?: config.osu.proxy?.toProxy()
         OsuWebApi.init(proxy)
         OsuApi.init(config.osu)
+        OsuBeatmapMirror.config = config.mirror
 
         // init http client
         WebClient.initClient(config.proxy)

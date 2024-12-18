@@ -63,11 +63,9 @@ data class Beatmapset(
 
     // Optional fields
     @JsonProperty("beatmaps")
-    @JsonIgnoreProperties("beatmapset")
     var beatmaps: List<Beatmap>? = null,
 
     @JsonProperty("converts")
-    @JsonIgnoreProperties("beatmapset")
     var converts: List<Beatmap>? = null,
 
     @JsonProperty("current_nominations")

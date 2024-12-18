@@ -10,11 +10,11 @@ description: "查询谱面信息, 支持传递 mod"
 
 ## 请求参数
 
-path参数:
+path 参数:
 
 - `bid`* : 谱面的 beatmap id, 必选
 
-url参数:
+url 参数:
 
 - `mods`: 指定 mod 后的信息, 使用 `HDHR` 格式的字符串, 可选
 - `mode`: 游戏模式, 如果谱面可以转换为对应模式则响应转换后的数据,

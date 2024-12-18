@@ -10,7 +10,7 @@ description: 查询玩家信息的接口
 
 ## 请求参数
 
-url参数:
+url 参数:
 
 - `uid` : 玩家的 osu!id
 - `name`: 玩家的用户名
