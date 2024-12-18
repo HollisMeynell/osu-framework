@@ -47,3 +47,10 @@ tasks.register("publishAllToLocal") {
         ":spring-osu-extended:publishToMavenLocal",
     )
 }
+
+tasks.register<JavaExec>("runApplication") {
+    group = "spring-application"
+    description = "Run the Application"
+    mainClass = "org.spring.application.MainKt"
+    classpath = project(":spring-application").sourceSets["main"].runtimeClasspath
+}

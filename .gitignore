@@ -43,3 +43,5 @@ bin/
 
 **/.idea
 **/native/**/target
+config.toml
+spring-osu-extended/src/main/resources/lib/*
