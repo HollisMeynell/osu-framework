@@ -1,4 +1,4 @@
-import init, {Runtime} from "./pkh";
+import init, {Runtime} from "./wasm";
 
 export default async function clickBoomEffect() {
     await init();
