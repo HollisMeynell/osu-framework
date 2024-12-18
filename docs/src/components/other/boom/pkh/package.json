@@ -1,0 +1,15 @@
+{
+  "name": "boom",
+  "type": "module",
+  "version": "0.1.0",
+  "files": [
+    "boom_bg.wasm",
+    "boom.js",
+    "boom.d.ts"
+  ],
+  "main": "boom.js",
+  "types": "boom.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}

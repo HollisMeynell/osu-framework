@@ -1,4 +1,3 @@
-import clickBoomEffect from "@site/src/components/other/boom";
 
 const keyboardKey = {
     up: "ArrowUp",
@@ -58,8 +57,6 @@ function doSomeThing () {
 
     audio.currentTime = 0;
     audio.play().catch(e=>console.error(e));
-
-    clickBoomEffect();
 
     unregister();
     audio.remove();
