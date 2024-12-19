@@ -4,7 +4,7 @@ import org.spring.osu.AuthScope
 import org.spring.osu.OsuApi
 import org.spring.web.DataVo
 import org.spring.web.Jwt
-import org.spring.web.JwtUser
+import org.spring.web.AuthUser
 import org.spring.web.LoginUserDto
 import org.spring.web.databases.OsuAuth
 
@@ -22,11 +22,11 @@ object UserService {
         val auth = OsuAuth(refreshToken = code)
         OsuApi.refreshUserAuth(auth)
         val role = if (Jwt.isAdmin(auth.id)) "admin" else "user"
-        val jwt = JwtUser(
+        val jwt = AuthUser(
             uid = auth.id!!,
             name = auth.name,
             role = role,
-        ).token(Jwt.secret)
+        ).token()
         return DataVo(
             data = LoginUserDto(
                 uid = auth.id!!,

@@ -2,6 +2,7 @@ package org.spring.web
 
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.server.request.*
 import io.ktor.utils.io.*
 import org.spring.core.json
@@ -17,6 +18,8 @@ typealias FieldVal = List<Pair<KProperty1<*, *>, Param?>>
 
 val typeCache = ConcurrentHashMap<FieldKey, FieldVal>()
 val bodyMethods = setOf(HttpMethod.Post, HttpMethod.Put, HttpMethod.Patch)
+
+fun ApplicationCall.getAuthUser() = authentication.principal<AuthUser>() !!
 
 inline fun <reified T : Any> ApplicationCall.getDataNullable(name: String): T? {
     return if (isSimpleType<T>()) {

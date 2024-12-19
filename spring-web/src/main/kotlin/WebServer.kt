@@ -17,7 +17,6 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.plugins.partialcontent.*
 import io.ktor.server.plugins.statuspages.*
-import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.jetbrains.exposed.sql.Database
@@ -63,7 +62,7 @@ object WebServer {
             configureJson()
             configureRouting()
             configureHTTP(config.server.cors)
-            setupJwt(config.server.secret)
+            setupJwt()
             initServerRouting()
         }
 
@@ -123,17 +122,10 @@ object WebServer {
                 mirror()
                 authenticate {
                     get("selfInfo") {
-                        val u = call.authentication.principal<JwtUser>()
+                        val u = call.getAuthUser()
                         val auth = OsuAuth.getByID(u!!.uid)
-                        val beatmap = OsuApi.getOwnData(auth!!)
-                        call.respond(DataVo(data = beatmap))
-                    }
-                    get("f") {
-                        val type = call.request.httpMethod.value
-                        val u = call.authentication.principal<JwtUser>()
-                        val name = u?.name ?: "no user"
-                        val x = call.parameters["o"] ?: throw IllegalArgumentException("no o")
-                        call.respondText { "$x (${type}) okok~ $name" }
+                        val user = OsuApi.getOwnData(auth!!)
+                        call.respond(DataVo(data = user))
                     }
                 }
             }

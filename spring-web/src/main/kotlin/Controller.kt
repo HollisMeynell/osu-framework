@@ -171,10 +171,25 @@ fun Route.mirror() = route("mirror") {
         }
     }
 
+    authenticate("bot") {
+        get("async/beatmap/{bid}") {
+            val bid = call.getData<Long>("bid")
+            OsuMirrorService.asyncDownload(bid)
+            call.respond(DataVo(data = "正在下载"))
+        }
+    }
+
     authenticate {
         post("upload/beatmap/{sid}") {
             val read = call.receiveChannel()
             OsuMirrorService.updateFile(3, read)
+        }
+
+        get("count") {
+            val user = call.getAuthUser()
+            if (!user.isAdmin()) throw PermissionException()
+            val count = OsuMirrorService.getAllCount()
+            call.respond(DataVo(data = count))
         }
     }
 }

@@ -32,7 +32,7 @@ object OsuBeatmapMirror {
     /**
      * if file found and not need update, return false
      */
-    private suspend fun shouldUpdate(bid: Long, channel: Array<Beatmapset?>? = null): Boolean {
+    suspend fun shouldUpdate(bid: Long, channel: Array<Beatmapset?>? = null): Boolean {
         val record = OsuFileRecord.getByBid(bid) ?: return true
         val status = record.status
         if (status == RankStatus.Ranked.value

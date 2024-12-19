@@ -149,6 +149,16 @@ data class OsuFileRecord(
                 else -> null
             }
         }
+
+        suspend fun getAllCount() = suspendTransaction {
+            exec("select count(*) as count from beatmap_files") { result ->
+                if (result.next()) {
+                    result.getLong("count")
+                } else {
+                    0
+                }
+            } ?: 0
+        }
     }
 
     suspend fun save() {

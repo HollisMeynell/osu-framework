@@ -34,6 +34,7 @@ data class WebConfig(
         val ssl: Boolean = false,
         var cors: List<String>? = null,
         var adminUsers: Set<Long> = emptySet(),
+        var botToken: String = "",
     )
 
     data class DatabaseConfig(
