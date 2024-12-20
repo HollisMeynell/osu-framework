@@ -36,6 +36,13 @@ git clone https://github.com/HollisMeynell/osu-framework.git
 在工作目录下执行
 
 ```shell
-docker-compose -f <项目路径> up -d
+docker-compose -f <项目路径>/docker-compose.yaml up -d
 ```
 
+### 更新
+
+在工作目录下执行
+    
+```shell
+docker-compose -f <项目路径>/docker-compose.yaml up -d --build sp-app
+```

@@ -11,7 +11,7 @@ services:
       POSTGRES_USER: sp
       POSTGRES_PASSWORD: "password_is0*001."
     volumes:
-      - ./database:/var/lib/postgresql/data
+      - "${PWD}/database:/var/lib/postgresql/data"
   # 应用
   sp-app:
     container_name: SP_APP
@@ -27,4 +27,4 @@ services:
     depends_on:
       - sp-db
     volumes:
-      - ./:/app
+      - "${PWD}:/app/"

@@ -58,9 +58,7 @@ ENV PATH "${JAVA_HOME}/bin:${PATH}"
 COPY --from=jre-build /javaruntime $JAVA_HOME
 
 WORKDIR /app
-COPY --from=build-app /app/build/libs/app.jar ./app.jar
-
-VOLUME ["/app"]
+COPY --from=build-app /app/build/libs/app.jar /app.jar
 
 ARG PORT=8080
 ARG DATABASE_URL
@@ -68,11 +66,11 @@ ARG DATABASE_USERNAME
 ARG DATABASE_PASSWORD
 
 ENV server.port=${PORT}
-ENV database.urlL=${DATABASE_URL}
+ENV database.url=${DATABASE_URL}
 ENV database.username=${DATABASE_USERNAME}
 ENV database.password=${DATABASE_PASSWORD}
 
 EXPOSE ${PORT}
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "/app.jar"]
 
