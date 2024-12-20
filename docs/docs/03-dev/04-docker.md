@@ -19,13 +19,15 @@ git clone https://github.com/HollisMeynell/osu-framework.git
 ### 配置环境
 
 - 创建一个空目录, **最好不要与项目代码在一起**
+- 创建 'database', 'osu' 两个目录, database 是数据库文件, osu 是镜像站相关文件
 - 在目录下创建[配置文件](02-config.md#参考)
 - 根据需要修改 `docker-compose.yml` 文件 (基本上只需要修改端口 PORT 即可)
 
 :::warning[关于配置]
 
-在使用 docker 部署时, 环境变量对 PORT / DATABASE 配置优先级最高,
-在配置文件中配置的 server.port / datavase.* 会被忽略
+- mirror.basePath 固定填写为 `/app/osu/`
+- 在使用 docker 部署时, 环境变量对 PORT / DATABASE 配置优先级最高,
+- 在配置文件中配置的 server.port / datavase.* 会被忽略
 
 :::
 
