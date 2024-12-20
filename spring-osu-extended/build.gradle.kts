@@ -17,6 +17,9 @@ plugins {
 }
 
 task("buildNative") {
+    if (!gradle.taskGraph.hasTask("dependencies")) {
+        return@task
+    }
     val libDir = layout.projectDirectory.dir("src/main/resources/lib").asFile.toPath()
     Files.createDirectories(libDir)
     val needBuild: Boolean =
