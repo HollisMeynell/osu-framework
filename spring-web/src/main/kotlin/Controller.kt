@@ -11,6 +11,8 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.jvm.javaio.*
+import org.spring.osu.extended.api.OsuWebApi
+import org.spring.osu.persistence.model.OsuWebUserRecord
 import org.spring.web.service.OsuMirrorService
 import org.spring.web.service.UserService
 import org.spring.web.service.YasunaoriService
@@ -21,8 +23,15 @@ private val log = KotlinLogging.logger { }
 private val client = WebClient.client
 
 fun Route.userController() = route("user") {
+    get("login/osu") {
+        val session = call.getData<String>("code")
+        val user = OsuWebApi.checkAccount(OsuWebUserRecord(session))
+            ?: throw HttpTipsException(400, "登陆失败, 请检查账号是否正确")
+        call.respond(DataVo(data = "用户<$user>录入成功"))
+    }
+
     get("login") {
-        val code = call.parameters["code"] ?: throw HttpTipsException(message = "no code")
+        val code = call.getDataNullable<String>("code") ?: throw HttpTipsException(message = "no code")
         val result = try {
             val user = UserService.login(code)
             DataVo(message = "登陆成功", data = user)
@@ -77,7 +86,7 @@ fun Route.yasunaori() = route("yasunaori") {
         val uid = call.getDataNullable<Long>("uid")
         val name = call.getDataNullable<String>("name")
         val response = try {
-            YasunaoriService.getUser(uid, name, call.getData("mode"))
+            YasunaoriService.getUser(uid, name, call.getDataNullable("mode"))
         } catch (e: Exception) {
             YasunaoriUserInfo("获取用户信息失败: ${e.message}")
         }

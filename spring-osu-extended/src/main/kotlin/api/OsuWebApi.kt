@@ -21,6 +21,15 @@ object OsuWebApi {
     private val userInfoReg =
         "<script id=\"json-current-user\".*>\\n\\s*(?<json>\\{.*})\\n</script>".toRegex(RegexOption.MULTILINE)
 
+    suspend fun checkAccount(account: OsuWebAccount): String? {
+        val user = try {
+            visitHomePage(account)
+        } catch (e: Exception) {
+            return null
+        }
+        return user?.username
+    }
+
     suspend fun visitHomePage(account: OsuWebAccount): WebUser? {
         val response = client.get {
             url.path("home")
