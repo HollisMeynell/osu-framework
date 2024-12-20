@@ -2,6 +2,7 @@ package org.spring.web
 
 import com.sksamuel.hoplite.ConfigLoaderBuilder
 import com.sksamuel.hoplite.PropertySource
+import com.sksamuel.hoplite.addEnvironmentSource
 import com.sksamuel.hoplite.addResourceSource
 import org.spring.core.ProxyConfig
 import org.spring.osu.OsuApiConfig
@@ -51,6 +52,7 @@ data class WebConfig(
         fun loadFromFile(): WebConfig {
             val local = System.getProperty("user.dir")
             val builder = ConfigLoaderBuilder.default()
+            builder.addEnvironmentSource()
             Path(local, "config", "config.toml").load(builder)
             Path(local, "config.toml").load(builder)
             builder.addResourceSource("/config.toml", true)

@@ -23,5 +23,6 @@ application {
 
 tasks.withType<ShadowJar> {
     minimize()
+    mergeServiceFiles()
     archiveFileName = "app.jar"
 }

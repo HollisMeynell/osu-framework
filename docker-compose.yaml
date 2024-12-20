@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+  # 数据库
+  sp-db:
+    container_name: SP_DB
+    image: postgres:16
+    restart: always
+    environment:
+      POSTGRES_DB: sp
+      POSTGRES_USER: sp
+      POSTGRES_PASSWORD: "password_is0*001."
+    volumes:
+      - ./database:/var/lib/postgresql/data
+  # 应用
+  sp-app:
+    container_name: SP_APP
+    build:
+      context: .
+      args:
+        - PORT=8080
+        - DATABASE_URL=jdbc:postgresql://sp-db:5432/sp
+        - DATABASE_USERNAME=sp
+        - DATABASE_PASSWORD=password_is0*001.
+    ports:
+      - "8080:8080"
+    depends_on:
+      - sp-db
+    volumes:
+      - ./:/app

@@ -48,8 +48,27 @@ tasks.register("publishAllToLocal") {
     )
 }
 
+tasks.register("buildApplication") {
+    group = "build"
+    description = "Build the application fat jar"
+    dependsOn(":spring-application:shadowJar")
+
+    doLast {
+        val sourceJar = file("spring-application/build/libs/app.jar")
+        val targetDir = file("build/libs")
+        val targetJar = targetDir.resolve("app.jar")
+
+        targetDir.mkdirs()
+        if (sourceJar.exists()) {
+            sourceJar.copyTo(targetJar, true)
+        } else {
+            throw GradleException("Source JAR file not found: ${sourceJar.path}")
+        }
+    }
+}
+
 tasks.register<JavaExec>("runApplication") {
-    group = "spring-application"
+    group = "application"
     description = "Run the Application"
     mainClass = "org.spring.application.MainKt"
     classpath = project(":spring-application").sourceSets["main"].runtimeClasspath
