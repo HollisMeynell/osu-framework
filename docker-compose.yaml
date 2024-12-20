@@ -1,9 +1,10 @@
 version: "3.8"
+name: osu-framework
 
 services:
   # 数据库
   sp-db:
-    container_name: SP_DB
+    container_name: sp-db
     image: postgres:16
     restart: always
     environment:
@@ -14,7 +15,7 @@ services:
       - "${PWD}/database:/var/lib/postgresql/data"
   # 应用
   sp-app:
-    container_name: SP_APP
+    container_name: sp-app
     build:
       context: .
       args:
