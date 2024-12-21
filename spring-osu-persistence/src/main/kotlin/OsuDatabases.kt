@@ -18,7 +18,7 @@ object OsuDatabases {
 
     fun registerTable(table: Table) {
         transaction(osuDB) {
-            SchemaUtils.create(table)
+            SchemaUtils.createMissingTablesAndColumns(table)
         }
     }
 

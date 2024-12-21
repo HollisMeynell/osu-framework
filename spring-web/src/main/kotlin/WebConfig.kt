@@ -31,6 +31,7 @@ data class WebConfig(
     data class ServerConfig(
         var port: Int = 8080,
         var secret: String = "*",
+        val fileDirectory: String = "${System.getProperty("user.dir")}/files",
         val localUrl: String = "localhost$port",
         val ssl: Boolean = false,
         var cors: List<String>? = null,

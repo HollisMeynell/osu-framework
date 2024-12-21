@@ -480,7 +480,8 @@ object OsuApi {
         score: Long,
         output: ByteWriteChannel
     ) {
-        val stream = ApiRequest.client.prepareGet {
+        val stream = ApiRequest.client.prepare {
+            method = HttpMethod.Get
             url.appendPathSegments("scores", score.toString(), "download")
             accept(ContentType.Application.Json)
             contentType(ContentType.Application.Json)

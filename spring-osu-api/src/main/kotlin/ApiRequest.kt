@@ -12,6 +12,7 @@ import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.jackson.*
+import org.spring.core.HttpClientRateLimiter
 import org.spring.core.Json
 import org.spring.osu.model.UserAuth
 import kotlin.reflect.full.isSubclassOf
@@ -19,7 +20,8 @@ import kotlin.reflect.full.isSubclassOf
 internal object ApiRequest {
     private lateinit var config: OsuApiConfig
     private lateinit var bot: UserAuth
-    lateinit var client: HttpClient
+    lateinit var client: HttpClientRateLimiter
+
     val log = KotlinLogging.logger { }
     val clientID
         get() = config.clientID
@@ -28,6 +30,7 @@ internal object ApiRequest {
 
     val isInited: Boolean
         get() = ::client.isInitialized
+
     /******************************* auth ****************************/
     fun getOauthUrl(state: String, vararg scopes: AuthScope): String =
         URLBuilder("https://osu.ppy.sh/oauth/authorize")
@@ -49,7 +52,8 @@ internal object ApiRequest {
             append("scope", "public")
         }
 
-        val response = client.post {
+        val response = client.request {
+            method = HttpMethod.Post
             url("https://osu.ppy.sh/oauth/token")
             headers {
                 accept(ContentType.Application.Json)
@@ -91,7 +95,8 @@ internal object ApiRequest {
             }
         }
 
-        val response = client.post {
+        val response = client.request {
+            method = HttpMethod.Post
             url("https://osu.ppy.sh/oauth/token")
             headers {
                 accept(ContentType.Application.Json)
@@ -121,7 +126,7 @@ internal object ApiRequest {
 
     fun init(config: OsuApiConfig) {
         this.config = config
-        client = HttpClient(CIO) {
+        val httpClient = HttpClient(CIO) {
             // proxy
             config.proxy?.let {
                 engine {
@@ -139,6 +144,8 @@ internal object ApiRequest {
                 url("https://osu.ppy.sh/api/v2/")
             }
         }
+
+        client = HttpClientRateLimiter(httpClient)
 
         bot = object : UserAuth {
             override var refreshToken: String? = clientToken

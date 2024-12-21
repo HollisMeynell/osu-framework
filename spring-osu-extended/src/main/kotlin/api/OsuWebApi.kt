@@ -9,6 +9,8 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.jvm.javaio.*
+import kotlinx.coroutines.CompletableDeferred
+import org.spring.core.HttpClientRateLimiter
 import org.spring.core.json
 import org.spring.osu.extended.Replay
 import org.spring.osu.extended.model.OsuWebAccount
@@ -16,7 +18,7 @@ import org.spring.osu.extended.model.WebUser
 import java.net.Proxy
 
 object OsuWebApi {
-    private lateinit var client: HttpClient
+    private lateinit var client: HttpClientRateLimiter
     private val csrfReg = "var csrf = \"(?<csrf>\\w+)\";".toRegex()
     private val userInfoReg =
         "<script id=\"json-current-user\".*>\\n\\s*(?<json>\\{.*})\\n</script>".toRegex(RegexOption.MULTILINE)
@@ -31,7 +33,8 @@ object OsuWebApi {
     }
 
     suspend fun visitHomePage(account: OsuWebAccount): WebUser? {
-        val response = client.get {
+        val response = client.request {
+            method = HttpMethod.Get
             url.path("home")
             headers.setHeader(account)
         }
@@ -53,7 +56,8 @@ object OsuWebApi {
     }
 
     suspend fun getMostPlayed(account: OsuWebAccount, limit: Int = 100, offset: Int = 0): JsonNode {
-        val response = client.get {
+        val response = client.request {
+            method = HttpMethod.Get
             url.path("users/${account.userID}/beatmapsets/most_played")
             parameter("limit", limit)
             parameter("offset", offset)
@@ -63,7 +67,8 @@ object OsuWebApi {
     }
 
     suspend fun doDownloadOsz(account: OsuWebAccount, output: ByteWriteChannel, sid: Long) {
-        val statement = client.prepareGet {
+        val statement = client.prepare {
+            method = HttpMethod.Get
             url.path("beatmapsets/$sid/download")
             headers.append(HttpHeaders.Referrer, "https://osu.ppy.sh/")
             headers.setHeader(account)
@@ -78,26 +83,28 @@ object OsuWebApi {
     }
 
     suspend fun doDownloadReplay(account: OsuWebAccount, scoreID: Long): Replay {
-        val statement = client.prepareGet {
+        val statement = client.prepare {
+            method = HttpMethod.Get
             url.path("scores/$scoreID/download")
             headers.append(HttpHeaders.Referrer, "https://osu.ppy.sh/")
             headers.setHeader(account)
         }
-        var replay: Replay? = null
+        val replay = CompletableDeferred<Replay>()
         statement.execute { response ->
             if (response.status.isSuccess().not()) {
-                throw Exception("Download replay failed [${response.status.description}]")
+                replay.completeExceptionally(Exception("Download replay failed [${response.status.description}]"))
             }
             response.bodyAsChannel().toInputStream().use {
-                replay = Replay(it)
+                replay.complete(Replay(it))
             }
         }
 
-        return replay ?: throw Exception("Download replay failed.")
+        return replay.await()
     }
 
     suspend fun doDownloadOsuFile(bid: Long): ByteArray {
-        val response = client.get {
+        val response = client.request {
+            method = HttpMethod.Get
             url.path("osu/$bid")
         }
 
@@ -109,7 +116,9 @@ object OsuWebApi {
     }
 
     suspend fun doDownloadAvatar(account: OsuWebAccount, user: Long): ByteArray {
-        val response = client.get("https://a.ppy.sh/$user") {
+        val response = client.request {
+            url("https://a.ppy.sh/$user")
+            method = HttpMethod.Get
             headers.setHeader(account)
         }
 
@@ -138,7 +147,7 @@ object OsuWebApi {
     }
 
     fun init(proxyConfig: Proxy? = null) {
-        client = HttpClient {
+        val httpClient = HttpClient {
             if (proxyConfig != null) {
                 engine { proxy = proxyConfig }
             }
@@ -147,5 +156,6 @@ object OsuWebApi {
                 headers { accept(ContentType.Application.FormUrlEncoded) }
             }
         }
+        client = HttpClientRateLimiter(httpClient)
     }
 }

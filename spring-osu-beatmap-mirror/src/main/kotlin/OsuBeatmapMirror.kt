@@ -8,6 +8,7 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream
 import org.jetbrains.exposed.sql.Column
+import org.spring.core.FileUtils
 import org.spring.osu.OsuApi
 import org.spring.osu.RankStatus
 import org.spring.osu.extended.api.OsuWebApi
@@ -19,14 +20,13 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
 import java.security.MessageDigest
-import kotlin.io.path.Path
 
 
 object OsuBeatmapMirror {
     const val BUFFER_SIZE = 8192
     var config: OsuBeatmapMirrorConfig = OsuBeatmapMirrorConfig("")
-    val basePath by lazy {
-        Path(config.basePath)
+    private val basePath by lazy {
+        FileUtils.createDirectory(config.basePath)
     }
 
     /**

@@ -12,6 +12,7 @@ import java.time.LocalDateTime
 
 class FileRecord(
     var id: Int? = null,
+    var userID: Long = 0,
     var localName: String = "",
     var fileName: String = "",
     var createTime: LocalDateTime = LocalDateTime.now(),
@@ -20,6 +21,8 @@ class FileRecord(
     companion object : IdTable<Int>("files") {
         val fileId = integer("id")
             .autoIncrement("files_id_seq")
+
+        val user = long("user_id")
 
         val localName = text("local")
             .index("local_name")
@@ -39,6 +42,7 @@ class FileRecord(
                 .map { row ->
                     FileRecord(
                         row[fileId],
+                        row[user],
                         row[localName],
                         row[fileName],
                         row[createTime],
@@ -54,6 +58,7 @@ class FileRecord(
             )
             val id = OsuDatabases.suspendTransaction {
                 insertAndGetId {
+                    it[user] = fileRecord.userID
                     it[localName] = fileRecord.localName
                     it[fileName] = fileRecord.fileName
                     it[createTime] = fileRecord.createTime
@@ -70,6 +75,7 @@ class FileRecord(
                 .map {
                     FileRecord(
                         it[fileId],
+                        it[user],
                         it[localName],
                         it[fileName],
                         it[createTime],
@@ -84,6 +90,10 @@ class FileRecord(
 
         suspend fun deleteByLocalName(local: List<String>) = OsuDatabases.suspendTransaction {
             deleteWhere { localName inList local }
+        }
+
+        init {
+           // WebDataBase.registerTable(this) {}
         }
     }
 }

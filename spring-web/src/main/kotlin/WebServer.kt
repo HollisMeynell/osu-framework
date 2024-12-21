@@ -26,6 +26,7 @@ import org.spring.osu.beatmap.mirror.OsuBeatmapMirror
 import org.spring.osu.extended.api.OsuWebApi
 import org.spring.osu.persistence.OsuDatabases
 import org.spring.web.databases.OsuAuth
+import org.spring.web.databases.WebDataBase
 
 object WebServer {
     lateinit var httpClient: HttpClient
@@ -46,6 +47,7 @@ object WebServer {
         }.let {
             val db = Database.connect(HikariDataSource(it))
             OsuDatabases.initDataBase(db)
+            WebDataBase.initDataBase(db)
         }
 
         // init osu api

@@ -13,6 +13,7 @@ import io.ktor.utils.io.*
 import io.ktor.utils.io.jvm.javaio.*
 import org.spring.osu.extended.api.OsuWebApi
 import org.spring.osu.persistence.model.OsuWebUserRecord
+import org.spring.web.databases.OsuAuth
 import org.spring.web.service.OsuMirrorService
 import org.spring.web.service.UserService
 import org.spring.web.service.YasunaoriService

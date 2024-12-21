@@ -5,6 +5,7 @@ dependencies {
     api(libs.kotlin.reflect)
     api(libs.kotlin.coroutines)
     api(libs.kotlin.logging)
+    api(libs.ktor.client.core)
     api(libs.logback.classic)
     api(libs.logback.core)
 }
