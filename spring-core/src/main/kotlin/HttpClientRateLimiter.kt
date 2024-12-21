@@ -72,7 +72,7 @@ class HttpClientRateLimiter(
 
             scope.ticker(tick) {
                 repeat(3) { i ->
-                    if (token[i] < rateMax[0]) {
+                    if (token[i] < rateMax[i]) {
                         token[i] = min(rateMax[i], token[i] + rateVelocity[i])
                     }
                 }
