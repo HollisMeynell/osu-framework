@@ -47,6 +47,7 @@ ktor-server-cio = { group = "io.ktor", name = "ktor-server-cio", version.ref = "
 ktor-server-cors = { group = "io.ktor", name = "ktor-server-cors", version.ref = "ktor" }
 ktor-server-core = { group = "io.ktor", name = "ktor-server-core", version.ref = "ktor" }
 ktor-server-auth = { group = "io.ktor", name = "ktor-server-auth-jwt", version.ref = "ktor" }
+ktor-server-rate = { group = "io.ktor", name = "ktor-server-rate-limit", version.ref = "ktor" }
 ktor-server-head = { group = "io.ktor", name = "ktor-server-auto-head-response", version.ref = "ktor" }
 ktor-server-status = { group = "io.ktor", name = "ktor-server-status-pages", version.ref = "ktor" }
 ktor-server-partial = { group = "io.ktor", name = "ktor-server-partial-content", version.ref = "ktor" }

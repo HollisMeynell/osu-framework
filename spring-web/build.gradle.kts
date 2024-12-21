@@ -14,6 +14,7 @@ dependencies {
     api(libs.ktor.server.cio)
     api(libs.ktor.server.cors)
     api(libs.ktor.server.head)
+    api(libs.ktor.server.rate)
     api(libs.ktor.server.status)
     api(libs.ktor.server.partial)
     api(libs.ktor.server.compression)

@@ -11,11 +11,13 @@ import io.ktor.server.application.install
 import io.ktor.server.auth.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
+import io.ktor.server.plugins.*
 import io.ktor.server.plugins.autohead.*
 import io.ktor.server.plugins.compression.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.plugins.partialcontent.*
+import io.ktor.server.plugins.ratelimit.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -27,6 +29,7 @@ import org.spring.osu.extended.api.OsuWebApi
 import org.spring.osu.persistence.OsuDatabases
 import org.spring.web.databases.OsuAuth
 import org.spring.web.databases.WebDataBase
+import kotlin.time.Duration.Companion.minutes
 
 object WebServer {
     lateinit var httpClient: HttpClient
@@ -65,6 +68,7 @@ object WebServer {
             configureRouting()
             configureHTTP(config.server.cors)
             setupJwt()
+            rateLimit()
             initServerRouting()
         }
 
@@ -82,6 +86,11 @@ object WebServer {
 
     private fun Application.configureRouting() {
         install(StatusPages) {
+            status(HttpStatusCode.TooManyRequests) { call, _ ->
+                val retryAfter = call.response.headers["Retry-After"]
+                val result = DataVo(429, "429: Too many requests. Wait for $retryAfter seconds.", retryAfter)
+                call.respond(status = HttpStatusCode.OK, result)
+            }
             status(HttpStatusCode.NotFound) { call, _ ->
                 val result = DataVo(404, "Not Found", null)
                 call.respond(HttpStatusCode.OK, result)
@@ -114,20 +123,45 @@ object WebServer {
         install(Compression)
     }
 
+    private fun Application.rateLimit() {
+        install(RateLimit) {
+            register {
+                requestKey { call ->
+                    val headers = call.request.headers
+                    headers["X-Real-IP"] ?: headers["X-Forwarded-For"] ?: call.request.origin.remoteHost
+                }
+                rateLimiter(limit = 6000, refillPeriod = 1.minutes)
+
+                requestWeight { call, _ ->
+                    val user = call.getAuthUserNullable()
+                    when {
+                        user == null -> 20
+                        user.role == AuthUser.Role.Bot -> 0
+                        user.isAdmin() -> 1
+                        else -> 8
+                    }
+
+                }
+            }
+        }
+    }
 
     private fun Application.initServerRouting() {
         routing {
-            route("api") {
-                userController()
-                public()
-                yasunaori()
-                mirror()
-                authenticate {
-                    get("selfInfo") {
-                        val u = call.getAuthUser()
-                        val auth = OsuAuth.getByID(u!!.uid)
-                        val user = OsuApi.getOwnData(auth!!)
-                        call.respond(DataVo(data = user))
+            rateLimit {
+
+                route("api") {
+                    userController()
+                    public()
+                    yasunaori()
+                    mirror()
+                    authenticate {
+                        get("selfInfo") {
+                            val u = call.getAuthUser()
+                            val auth = OsuAuth.getByID(u!!.uid)
+                            val user = OsuApi.getOwnData(auth!!)
+                            call.respond(DataVo(data = user))
+                        }
                     }
                 }
             }

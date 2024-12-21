@@ -86,6 +86,10 @@ fun Route.yasunaori() = route("yasunaori") {
     get("user") {
         val uid = call.getDataNullable<Long>("uid")
         val name = call.getDataNullable<String>("name")
+        call.request.headers.forEach { s, strings ->
+            println("$s: ")
+            strings.forEach { println("\t\t$it") }
+        }
         val response = try {
             YasunaoriService.getUser(uid, name, call.getDataNullable("mode"))
         } catch (e: Exception) {

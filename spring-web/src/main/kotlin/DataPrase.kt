@@ -20,6 +20,7 @@ val typeCache = ConcurrentHashMap<FieldKey, FieldVal>()
 val bodyMethods = setOf(HttpMethod.Post, HttpMethod.Put, HttpMethod.Patch)
 
 fun ApplicationCall.getAuthUser() = authentication.principal<AuthUser>() !!
+fun ApplicationCall.getAuthUserNullable() = authentication.principal<AuthUser>()
 
 inline fun <reified T : Any> ApplicationCall.getDataNullable(name: String): T? {
     return if (isSimpleType<T>()) {
