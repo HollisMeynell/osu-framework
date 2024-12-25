@@ -1,0 +1,131 @@
+---
+authors: spring
+title: "这个是日记吗"
+---
+
+# 开始
+
+<!-- truncate -->
+
+先给文档网站完善一下, 捋一下功能.
+
+## linux 系统调优 (转载来源: [大河向东流](https://www.p8r.top/linux/conf/))
+
+### 文件进程数
+
+- nofile：单个进程的最大打开文件数
+- fs.nr_open：单个进程可分配的最大文件数
+- fs.file-max:：系统内核一共可以打开的最大值
+
+| name     | query                                                | default value        |
+|----------|------------------------------------------------------|----------------------|
+| nofile   | `ulimit -n`                                          | 1024                 |
+| nr_open  | `cat /proc/sys/fs/nr_open`<br/>`sysctl fs.nr_open`   | 1073741816           |
+| file-max | `cat /proc/sys/fs/file-max`<br/>`sysctl fs.file-max` | 9223372036854775807  |
+
+:::warning
+
+nofile 的值不允许超过 nr_open 和 file-max 的值，否则会造成ssh登录不了系统
+
+:::
+
+下面配置添加在文件结尾, 需要重启服务器
+
+```Bash title="/etc/security/limits.conf" showLineNumbers
+# 所有用户可打开的最大文件数的软限制
+* soft nofile 65535
+
+# 所有用户可打开的最大文件数的硬限制
+* hard nofile 65535
+
+# 所有用户可创建的最大进程数的软限制为无限制
+* soft nproc unlimited
+
+# 所有用户可创建的最大进程数的硬限制为无限制
+* hard nproc unlimited
+```
+
+### 系统参数
+
+内核网络优化, 执行 `sysctl -p` 生效
+
+```Bash title="/etc/sysctl.conf" showLineNumbers
+
+# 用于向外连接的端口范围，建议使用参数
+net.ipv4.ip_local_port_range = 1024 65535
+
+# 内核分配给TCP连接的内存大小的最小值、默认值和最大值，单位是1Page=4096B
+# 3G 8G 16G
+net.ipv4.tcp_mem = 786432 2097152 3145728
+
+# TCP接收缓冲区的最小值、默认值和最大值，单位是字节B
+# 4K 4K 16G
+net.ipv4.tcp_rmem = 4096 4096 16777216
+
+# TCP发送缓冲区的最小值、默认值和最大值，单位是字节B
+# 4K 4K 16G
+net.ipv4.tcp_wmem = 4096 4096 16777216
+
+# 单个网络套接字能够使用的最大接收缓冲区大小
+# 16G
+net.core.rmem_max = 16777216
+
+# 单个网络套接字能够使用的最大发送缓冲区大小
+# 16G
+net.core.wmem_max = 16777216
+
+# TCP监听队列的长度，即处于SYN_RECV状态的连接的最大数量
+# add-next-line
+net.core.somaxconn = 8192
+
+# 服务器端用于记录那些尚未收到客户端确认信息的连接请求的最大值，指定SYN队列的最大长度
+# add-next-line
+net.ipv4.tcp_max_syn_backlog = 8192
+
+# 设置为 0，以防止潜在的攻击者通过发送伪造的 ICMP 重定向消息来篡改主机的路由信息
+net.ipv4.conf.all.accept_redirects = 0
+
+# 在高带宽延迟网络中，启用 TCP 窗口缩放功能可以显著提高数据传输的吞吐量
+net.ipv4.tcp_window_scaling = 1
+
+# 高并发场景下，减少TIME-WAIT连接的数量，提高系统处理新连接的能力
+net.ipv4.tcp_tw_reuse = 1
+
+# 启用TCP时间戳选项，这有助于避免在高带宽网络中可能出现的序列号卷绕问题，提高网络性能
+net.ipv4.tcp_timestamps = 1
+
+# 减小FIN-WAIT-2 状态下的超时时间，可以更快地释放这些连接所占用的资源，从而优化系统的性能
+net.ipv4.tcp_fin_timeout = 30
+
+# KeepAlive空闲时长，默认7200秒（2小时），TCP连接在空闲多长时间后开始发送保活探测包，可以更快的检测到无效连接。视应用实际需求情况，设置对应的值，本文以60秒为例。在长连接的情况下，客户端应更频繁的发送探测包。
+net.ipv4.tcp_keepalive_time = 60
+
+# 内核在回收内存时，对匿名页和文件页的回收倾向，通常使用0-100的范围之间的整数值。本文不建议使用，设置为0，不使用swap交换空间。落实到不同场景下，还是要根据实际情况进行综合考量。
+vm.swappiness = 0
+
+# 当出现SYN等待队列溢出时，启用cookies来处理，可防范少量SYN攻击
+net.ipv4.tcp_syncookies = 1
+
+# 系统同时保持TIME_WAIT套接字的最大数量，如果超过这个数值，TIME_WAIT套接字将立刻被清除并打印警告信息。默认为180000，对于Apache、Nginx等服务器来说可以将其调低一点，设置5000~30000
+net.ipv4.tcp_max_tw_buckets = 5000
+```
+
+:::tip
+
+使用 `sysctl {key}` 查看当前的系统参数.
+
+:::
+
+## 测试代码块
+
+<JvmCode title={"code"}>
+    ```
+    fun main() {
+        println("Hello, World!")
+    }
+    ---
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+    }
+    ```
+</JvmCode>

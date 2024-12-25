@@ -1,10 +1,21 @@
 .box {
   margin: 0 1rem;
-  &:hover {
-    color: var(--ifm-color-primary);
+  user-select: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+
+  .icon {
+    fill: var(--ifm-font-color-base);
   }
-  div {
-    user-select: none;
-    cursor: pointer;
+
+  &:hover .icon {
+    fill: var(--ifm-color-primary);
+  }
+
+  svg {
+    $size: 22px;
+    width: $size;
+    height: $size;
   }
 }

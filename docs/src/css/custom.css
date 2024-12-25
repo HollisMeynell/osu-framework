@@ -45,6 +45,22 @@
     src: url('/font/Blueaka.otf');
 }
 
+.theme-code-block-added-line {
+    background-color: #00FF0020;
+    display: block;
+    margin: 0 calc(-1 * var(--ifm-pre-padding));
+    padding: 0 var(--ifm-pre-padding);
+    border-left: 3px solid #00FF0080;
+}
+
+.theme-code-block-delete-line {
+    background-color: #ff000020;
+    display: block;
+    margin: 0 calc(-1 * var(--ifm-pre-padding));
+    padding: 0 var(--ifm-pre-padding);
+    border-left: 3px solid #ff000080;
+}
+
 /* 30-190 #fff */
 @keyframes colorChange {
     0% {

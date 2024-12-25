@@ -1,0 +1,18 @@
+.svg {
+  cursor: pointer;
+}
+
+.item {
+  fill: var(--ifm-color-primary);
+  stroke: var(--ifm-color-primary);
+  transform-origin: center;
+  transition: transform .3s ease-in-out;
+
+  &.show {
+    transform: scale(1);
+  }
+
+  &.hide {
+    transform: scale(0);
+  }
+}

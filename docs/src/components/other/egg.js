@@ -48,7 +48,6 @@ function getAudioElement() {
 }
 
 function doSomeThing () {
-    debugger
     const audio = document.createElement('audio');
     audio.volume = 0.3;
     audio.src = "/audio/start.mp3";
