@@ -1,4 +1,4 @@
-package org.spring.osu.persistence.model
+package org.spring.osu.persistence.entity
 
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.upsert

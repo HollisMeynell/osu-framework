@@ -115,8 +115,6 @@ object WebServer {
             cros?.forEach {
                 allowHost(it)
             }
-            allowHost("a.yasunaori.be", schemes = listOf("https"))
-            allowHost("www.websocket-test.com", schemes = listOf("http"))
         }
         install(AutoHeadResponse)
         install(PartialContent)
@@ -133,14 +131,17 @@ object WebServer {
                 rateLimiter(limit = 6000, refillPeriod = 1.minutes)
 
                 requestWeight { call, _ ->
-                    val user = call.getAuthUserNullable()
+                    return@requestWeight 10
+                    /* todo: 实现区分身份的请求权重
+                    val user = call.getAuthUser()
                     when {
-                        user == null -> 20
+                        !user.isLogin() -> 20
                         user.role == AuthUser.Role.Bot -> 0
                         user.isAdmin() -> 1
                         else -> 8
                     }
 
+                     */
                 }
             }
         }
@@ -149,16 +150,15 @@ object WebServer {
     private fun Application.initServerRouting() {
         routing {
             rateLimit {
-
                 route("api") {
-                    userController()
                     public()
-                    yasunaori()
+                    userController()
                     mirror()
+                    yasunaori()
                     authenticate {
                         get("selfInfo") {
                             val u = call.getAuthUser()
-                            val auth = OsuAuth.getByID(u!!.uid)
+                            val auth = OsuAuth.getByID(u.uid)
                             val user = OsuApi.getOwnData(auth!!)
                             call.respond(DataVo(data = user))
                         }

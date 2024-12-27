@@ -4,7 +4,6 @@ plugins {
 rootProject.name = "osu-framework"
 include("spring-application")
 include("spring-core")
-include("spring-image")
 include("spring-osu-api")
 include("spring-osu-beatmap-mirror")
 include("spring-osu-extended")

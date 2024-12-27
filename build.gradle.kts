@@ -2,7 +2,6 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.shadow)
     application
-
     `java-library`
     `maven-publish`
 }

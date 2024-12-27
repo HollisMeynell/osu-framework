@@ -143,6 +143,9 @@ const config: Config = {
             {
               label: 'GitHub',
               href: 'https://github.com/HollisMeynell/osu-framework',
+            },{
+              label: 'Front End',
+              href: 'https://github.com/SIyuyuko/osu-tourney-online',
             },
           ],
         },

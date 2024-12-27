@@ -5,7 +5,7 @@ dependencies {
     api(project(":spring-osu-persistence"))
     api(project(":spring-osu-beatmap-mirror"))
 
-    api(libs.hoplite)
+    api(libs.hoplite.core)
     api(libs.hoplite.toml)
     api(libs.hikari)
     api(libs.ktor.client.cio)
@@ -22,4 +22,3 @@ dependencies {
     api(libs.ktor.serialization.jackson)
     api(libs.krontab)
 }
-

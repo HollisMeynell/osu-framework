@@ -1,4 +1,4 @@
-package org.spring.osu.persistence.model
+package org.spring.osu.persistence.entity
 
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.Expression
@@ -41,7 +41,7 @@ data class OsuWebUserRecord(
         override val id = uid.entityId()
         override val primaryKey = PrimaryKey(uid)
 
-        val random = object : Expression<OsuWebUserRecord>() {
+        private val random = object : Expression<OsuWebUserRecord>() {
             override fun toQueryBuilder(queryBuilder: QueryBuilder) {
                 queryBuilder.append("random()")
             }

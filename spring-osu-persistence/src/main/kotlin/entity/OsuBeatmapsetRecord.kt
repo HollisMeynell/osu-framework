@@ -1,4 +1,4 @@
-package org.spring.osu.persistence.model
+package org.spring.osu.persistence.entity
 
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.ResultRow
@@ -79,15 +79,15 @@ object OsuBeatmapsetRecord : IdTable<Long>("osu_beatmapset") {
         }
     }
 
-    suspend fun getByID(SID:Long): Beatmapset? {
+    suspend fun getByID(SID:Long, withBeatmaps:Boolean = false): Beatmapset? {
         val result: Beatmapset? = suspendTransaction {
             return@suspendTransaction selectAll()
                 .where { beatmapsetID eq SID }
                 .limit(1)
-                .map(::toBeatmapset)
+                .map(OsuBeatmapsetRecord::toBeatmapset)
                 .firstOrNull()
         }
-        result?.let {
+        if (withBeatmaps) result?.let {
             it.beatmaps = OsuBeatmapRecord.getBySID(result.id)
         }
         return result

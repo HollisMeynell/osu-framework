@@ -1,9 +1,11 @@
 [versions]
 commons-compress = "1.27.1"
 exposed = "0.57.0"
+jwt = "4.4.0"
 hikari = "6.2.1"
 kotlin = "2.1.0"
 kotlin-coroutines = "1.10.1"
+kotlin-io = "0.6.0"
 kotlin-logging = "7.0.3"
 kotlin-jackson = "2.18.2"
 krontab = "2.6.1"
@@ -16,16 +18,15 @@ skija = "0.116.2"
 hoplite = "2.9.0"
 
 [plugins]
-extra-module-info = { id = "org.gradlex.extra-java-module-info", version.ref = "extra-java-module-info" }
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 
 [libraries]
 xz = { group = "org.tukaani", name = "xz", version = "1.10" }
 commons-compress = { group = "org.apache.commons", name = "commons-compress", version.ref = "commons-compress" }
-krontab = { group = "dev.inmo", name = "krontab", version.ref = "krontab" }
+ krontab = { group = "dev.inmo", name = "krontab", version.ref = "krontab" }
 
-hoplite = { group = "com.sksamuel.hoplite", name = "hoplite-core", version.ref = "hoplite" }
+hoplite-core = { group = "com.sksamuel.hoplite", name = "hoplite-core", version.ref = "hoplite" }
 hoplite-toml = { group = "com.sksamuel.hoplite", name = "hoplite-toml", version.ref = "hoplite" }
 
 skija-linux = { group = "io.github.humbleui", name = "skija-linux-x64", version.ref = "skija" }
@@ -56,6 +57,7 @@ ktor-server-content-negotiation = { group = "io.ktor", name = "ktor-server-conte
 
 
 kotlin-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlin-coroutines" }
+kotlin-io-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-io-core", version.ref = "kotlin-io" }
 kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin" }
 kotlin-logging = { group = "io.github.oshai", name = "kotlin-logging-jvm", version.ref = "kotlin-logging" }
 logback-classic = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logback" }
@@ -66,4 +68,5 @@ postgresql = { group = "org.postgresql", name = "postgresql", version.ref = "pos
 exposed-core = { group = "org.jetbrains.exposed", name = "exposed-core", version.ref = "exposed" }
 exposed-dao = { group = "org.jetbrains.exposed", name = "exposed-dao", version.ref = "exposed" }
 exposed-jdbc = { group = "org.jetbrains.exposed", name = "exposed-jdbc", version.ref = "exposed" }
+exposed-json = { group = "org.jetbrains.exposed", name = "exposed-json", version.ref = "exposed" }
 exposed-time = { group = "org.jetbrains.exposed", name = "exposed-java-time", version.ref = "exposed" }

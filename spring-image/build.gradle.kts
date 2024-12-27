@@ -1,6 +1,0 @@
-plugins {
-    skija
-}
-dependencies {
-
-}

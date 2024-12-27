@@ -14,7 +14,7 @@ import org.spring.osu.RankStatus
 import org.spring.osu.extended.api.OsuWebApi
 import org.spring.osu.model.Beatmapset
 import org.spring.osu.persistence.OsuDatabases.suspendTransaction
-import org.spring.osu.persistence.model.OsuWebUserRecord
+import org.spring.osu.persistence.entity.OsuWebUserRecord
 import java.io.*
 import java.nio.file.Files
 import java.nio.file.Path
@@ -23,7 +23,7 @@ import java.security.MessageDigest
 
 
 object OsuBeatmapMirror {
-    const val BUFFER_SIZE = 8192
+    private const val BUFFER_SIZE = 8192
     var config: OsuBeatmapMirrorConfig = OsuBeatmapMirrorConfig("")
     private val basePath by lazy {
         FileUtils.createDirectory(config.basePath)
@@ -65,8 +65,8 @@ object OsuBeatmapMirror {
         }
     }
 
-    suspend fun download(sid: Long, beatmapset: Beatmapset? = null) {
-        val beatmapset = beatmapset ?: OsuApi.getBeatmapset(sid)
+    suspend fun download(sid: Long, set: Beatmapset? = null) {
+        val beatmapset = set ?: OsuApi.getBeatmapset(sid)
         val byteChannel = ByteChannel(true)
         val account = OsuWebUserRecord.getRandomRecord() ?: throw IllegalStateException("No account found")
 

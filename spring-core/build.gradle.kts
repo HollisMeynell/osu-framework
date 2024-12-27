@@ -8,6 +8,7 @@ dependencies {
     api(libs.ktor.client.core)
     api(libs.logback.classic)
     api(libs.logback.core)
+    api(libs.kotlin.io.core)
 }
 
 plugins {

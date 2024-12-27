@@ -15,7 +15,6 @@ COPY *.gradle.kts ./
 COPY buildSrc ./buildSrc
 COPY spring-application/build.gradle.kts ./spring-application/build.gradle.kts
 COPY spring-core/build.gradle.kts ./spring-core/build.gradle.kts
-COPY spring-image/build.gradle.kts ./spring-image/build.gradle.kts
 COPY spring-osu-api/build.gradle.kts ./spring-osu-api/build.gradle.kts
 COPY spring-osu-beatmap-mirror/build.gradle.kts ./spring-osu-beatmap-mirror/build.gradle.kts
 COPY spring-osu-extended/build.gradle.kts ./spring-osu-extended/build.gradle.kts
