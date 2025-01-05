@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.*
 import com.fasterxml.jackson.databind.JsonNode
 import org.spring.core.json
 import org.spring.osu.OsuMode
-import org.spring.osu.model.LazerMod.DoubleTime.Value
 
 sealed interface Mod {
     val type: String
@@ -28,7 +27,11 @@ sealed interface ValueMod {
     }
 }
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "acronym")
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.EXISTING_PROPERTY,
+    property = "acronym"
+)
 @JsonSubTypes(
     JsonSubTypes.Type(value = LazerMod.Easy::class, name = "EZ"),
     JsonSubTypes.Type(value = LazerMod.NoFail::class, name = "NF"),
@@ -1897,6 +1900,10 @@ sealed class LazerMod {
             @JsonProperty("max_cursor_size") var maxCursorSize: Float? = null,
         )
 
+        init {
+            maxSizeComboCount?.let { this.maxSizeComboCount = it }
+            maxCursorSize?.let { this.maxCursorSize = it }
+        }
         companion object : Mod {
             override val type: String = "BM"
             override val mode: Set<OsuMode> = setOf(OsuMode.Osu)

@@ -1,4 +1,4 @@
-package org.spring.web.databases
+package org.spring.web.entity
 
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
