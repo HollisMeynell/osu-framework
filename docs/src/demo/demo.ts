@@ -84,35 +84,46 @@ interface CategorySlotFeedback {
 /*************************************************/
 // 选完图后, 玩家方面:
 interface GamePlay {
-    // 一场比赛
     rounds: Round[],
-}
+} // 整个比赛
 
 interface Round {
     id: number,
+    name: string,
     pool: GamePoolView,
-    action: RoundAction[],
     // 一轮包含多场比赛
     match: Match[],
-}
-
-interface RoundAction {
-    id: number,
-    team: "red" | "blue",
-    type: "ban" | "pick" | "warmup",
-    target: CategorySlot,
-}
+} // 单轮所有对局
 
 interface Match {
     red: Team,
     blue: Team,
-    win: "red" | "blue",
-    action: RoundAction, // 对应开头谁选得
-    scores: [], // todo: 待补充
+    winner: "red" | "blue" | "pending",
+    action: PlayAction[],
+    scores: PlayScores[], // todo: 待补充
     // todo: 针对特殊规则, 比如 acc 排名, EZ分数*2 等描述信息, 以及中间有选手退出导致重赛
+} // 单场对局
+
+interface PlayAction {
+    id: number,
+    team: "red" | "blue",
+    type: "ban" | "pick" | "warmup",
+    target: CategorySlot,
+    scores?: [],
+} // 对局中动作
+
+interface PlayScores {
+    team: "red" | "blue",
+    score: number,
+    playerScores: playerScore[],
+}
+
+interface playerScore {
+    player: GameUser,
+    score: number
 }
 
 interface Team {
     name: string,
-    players: GameUser, // 这里建议是分开, 因为可能包含费用之类的
+    players: GameUser[], // 这里建议是分开, 因为可能包含费用之类的
 }
