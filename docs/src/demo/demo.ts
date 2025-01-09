@@ -83,7 +83,7 @@ interface CategorySlotFeedback {
 }
 /*************************************************/
 // 选完图后, 玩家方面:
-interface GamePlay {
+interface Tournament {
     rounds: Round[],
 } // 整个比赛
 
@@ -104,6 +104,11 @@ interface Match {
     // todo: 针对特殊规则, 比如 acc 排名, EZ分数*2 等描述信息, 以及中间有选手退出导致重赛
 } // 单场对局
 
+interface Team {
+    name: string,
+    players: GameUser[], // 这里建议是分开, 因为可能包含费用之类的
+}
+
 interface PlayAction {
     id: number,
     team: "red" | "blue",
@@ -121,9 +126,4 @@ interface PlayScores {
 interface playerScore {
     player: GameUser,
     score: number
-}
-
-interface Team {
-    name: string,
-    players: GameUser[], // 这里建议是分开, 因为可能包含费用之类的
 }
