@@ -46,19 +46,36 @@ interface PoolView extends Pool {
 
 interface Category {
     info: CategoryInfo,
-    id: number,
-    name: string,
-    color?: number, // 颜色? 可以增加区分度
-    // 必开的 mod, 用于修改 slots 中谱面的 星级/属性
-    mustMods: [],
-    // 预想是可以带上可选的 mod, 可以实时更新 星级/属性
-    mods: [],
     slots: CategorySlot[],
 } // 各模组图池
 
 interface CategoryInfo {
     name: string,
-    MustMod: string[],
+    mustMod: Mod,// 必开的 mod, 用于修改 slots 中谱面的 星级/属性
+    optionalMods: Mod[],// 预想是可以带上可选的 mod, 可以实时更新 星级/属性
+    color?: number, // 颜色? 可以增加区分度
+} // 模组信息
+
+enum Mod {
+    "HD",
+    "HR",
+    "DT",
+    "FM",
+    "EZ",
+    "HT",
+    "NC",
+    "NF",
+    "SD",
+    "PF",
+    "SO",
+    "RX",
+    "AP",
+    "FL",
+    "AT",
+    "CN",
+    "TB",
+}
+
 
 // 由 manager 可以根据测图人的反馈,
 // 直接确定一个 CategorySlotPending id, 此时后端移除其他的CategorySlotPending
@@ -71,7 +88,7 @@ interface CategorySlot {
         // todo: 要哪一些信息最好精确一点
     },
     // todo: 加一个冤有头债有主的字段?
-} // 模组中某位置的图
+} // 模组中某位置的单张图
 
 // 这个当选完后移除, 不再展示
 interface CategorySlotPending extends CategorySlot {
@@ -84,6 +101,8 @@ interface CategorySlotPending extends CategorySlot {
 // 测图可以给出评语
 interface CategorySlotFeedback {
     userId: number,
+    rating: number,
+    feedback: string,
     // todo: 评语 推荐度
 }
 
