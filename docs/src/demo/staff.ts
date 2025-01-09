@@ -18,20 +18,43 @@ export enum GameRole {
 }
 
 // 角色权限配置
+// 角色权限配置
 export interface RolePermissions {
     [GameRole.host]: {
+        // 管理权限
         manageStaff: true,       // 管理工作人员
         manageRules: true,       // 管理规则
         managePool: true,        // 管理图池
         manageRegistration: true, // 管理报名
         manageSchedule: true,     // 管理赛程
+        
+        // 邀请权限
+        inviteStaff: true,       // 邀请工作人员
+        invitePlayer: true,      // 邀请选手参赛
+        inviteTeam: true,        // 邀请队伍参赛
+        
         all: true                 // 所有权限
     };
     [GameRole.manager]: {
+        // 管理权限
         managePool: true,
         manageRegistration: true,
         manageSchedule: true,
+        inviteStaff: true,
+        invitePlayer: true,
         // ... 其他权限
+    };
+    [GameRole.beatmap_selector]: {
+        // 管理权限
+        managePool: true,        // 管理图池
+        inviteTester: true,
+    };
+    [GameRole.beatmap_tester]: {
+        // 仅有基本权限，无邀请权限
+    };
+    [GameRole.referee]: {
+        manageMatch: true,       // 管理比赛
+        inviteReferee: true,     // 可以邀请其他裁判（用于替补）
     };
     // ... 其他角色的权限配置
 }
