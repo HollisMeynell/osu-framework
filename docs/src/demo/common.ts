@@ -13,6 +13,11 @@ export enum GameMode {
     "mania",
 }
 
+export enum ManiaKeyCount {
+    "4k" = 4,
+    "7k" = 7
+}
+
 // Mod类型
 export enum Mod {
     // 表示真实的mod, 并非 category, 然后移除了大部分不可能上比赛的 mod

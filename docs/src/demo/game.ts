@@ -4,7 +4,7 @@
  * 包含比赛基础信息、报名系统等
  */
 
-import { GameMode, Mod, TimeRange, Timestamps, ApprovalStatus } from './common';
+import { GameMode, ManiaKeyCount, Mod, TimeRange, Timestamps, ApprovalStatus } from './common';
 import { User, Player } from './user';
 import { Pool } from './pool';
 import { Tournament } from './tournament';
@@ -20,7 +20,7 @@ export enum GameStatus {
 }
 
 // 比赛基础信息
-export interface Game extends Timestamps {
+export interface BaseGame extends Timestamps {
     id: number;
     title: string;           // 比赛标题
     fullTitle: string;       // 完整标题
@@ -55,6 +55,22 @@ export interface Game extends Timestamps {
     playerCount: number;     // 当前参赛人数
     viewCount: number;       // 浏览量
 }
+
+// Mania 特有配置
+interface ManiaConfig {
+    keyCount: ManiaKeyCount;
+}
+
+// 区分不同模式的游戏类型
+type Game =
+    | (BaseGame & {
+        mode: 'mania';
+        maniaConfig: ManiaConfig;
+      })
+    | (BaseGame & {
+        mode: Exclude<GameMode, 'mania'>;
+        maniaConfig?: never;  // 明确禁止其他模式使用 maniaConfig
+      });
 
 // 队伍
 export interface Team extends Timestamps {
