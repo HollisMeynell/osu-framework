@@ -4,7 +4,7 @@
  * 包含工作人员角色、权限、排班等
  */
 
-import { Timestamps } from './common';
+import { Timestamps, ApprovalStatus } from './common';
 
 // 比赛中的角色
 export enum GameRole {
@@ -27,12 +27,12 @@ export interface RolePermissions {
         managePool: true,        // 管理图池
         manageRegistration: true, // 管理报名
         manageSchedule: true,     // 管理赛程
-        
+
         // 邀请权限
         inviteStaff: true,       // 邀请工作人员
         invitePlayer: true,      // 邀请选手参赛
         inviteTeam: true,        // 邀请队伍参赛
-        
+
         all: true                 // 所有权限
     };
     [GameRole.manager]: {
@@ -68,7 +68,7 @@ export interface Staff extends Timestamps {
     status: "active" | "inactive";
     joinedAt: Date;              // 加入时间
     leftAt?: Date;               // 离开时间
-    
+
     // 工作统计
     statistics: {
         matchesHandled: number;  // 处理的比赛数
@@ -96,13 +96,13 @@ export interface StaffSchedule extends Timestamps {
     staffId: number;
     role: GameRole;
     status: ScheduleStatus;
-    
+
     // 时间安排
     scheduledStart: Date;
     scheduledEnd: Date;
     actualStart?: Date;
     actualEnd?: Date;
-    
+
     // 替换记录
     replacedBy?: number;        // 被谁替换
     replacementReason?: string; // 替换原因
@@ -126,7 +126,7 @@ export interface StaffWork extends Timestamps {
     poolId?: number;         // 相关图池
     description: string;
     duration: number;        // 工作时长（分钟）
-    
+
     // 评价
     feedback?: {
         rating: number;      // 评分
@@ -152,22 +152,22 @@ export interface StaffApplication extends Timestamps {
     gameId: number;
     userId: number;
     roles: GameRole[];        // 申请的角色
-    
+
     // 申请信息
     experience: {
         role: GameRole;
         description: string;
         tournaments: string[];
     }[];
-    
+
     availability: {
         timezone: string;
         weeklyHours: number;
         preferences: TimePreference[];
     };
-    
+
     // 申请状态
-    status: "pending" | "approved" | "rejected";
+    status: ApprovalStatus;
     reviewedBy?: number;     // 审核人
     reviewNote?: string;     // 审核备注
 }
