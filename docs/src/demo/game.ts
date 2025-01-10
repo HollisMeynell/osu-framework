@@ -23,11 +23,11 @@ export enum GameStatus {
 export interface Game extends Timestamps {
     id: number;
     title: string;           // 比赛标题
-    fullTitle: string;       // 完整标题（可能包含赞助商）
+    fullTitle: string;       // 完整标题
     description: string;     // 比赛描述
     mode: GameMode;          // 游戏模式
     status: GameStatus;      // 比赛状态
-    
+
     // 参与限制
     playerLimit: number;     // 人数上限
     rankRange?: {           // 段位限制
@@ -39,18 +39,18 @@ export interface Game extends Timestamps {
     // 时间安排
     registrationPeriod: TimeRange;  // 报名时间
     tournamentPeriod: TimeRange;    // 比赛时间
-    
+
     // 相关资源
     poster?: string;         // 海报URL
     discord?: string;        // Discord链接
     spreadsheet?: string;    // 表格链接
-    
+
     // 关联数据
     teams: Team[];          // 队伍列表
     staffs: Staff[];        // 工作人员
     pools: Pool[];          // 图池
     tournament: Tournament;  // 比赛赛程
-    
+
     // 统计信息
     playerCount: number;     // 当前参赛人数
     viewCount: number;       // 浏览量
@@ -66,7 +66,7 @@ export interface Team extends Timestamps {
     players: Player[];       // 队员列表
     captain: number;         // 队长ID
     seedRank?: number;      // 种子排名----------------------待定
-    
+
     statistics?: {          // 队伍统计
         gamesPlayed: number;
         gamesWinned: number;
