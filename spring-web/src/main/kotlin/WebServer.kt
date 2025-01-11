@@ -152,6 +152,7 @@ object WebServer {
                     public()
                     userController()
                     mirror()
+                    osu()
                     yasunaori()
                     authenticate {
                         get("selfInfo") {

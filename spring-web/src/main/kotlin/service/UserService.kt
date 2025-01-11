@@ -2,11 +2,13 @@ package org.spring.web.service
 
 import org.spring.osu.AuthScope
 import org.spring.osu.OsuApi
-import org.spring.web.DataVo
-import org.spring.web.entity.OsuAuth
-import org.spring.web.Jwt
+import org.spring.osu.OsuMode
 import org.spring.web.AuthUser
+import org.spring.web.DataVo
+import org.spring.web.Jwt
 import org.spring.web.LoginUserDto
+import org.spring.web.entity.OsuAuth
+import org.spring.web.model.OsuUserVo
 
 object UserService {
     fun oauthUrl() = DataVo(
@@ -36,7 +38,18 @@ object UserService {
             )
         )
     }
-    suspend fun getUserInfo(uid: Long): DataVo<Any>{
-        return DataVo(data = OsuAuth.getByID(uid))
+
+    suspend fun getUserInfo(uid: Long, mode: String? = null): DataVo<OsuUserVo> {
+        var osuMode = OsuMode.getMode(mode)
+        val user = OsuApi.getUser(user = uid, mode = osuMode)
+        osuMode = user.rankHistory?.mode ?: osuMode
+        return DataVo(data = OsuUserVo.extendedFromUser(user, osuMode))
+    }
+
+    suspend fun getUserInfo(name: String, mode: String? = null): DataVo<OsuUserVo> {
+        var osuMode = OsuMode.getMode(mode)
+        val user = OsuApi.getUser(name = name, mode = osuMode)
+        osuMode = user.rankHistory?.mode ?: osuMode
+        return DataVo(data = OsuUserVo.extendedFromUser(user, osuMode))
     }
 }

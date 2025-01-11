@@ -1,0 +1,7 @@
+{
+  "label": "User",
+  "link": {
+    "type": "generated-index",
+    "description": "用户信息的相关接口"
+  }
+}

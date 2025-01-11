@@ -174,7 +174,7 @@ enum class OsuMode(val value: Int, val describe: String) {
 
     class RulesetSerializer : JsonSerializer<OsuMode?>() {
         override fun serialize(value: OsuMode?, generator: JsonGenerator, provider: SerializerProvider) {
-            if (value != null) generator.writeString(value.name)
+            if (value != null) generator.writeString(value.describe)
         }
     }
 

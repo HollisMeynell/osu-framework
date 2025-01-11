@@ -64,7 +64,7 @@ data class UserStatistics (
     var totalHits: Long,
 
     @JsonProperty("total_score")
-    var totalScore: Long
+    var totalScore: Long,
 ) {
     data class GradeCounts(
         @JsonProperty("a")
