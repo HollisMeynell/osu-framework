@@ -14,3 +14,10 @@ cd docs
 pnpm install
 
 pnpm run build
+
+if [ -d "./build" ]; then
+  if [ -d "./release" ]; then
+    rm -rf ./release
+  fi
+  mv ./build ./release
+fi
