@@ -27,8 +27,7 @@ import org.spring.osu.OsuApi
 import org.spring.osu.beatmap.mirror.OsuBeatmapMirror
 import org.spring.osu.extended.api.OsuWebApi
 import org.spring.osu.persistence.OsuDatabases
-import org.spring.web.databases.OsuAuth
-import org.spring.web.databases.WebDataBase
+import org.spring.web.entity.OsuAuth
 import kotlin.time.Duration.Companion.minutes
 
 object WebServer {
@@ -50,7 +49,6 @@ object WebServer {
         }.let {
             val db = Database.connect(HikariDataSource(it))
             OsuDatabases.initDataBase(db)
-            WebDataBase.initDataBase(db)
         }
 
         // init osu api

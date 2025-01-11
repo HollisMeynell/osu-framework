@@ -3,10 +3,10 @@ package org.spring.web.service
 import org.spring.osu.AuthScope
 import org.spring.osu.OsuApi
 import org.spring.web.DataVo
+import org.spring.web.entity.OsuAuth
 import org.spring.web.Jwt
 import org.spring.web.AuthUser
 import org.spring.web.LoginUserDto
-import org.spring.web.databases.OsuAuth
 
 object UserService {
     fun oauthUrl() = DataVo(
@@ -36,5 +36,7 @@ object UserService {
             )
         )
     }
-
+    suspend fun getUserInfo(uid: Long): DataVo<Any>{
+        return DataVo(data = OsuAuth.getByID(uid))
+    }
 }

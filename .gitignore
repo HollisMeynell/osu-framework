@@ -43,5 +43,7 @@ bin/
 
 **/.idea
 **/native/**/target
+
+docs/release
 config.toml
 spring-osu-extended/src/main/resources/lib/*
