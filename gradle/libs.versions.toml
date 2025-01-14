@@ -14,7 +14,7 @@ logback = "1.5.16"
 postgres = "42.7.4"
 shadow = "8.3.5"
 extra-java-module-info = "1.9"
-skija = "0.116.2"
+skija = "0.116.3"
 hoplite = "2.9.0"
 
 [plugins]
