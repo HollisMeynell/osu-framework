@@ -292,12 +292,15 @@ data class User(
             "note" -> Type.Note
             "restriction" -> Type.Restriction
             "silence" -> Type.Silence
-            else -> throw IllegalArgumentException("Unknown type: $_type")
+            "tournament_ban" -> Type.TournamentBan
+            else -> Type.Other
         }
         enum class Type {
             Note,
             Restriction,
             Silence,
+            TournamentBan,
+            Other,
         }
     }
 
