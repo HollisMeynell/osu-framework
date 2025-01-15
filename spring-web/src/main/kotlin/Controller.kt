@@ -81,6 +81,23 @@ fun Route.public() = route("public") {
     }
 }
 
+fun Route.osu() = route("osu") {
+    get("user/{uid}") {
+        val uid = call.getData<String>("uid")
+        val mode = call.getDataNullable<String>("mode")
+        val response = try {
+            if (uid.startsWith('@')){
+                UserService.getUserInfo(uid.substring(1), mode)
+            } else {
+                UserService.getUserInfo(uid.toLong(), mode)
+            }
+        } catch (e: Exception) {
+            DataVo(message = "获取用户信息失败: ${e.message}")
+        }
+        call.respond(response)
+    }
+}
+
 fun Route.yasunaori() = route("yasunaori") {
     get("user") {
         val uid = call.getDataNullable<Long>("uid")
