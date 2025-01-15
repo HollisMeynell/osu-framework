@@ -4,7 +4,7 @@ import PlayPauseButton from "@site/src/components/MusicPlayer/PlayPauseButton";
 import {useEffect, useRef, useState} from "react";
 
 export default function MusicPlayer() {
-    const url = "https://disk.365246692.xyz/d/public/mapping/Illumi.mp3?sign=hMoGGwgdoGu9Q3EVMQRXUy0GziGw23Czbfeyn9Mzhoo=:1735187784";
+    const url = "https://disk.365246692.xyz/d/public/mapping/Illumi.mp3";
     const show = useAppSelector(s => s.music.show);
     const dispatch = useAppDispatch();
     const dom = useRef<HTMLDivElement>(null);

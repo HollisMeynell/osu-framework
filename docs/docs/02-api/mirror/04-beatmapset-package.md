@@ -24,7 +24,7 @@ GET /api/mirror/beatmapset/all?sid=2&sid=3&sid=4
 
 ## 响应结果
 
-二进制响应流, 无任何其他包装, 出错时返回[单体数据响应](../01-README.md#单体数据响应)格式
+二进制响应流, 无任何其他包装, 出错时返回[单体数据响应](../README.md#单体数据响应)格式
 
 :::warning
 

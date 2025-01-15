@@ -1,0 +1,8 @@
+{
+  "label": "镜像站接口",
+  "position": 2,
+  "link": {
+    "type": "generated-index",
+    "description": "与 Beatmap 下载相关的接口"
+  }
+}
