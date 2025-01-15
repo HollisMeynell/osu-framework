@@ -1,4 +1,5 @@
 ---
+title: 谱面信息*
 description: "查询谱面信息, 支持传递 mod"
 ---
 
@@ -7,6 +8,10 @@ description: "查询谱面信息, 支持传递 mod"
 ## 接口路径
     
 `/api/yasunaori/beatmap/{bid}`
+
+## 请求类型
+
+- `GET`
 
 ## 请求参数
 

@@ -1,5 +1,5 @@
 ---
-title: "下载谱面"
+title: "下载谱面*"
 description: "下载 beatmapset 的 .osz 文件"
 ---
 
@@ -8,6 +8,10 @@ description: "下载 beatmapset 的 .osz 文件"
 ## 接口路径
 
 `/api/mirror/beatmapset/{sid}`
+
+## 请求类型
+
+- `GET`
 
 ## 请求参数
 

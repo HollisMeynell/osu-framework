@@ -1,5 +1,5 @@
 ---
-title: "打包下载多个谱面"
+title: "打包下载多个谱面*"
 description: "下载包含多个 beatmapset.osz 文 .zip 文件"
 ---
 
@@ -8,6 +8,10 @@ description: "下载包含多个 beatmapset.osz 文 .zip 文件"
 ## 接口路径
 
 `/api/mirror/beatmapset/all`
+
+## 请求类型
+
+- `GET`
 
 ## 请求参数
 

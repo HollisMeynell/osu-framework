@@ -1,5 +1,5 @@
 ---
-title: "下载谱面内容文件"
+title: "下载谱面内容文件*"
 description: "获取在 beatmap 中某个类型的文件, 是实际文件数据"
 ---
 
@@ -8,6 +8,10 @@ description: "获取在 beatmap 中某个类型的文件, 是实际文件数据"
 ## 接口路径
 
 `/api/mirror/beatmap/{type}/{bid}`
+
+## 请求类型
+
+- `GET`
 
 ## 请求参数
 

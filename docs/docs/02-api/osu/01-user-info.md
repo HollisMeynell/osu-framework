@@ -1,5 +1,5 @@
 ---
-title: "Osu User 信息"
+title: "Osu User 信息*"
 description: "查询玩家信息"
 ---
 
@@ -8,6 +8,10 @@ description: "查询玩家信息"
 ## 接口路径
 
 `/api/osu/user/{uid|@name}`
+
+## 请求类型
+
+- `GET`
 
 ## 请求参数
 

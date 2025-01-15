@@ -1,5 +1,5 @@
 ---
-title: "获取谱面文件名"
+title: "获取谱面文件名*"
 description: "获取在 beatmap 中某个类型的文件名称, 例如获取背景文件 `bg.jpg` 等"
 ---
 
@@ -8,6 +8,10 @@ description: "获取在 beatmap 中某个类型的文件名称, 例如获取背�
 ## 接口路径
 
 `/api/mirror/fileName/{type}/{bid}`
+
+## 请求类型
+
+- `GET`
 
 ## 请求参数
 

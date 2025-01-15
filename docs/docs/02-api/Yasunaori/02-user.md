@@ -1,4 +1,5 @@
 ---
+title: 玩家信息*
 description: 查询玩家信息的接口
 ---
 
@@ -7,6 +8,10 @@ description: 查询玩家信息的接口
 ## 接口路径
 
 `/api/yasunaori/user`
+
+## 请求类型
+
+- `GET`
 
 ## 请求参数
 
