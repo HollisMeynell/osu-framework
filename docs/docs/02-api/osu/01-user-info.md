@@ -41,6 +41,34 @@ GET /api/osu/user/2?mode=mania
 
 ## 响应结果
 
+data 定义为:
+
+```mermaid
+classDiagram
+LoginUser <-- Level
+class LoginUser {
+    int id;
+    string name;
+    string avatar;
+    string cover;
+    string country;
+    // extended 
+    int fans;
+    enum mode;
+    float pp;
+    Level level;
+    int global_rank;
+    int country_rank;
+    int ranked_score;
+    int total_score;
+    int total_hits;
+}
+class Level {
+    int current;
+    int progress;
+}
+```
+
 - 正常响应:
 ```json
 {
