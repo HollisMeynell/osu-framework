@@ -6,8 +6,8 @@ import org.spring.osu.OsuMode
 import org.spring.web.AuthUser
 import org.spring.web.DataVo
 import org.spring.web.Jwt
-import org.spring.web.LoginUserDto
 import org.spring.web.entity.OsuAuth
+import org.spring.web.model.LoginUserVo
 import org.spring.web.model.OsuUserVo
 
 object UserService {
@@ -20,9 +20,10 @@ object UserService {
         )
     )
 
-    suspend fun login(code: String): DataVo<LoginUserDto> {
+    suspend fun login(code: String): DataVo<LoginUserVo> {
         val auth = OsuAuth(refreshToken = code)
         OsuApi.refreshUserAuth(auth)
+        val userInfo = OsuAuth.getContextUser() ?: OsuApi.getOwnData(auth)
         val role = if (Jwt.isAdmin(auth.id)) "admin" else "user"
         val jwt = AuthUser(
             uid = auth.id!!,
@@ -30,11 +31,12 @@ object UserService {
             role = role,
         ).token()
         return DataVo(
-            data = LoginUserDto(
+            data = LoginUserVo(
                 uid = auth.id!!,
                 name = auth.name,
                 token = jwt,
                 admin = Jwt.isAdmin(auth.id),
+                info = OsuUserVo.extendedFromUser(userInfo)
             )
         )
     }

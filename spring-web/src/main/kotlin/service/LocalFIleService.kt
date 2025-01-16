@@ -1,8 +1,8 @@
 package org.spring.web.service
 
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.spring.core.FileUtils
+import org.spring.core.MainDispatcher
 import org.spring.web.WebConfig
 import java.nio.file.Files
 import java.nio.file.StandardOpenOption
@@ -17,7 +17,7 @@ object LocalFIleService {
     suspend fun writeFile(name: String, data: ByteArray) {
         val key = UUID.randomUUID().toString()
         val path = UPLOAD_PATH.resolve(key)
-        withContext(Dispatchers.IO) {
+        withContext(MainDispatcher) {
             Files.write(path, data, StandardOpenOption.CREATE, StandardOpenOption.WRITE)
         }
     }

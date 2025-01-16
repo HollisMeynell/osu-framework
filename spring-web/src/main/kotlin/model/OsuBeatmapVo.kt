@@ -1,5 +1,5 @@
 package org.spring.web.model
 
-class OsuBeatmapVo {
-
-}
+data class OsuBeatmapVo(
+    val id:Int,
+){}

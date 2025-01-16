@@ -3,7 +3,10 @@ package org.spring.web.entity
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.upsert
+import org.spring.core.getContext
+import org.spring.core.setContext
 import org.spring.osu.OsuApi
+import org.spring.osu.model.User
 import org.spring.osu.persistence.OsuDatabases
 
 class OsuAuth(
@@ -17,6 +20,7 @@ class OsuAuth(
     override suspend fun update() {
         if (id == null) {
             val userInfo = OsuApi.getOwnData(this)
+            setContext(CONTEXT_KEY, userInfo)
             id = userInfo.id
             name = userInfo.username
         }
@@ -38,6 +42,9 @@ class OsuAuth(
     }
 
     companion object : IdTable<Long>("osu_oauth") {
+        @JvmStatic
+        val CONTEXT_KEY = "osu_oauth_get_user_info"
+
         val uid = long("osu_id")
         val name = text("username")
         val accessToken = text("access_token")
@@ -67,5 +74,7 @@ class OsuAuth(
         init {
             OsuDatabases.registerTable(this)
         }
+
+        fun getContextUser(): User? = getContext(CONTEXT_KEY)
     }
 }

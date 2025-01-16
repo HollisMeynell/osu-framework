@@ -9,6 +9,7 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream
 import org.jetbrains.exposed.sql.Column
 import org.spring.core.FileUtils
+import org.spring.core.MainDispatcher
 import org.spring.osu.OsuApi
 import org.spring.osu.RankStatus
 import org.spring.osu.extended.api.OsuWebApi
@@ -60,7 +61,7 @@ object OsuBeatmapMirror {
     suspend fun upload(sid: Long, input: InputStream) {
         val beatmapset = OsuApi.getBeatmapset(sid)
 
-        withContext(Dispatchers.IO + SupervisorJob()) {
+        withContext(MainDispatcher + SupervisorJob()) {
             writeStream(sid, beatmapset, input)
         }
     }
@@ -74,7 +75,7 @@ object OsuBeatmapMirror {
             val job1 = launch {
                 OsuWebApi.doDownloadOsz(account, byteChannel, sid)
             }
-            withContext (Dispatchers.IO + SupervisorJob()) {
+            withContext (MainDispatcher + SupervisorJob()) {
                 writeStream(sid, beatmapset, byteChannel.toInputStream())
             }
             job1.join()
@@ -92,7 +93,7 @@ object OsuBeatmapMirror {
 
     suspend fun remove(sid: Long) {
         OsuFileRecord.deleteBySid(sid)
-        withContext(Dispatchers.IO) {
+        withContext(MainDispatcher) {
             Files.walk(basePath.resolve(sid.toString()))
         }.use {
             it.sorted(Comparator.reverseOrder()).forEach(Files::delete)
@@ -125,7 +126,7 @@ object OsuBeatmapMirror {
     }
 
     private suspend fun writeDirToZip(zip: ZipArchiveOutputStream, path: Path, hasVideo: Boolean, base: String = "") {
-        withContext(Dispatchers.IO) {
+        withContext(MainDispatcher) {
             Files.list(path)
         }.use { list ->
             for (it in list.toList()) {

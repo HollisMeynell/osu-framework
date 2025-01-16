@@ -1,7 +1,7 @@
 package org.spring.osu.extended
 
 import kotlinx.coroutines.*
-import org.spring.core.coroutineScope
+import org.spring.core.CoroutineScope
 import org.spring.core.ticker
 import org.spring.osu.OsuApi
 import org.spring.osu.model.Match
@@ -17,7 +17,7 @@ class MatchListenerStarter(
     vararg listener: MatchListener,
 ) {
     lateinit var stopJob: () -> Unit
-    private val kill: Job = coroutineScope.async {
+    private val kill: Job = CoroutineScope.async {
         delay(3.hours)
         stop(StopType.Timeout)
     }
@@ -92,7 +92,7 @@ class MatchListenerStarter(
             stop(StopType.End)
             return
         }
-        stopJob = coroutineScope.ticker(10.seconds) { doAction() }
+        stopJob = CoroutineScope.ticker(10.seconds) { doAction() }
         coroutineScope { kill.start() }
         listeners.on { onListenStart() }
     }

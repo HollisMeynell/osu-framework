@@ -3,6 +3,7 @@ package org.spring.osu.extended.api
 import com.fasterxml.jackson.databind.JsonNode
 import io.ktor.client.*
 import io.ktor.client.call.*
+import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -147,13 +148,18 @@ object OsuWebApi {
     }
 
     fun init(proxyConfig: Proxy? = null) {
-        val httpClient = HttpClient {
+        val httpClient = HttpClient(CIO) {
             if (proxyConfig != null) {
                 engine { proxy = proxyConfig }
             }
             defaultRequest {
                 url("https://osu.ppy.sh/")
                 headers { accept(ContentType.Application.FormUrlEncoded) }
+            }
+            install(HttpTimeout) {
+                requestTimeoutMillis = 30_000
+                connectTimeoutMillis = 5_1000
+                socketTimeoutMillis = 5_1000
             }
         }
         client = HttpClientRateLimiter(httpClient)

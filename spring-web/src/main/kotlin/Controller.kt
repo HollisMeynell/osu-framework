@@ -11,6 +11,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.jvm.javaio.*
+import org.spring.core.withContext
 import org.spring.osu.extended.api.OsuWebApi
 import org.spring.osu.persistence.entity.OsuWebUserRecord
 import org.spring.web.service.OsuMirrorService
@@ -22,15 +23,30 @@ import org.spring.web.service.YasunaoriUserInfo
 private val log = KotlinLogging.logger { }
 private val client = WebClient.client
 
-fun Route.userController() = route("user") {
-    get("login/osu") {
+fun Route.xGet(path: String, body: suspend RoutingContext.() -> Unit): Route {
+    return get(path) {
+        withContext {
+            body()
+        }
+    }
+}
+fun Route.xPost(path: String, body: suspend RoutingContext.() -> Unit): Route {
+    return post(path) {
+        withContext {
+            body()
+        }
+    }
+}
+
+fun Route.user() = route("user") {
+    xGet("login/osu") {
         val session = call.getData<String>("code")
         val user = OsuWebApi.checkAccount(OsuWebUserRecord(session))
             ?: throw HttpTipsException(400, "登陆失败, 请检查账号是否正确")
         call.respond(DataVo(data = "用户<$user>录入成功"))
     }
 
-    get("login") {
+    xGet("login") {
         val code = call.getDataNullable<String>("code") ?: throw HttpTipsException(message = "no code")
         val result = try {
             val user = UserService.login(code)
@@ -44,11 +60,11 @@ fun Route.userController() = route("user") {
 }
 
 fun Route.public() = route("public") {
-    get("getOauthUrl") {
+    xGet("getOauthUrl") {
         call.respond(UserService.oauthUrl())
     }
 
-    post("proxy/{key?}") {
+    xPost("proxy/{key?}") {
         val key = call.getDataNullable<String>("key")
         if (key != WebConfig.Instance.server.secret) {
             throw HttpTipsException(403, "no permission")
@@ -82,10 +98,10 @@ fun Route.public() = route("public") {
 }
 
 fun Route.osu() = route("osu") {
-    get("user/{uid}") {
+    xGet("user/{uid}") {
         val uid = call.getData<String>("uid")
         val mode = call.getDataNullable<String>("mode")
-        val response = if (uid.startsWith('@')){
+        val response = if (uid.startsWith('@')) {
             UserService.getUserInfo(uid.substring(1), mode)
         } else {
             UserService.getUserInfo(uid.toLong(), mode)
@@ -95,7 +111,7 @@ fun Route.osu() = route("osu") {
 }
 
 fun Route.yasunaori() = route("yasunaori") {
-    get("user") {
+    xGet("user") {
         val uid = call.getDataNullable<Long>("uid")
         val name = call.getDataNullable<String>("name")
         val response = try {
@@ -106,7 +122,7 @@ fun Route.yasunaori() = route("yasunaori") {
         call.respond(response)
     }
 
-    get("beatmap/{bid}") {
+    xGet("beatmap/{bid}") {
         val bid = call.getData<Long>("bid")
         val mods = call.getDataNullable<String>("mods")
         val mode = call.getDataNullable<String>("mode")
@@ -118,7 +134,7 @@ fun Route.yasunaori() = route("yasunaori") {
         call.respond(response)
     }
 
-    get("avatar/{id}") {
+    xGet("avatar/{id}") {
         val id = call.getData<String>("id")
         call.respondBytesWriter(
             contentType = ContentType.Image.JPEG
@@ -132,7 +148,7 @@ fun Route.yasunaori() = route("yasunaori") {
 }
 
 fun Route.mirror() = route("mirror") {
-    get("fileName/{type}/{bid}") {
+    xGet("fileName/{type}/{bid}") {
         val bid = call.getData<Long>("bid")
         val type = call.getData<String>("type")
         val file = OsuMirrorService.getFilePath(bid, type)
@@ -142,7 +158,7 @@ fun Route.mirror() = route("mirror") {
     /**
      * type: bg, song, osufile
      */
-    get("beatmap/{type}/{bid}") {
+    xGet("beatmap/{type}/{bid}") {
         val type = call.getData<String>("type")
         val bid = call.getData<Long>("bid")
         val path = OsuMirrorService.getFilePath(bid, type)
@@ -156,7 +172,7 @@ fun Route.mirror() = route("mirror") {
         call.respond(LocalPathContent(path))
     }
 
-    get("beatmapset/{sid}") {
+    xGet("beatmapset/{sid}") {
         val sid = call.getData<Long>("sid")
         val video = call.getDataNullable<Boolean>("video") ?: true
         call.response.header(
@@ -174,7 +190,7 @@ fun Route.mirror() = route("mirror") {
     /**
      * 使用sid参数, 可以多个
      */
-    get("beatmapset/all") {
+    xGet("beatmapset/all") {
         val video = call.getDataNullable<Boolean>("video") ?: true
         val sids = call.request
             .queryParameters
@@ -194,7 +210,7 @@ fun Route.mirror() = route("mirror") {
     }
 
     authenticate {
-        get("async/beatmap/{bid}") {
+        xGet("async/beatmap/{bid}") {
             val bid = call.getData<Long>("bid")
             OsuMirrorService.asyncDownload(bid)
             call.respond(DataVo(data = "正在下载"))
@@ -202,12 +218,12 @@ fun Route.mirror() = route("mirror") {
     }
 
     authenticate {
-        post("upload/beatmap/{sid}") {
+        xPost("upload/beatmap/{sid}") {
             val read = call.receiveChannel()
             OsuMirrorService.updateFile(3, read)
         }
 
-        get("count") {
+        xGet("count") {
             val user = call.getAuthUser()
             if (!user.isAdmin()) throw PermissionException()
             val count = OsuMirrorService.getAllCount()

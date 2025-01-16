@@ -9,19 +9,38 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.concurrent.getOrSet
+import kotlin.reflect.KMutableProperty
+import kotlin.reflect.KMutableProperty1
+import kotlin.reflect.KProperty1
+import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.jvm.isAccessible
+import kotlin.reflect.jvm.javaField
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 /************* kt ****************/
 typealias TickerStop = () -> Unit
 
-@OptIn(DelicateCoroutinesApi::class)
-var coroutineScope: CoroutineScope = GlobalScope
+val VirtualThreadFactory = Thread.ofVirtual().name("spring-main").factory()!!
+
+val VirtualThreadExecutor = Executors.newThreadPerTaskExecutor(
+    VirtualThreadFactory
+)!!
+
+val MainDispatcher = VirtualThreadExecutor.asCoroutineDispatcher()
+
+var CoroutineScope: CoroutineScope = CoroutineScope (
+    MainDispatcher + SupervisorJob()
+)
+
 val log = KotlinLogging.logger("org.spring.core")
 
 val LOCAL = ThreadLocal<MutableMap<String, Any>>()
+
 fun <T : Any> setContext(key: String, value: T) {
     val map = LOCAL.getOrSet { mutableMapOf() }
     map[key] = value
@@ -39,11 +58,11 @@ fun clearContext() {
 }
 
 suspend fun <T> withContext(block: suspend () -> T): T {
-    return coroutineScope {
-        async(coroutineContext + LOCAL.asContextElement()) {
-            block()
-        }.await()
-    }
+    return CoroutineScope.async(LOCAL.asContextElement()) {
+        val result = block()
+        clearContext()
+        result
+    }.await()
 }
 
 /**
@@ -97,7 +116,7 @@ inline fun debounce(
     crossinline action: suspend CoroutineScope.() -> Unit
 ) {
     debounceJobMap[key]?.cancel()
-    debounceJobMap[key] = coroutineScope.launch {
+    debounceJobMap[key] = CoroutineScope.launch {
         delay(delayTime)
         debounceJobMap.remove(key)
         action()
@@ -182,7 +201,7 @@ suspend inline fun <T> selectRun(
         onError(it)
     }
     val tasks = actions.map { action ->
-        coroutineScope.launch {
+        CoroutineScope.launch {
             try {
                 val result = action()
                 channel.send(result)
@@ -230,9 +249,5 @@ inline fun tryRunUnit(
  * init
  */
 fun applicationRun(action: suspend CoroutineScope.() -> Unit) = runBlocking {
-    supervisorScope {
-        coroutineScope = this@supervisorScope
-        coroutineScope.action()
-    }
+     CoroutineScope.action()
 }
-

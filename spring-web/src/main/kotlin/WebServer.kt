@@ -6,8 +6,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.*
 import io.ktor.http.*
 import io.ktor.serialization.jackson.*
-import io.ktor.server.application.Application
-import io.ktor.server.application.install
+import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
@@ -95,13 +94,13 @@ object WebServer {
             }
             exception<HttpTipsException> { call, cause ->
                 if (cause.cuse != null) {
-                    log.error(cause.cuse) { cause.message }
+                    org.spring.core.log.error(cause.cuse) { cause.message }
                 }
                 val result = DataVo(cause.code, cause.message!!, null)
                 call.respond(status = HttpStatusCode.OK, result)
             }
             exception<Throwable> { call, cause ->
-                log.error(cause) { "" }
+                org.spring.core.log.error(cause) { "" }
                 val result = DataVo(500, cause.message ?: "server error", null)
                 call.respond(status = HttpStatusCode.OK, result)
             }
@@ -146,21 +145,20 @@ object WebServer {
     }
 
     private fun Application.initServerRouting() {
+        rootPath = "api"
         routing {
             rateLimit {
-                route("api") {
-                    public()
-                    userController()
-                    mirror()
-                    osu()
-                    yasunaori()
-                    authenticate {
-                        get("selfInfo") {
-                            val u = call.getAuthUser()
-                            val auth = OsuAuth.getByID(u.uid)
-                            val user = OsuApi.getOwnData(auth!!)
-                            call.respond(DataVo(data = user))
-                        }
+                public()
+                user()
+                mirror()
+                osu()
+                yasunaori()
+                authenticate {
+                    get("selfInfo") {
+                        val u = call.getAuthUser()
+                        val auth = OsuAuth.getByID(u.uid)
+                        val user = OsuApi.getOwnData(auth!!)
+                        call.respond(DataVo(data = user))
                     }
                 }
             }

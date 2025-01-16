@@ -29,7 +29,7 @@ class HttpClientRateLimiter(
     private val token = IntArray(3) { i -> rateMax[i] }
 
     private val tasks = Channel<RateLimitRequest>(0)
-    private val scope = CoroutineScope(Dispatchers.Default)
+    private val scope = CoroutineScope
 
     init {
         rateMax[0] = rateSecond
