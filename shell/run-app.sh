@@ -1,1 +1,1 @@
-./gradlew runApplication
+./gradlew :runApplication --console=plain
