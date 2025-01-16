@@ -120,7 +120,7 @@ const config: Config = {
           items: [
             {
               label: '文档',
-              to: '/d/web/README/',
+              to: '/d/web/',
             },
             {
               label: '日志',
