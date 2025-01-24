@@ -45,8 +45,8 @@ data 定义为:
 
 ```mermaid
 classDiagram
-LoginUser <-- Level
-class LoginUser {
+User <-- Level
+class User {
     int id;
     string name;
     string avatar;

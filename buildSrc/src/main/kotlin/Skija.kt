@@ -5,7 +5,7 @@ import org.gradle.kotlin.dsl.dependencies
 
 
 class Skija : Plugin<Project> {
-    val os = System.getProperty("os.name").lowercase()
+    private val os = System.getProperty("os.name").lowercase()
 
     override fun apply(target: Project) {
         val libs = target.extensions.getByType(VersionCatalogsExtension::class.java).named("libs")
