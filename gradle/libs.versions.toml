@@ -16,10 +16,12 @@ shadow = "8.3.6"
 extra-java-module-info = "1.9"
 skija = "0.116.3"
 hoplite = "2.9.0"
+maven-publish = "0.30.0"
 
 [plugins]
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }
 
 [libraries]
 xz = { group = "org.tukaani", name = "xz", version = "1.10" }
