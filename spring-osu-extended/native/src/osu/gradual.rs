@@ -1,6 +1,5 @@
 use crate::java::cache_key::{GRADUAL_PERFORMANCE_CLASS, GRADUAL_PERFORMANCE_INIT};
 use crate::java::{get_jni_class, get_jni_method_id};
-use crate::osu::difficulty::DifficultySetter;
 use crate::osu::java_fu::{get_object_ptr, release_object, set_object_ptr};
 use crate::osu::performance::{generate_java_state, parse_java_state};
 use crate::{get_class, to_ptr, to_status, to_status_use};
@@ -8,7 +7,7 @@ use jni::objects::{JByteArray, JClass, JObject};
 use jni::sys::{jint, jlong, jobject, jvalue};
 use jni::JNIEnv;
 use rosu_pp::any::{PerformanceAttributes, ScoreState};
-use rosu_pp::GradualPerformance;
+use rosu_pp::{Difficulty, GradualPerformance};
 
 pub fn gradual_performance(
     env: &mut JNIEnv,
@@ -17,7 +16,7 @@ pub fn gradual_performance(
 ) -> crate::Result<jobject> {
     let beatmap = to_status_use(beatmap_ptr)?;
     let difficulty_ptr = get_object_ptr(env, this)?;
-    let difficulty = to_status::<DifficultySetter>(difficulty_ptr)?.to_difficulty();
+    let difficulty = to_status::<Difficulty>(difficulty_ptr)?;
     release_object(env, this)?;
 
     let gradual = difficulty.gradual_performance(beatmap);

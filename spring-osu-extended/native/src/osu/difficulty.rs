@@ -1,6 +1,6 @@
 use super::java_fu::{get_object_ptr, set_object_ptr};
 use crate::java::{cache_key::*, get_jni_class, get_jni_static_method_id};
-use crate::{get_class, get_mods_from_java, to_ptr, to_status_use, Result};
+use crate::{get_class, get_mods_from_java, to_ptr, to_status_replace, to_status_use, Result};
 use jni::objects::{GlobalRef, JClass, JObject, JString};
 use jni::signature::ReturnType;
 use jni::sys::{jbyte, jdouble, jfloat, jint, jlong, jobject, jvalue};
@@ -12,109 +12,22 @@ use rosu_pp::osu::OsuDifficultyAttributes;
 use rosu_pp::taiko::TaikoDifficultyAttributes;
 use rosu_pp::{Difficulty, GameMods};
 
-struct DifficultyValue {
-    ar: Option<(f32, bool)>,
-    od: Option<(f32, bool)>,
-    cs: Option<(f32, bool)>,
-    hp: Option<(f32, bool)>,
-    lazer: Option<bool>,
-    hardrock_offsets: Option<bool>,
-    passed_objects: Option<u32>,
-    clock_rate: Option<f64>,
-}
-
-impl Default for DifficultyValue {
-    fn default() -> Self {
-        Self {
-            ar: None,
-            od: None,
-            cs: None,
-            hp: None,
-            lazer: None,
-            hardrock_offsets: None,
-            passed_objects: None,
-            clock_rate: None,
-        }
-    }
-}
-
-pub(crate) struct DifficultySetter {
-    cache: Option<Difficulty>,
-    values: Option<DifficultyValue>,
-    mods: Option<GameMods>,
-    changed: bool,
-}
-
-impl DifficultySetter {
-    pub fn get_difficulty(&mut self) -> &mut Difficulty {
-        let difficulty = self.get_cache();
-        self.cache.insert(difficulty)
-    }
-
-    pub fn to_difficulty(mut self) -> Difficulty {
-        self.get_cache()
-    }
-
-    fn get_cache(&mut self) -> Difficulty {
-        let setter = self;
-        let mut difficulty = if let Some(difficulty) = setter.cache.take() {
-            difficulty
-        } else {
-            Difficulty::new()
-        };
-        if !setter.changed {
-            return difficulty;
-        }
-        if setter.values.is_some() || setter.mods.is_some() {
-            if let Some(values) = &setter.values {
-                macro_rules! set_value {
-                    (>$key:ident) => {
-                        if let Some((value, with_mode)) = values.$key {
-                            difficulty = difficulty.$key(value, with_mode);
-                        }
-                    };
-                    ($key:ident) => {
-                        if let Some(value) = values.$key {
-                            difficulty = difficulty.$key(value);
-                        }
-                    };
-                }
-                set_value!(>ar);
-                set_value!(>od);
-                set_value!(>cs);
-                set_value!(>hp);
-                set_value!(lazer);
-                set_value!(hardrock_offsets);
-                set_value!(passed_objects);
-                set_value!(clock_rate);
-            }
-            if let Some(mods) = &setter.mods {
-                difficulty = difficulty.mods(mods.clone());
-            }
-        };
-        setter.changed = false;
-        difficulty
-    }
-}
-
 macro_rules! set_state {
     ($($fx:ident($f:ident);)+) => {$(
         pub fn $fx(env: &mut JNIEnv, this: &JObject, value: f32, with_mods: bool) -> Result<()> {
             let ptr = get_object_ptr(env, this)?;
-            let setter = to_status_use::<DifficultySetter>(ptr)?;
-            let values = setter.values.get_or_insert_with(DifficultyValue::default);
-            values.$f = Some((value, with_mods));
-            setter.changed = true;
+            to_status_replace::<Difficulty>(ptr, |difficulty: Difficulty| {
+                difficulty.$f(value, with_mods)
+            })?;
             Ok(())
         }
     )+};
     ($($fx:ident[$f:ident:$t:ty];)+) => {$(
         pub fn $fx(env: &mut JNIEnv, this: &JObject, value: $t) -> Result<()> {
             let ptr = get_object_ptr(env, this)?;
-            let setter = to_status_use::<DifficultySetter>(ptr)?;
-            let values = setter.values.get_or_insert_with(DifficultyValue::default);
-            values.$f = Some(value);
-            setter.changed = true;
+            to_status_replace::<Difficulty>(ptr, |difficulty: Difficulty| {
+                difficulty.$f(value)
+            })?;
             Ok(())
         }
     )+};
@@ -161,9 +74,7 @@ pub fn set_difficulty_mods_mix(
 #[inline]
 fn set_difficulty_mods(env: &mut JNIEnv, this: &JObject, mods: GameMods) -> Result<()> {
     let ptr = get_object_ptr(env, this)?;
-    let setter = to_status_use::<DifficultySetter>(ptr)?;
-    setter.mods = Some(mods);
-    setter.changed = true;
+    to_status_replace::<Difficulty>(ptr, |difficulty: Difficulty| difficulty.mods(mods))?;
     Ok(())
 }
 
@@ -179,31 +90,24 @@ pub fn generate_difficulty(
     hp: jfloat,
     clock_rate: jdouble,
 ) -> Result<()> {
-    let mut setter = DifficultyValue::default();
-    setter.lazer = Some(is_lazer);
+    let mut difficulty = Difficulty::new().lazer(is_lazer);
     if !is_all_null {
-        macro_rules! set_field {
+        macro_rules! f {
             ($name:ident) => {
                 if $name >= -9f32 {
-                    setter.$name = Some(($name, with_mods));
+                    difficulty = difficulty.$name($name, with_mods);
                 }
             };
         }
-        set_field!(ar);
-        set_field!(od);
-        set_field!(cs);
-        set_field!(hp);
+        f!(ar);
+        f!(od);
+        f!(cs);
+        f!(hp);
         if clock_rate >= 0f64 {
-            setter.clock_rate = Some(clock_rate);
+            difficulty = difficulty.clock_rate(clock_rate);
         }
     }
-    let setter = DifficultySetter {
-        values: Some(setter),
-        cache: None,
-        mods: None,
-        changed: true,
-    };
-    let ptr = to_ptr(setter);
+    let ptr = to_ptr(difficulty);
     set_object_ptr(env, this, ptr)?;
     Ok(())
 }
@@ -405,8 +309,7 @@ pub fn difficulty_calculate(
 ) -> Result<jobject> {
     let beatmap = to_status_use(beatmap_ptr)?;
     let ptr = get_object_ptr(env, this)?;
-    let setter = to_status_use::<DifficultySetter>(ptr)?;
-    let difficulty = setter.get_difficulty();
+    let difficulty = to_status_use::<Difficulty>(ptr)?;
     let attr = difficulty.calculate(beatmap);
     let obj = generate_difficulty_attributes(env, &attr)?;
     let ptr = match attr {

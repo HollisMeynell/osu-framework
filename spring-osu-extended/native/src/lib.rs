@@ -1,4 +1,5 @@
 use crate::NativeError::Runtime;
+use replace_with::replace_with_or_abort;
 use thiserror::Error;
 
 mod java;
@@ -65,6 +66,25 @@ pub fn to_status_use<T>(p: i64) -> Result<&'static mut T> {
         point
             .as_mut()
             .ok_or_else(|| format!("read pointer error: ({})", p).into())
+    }
+}
+
+#[inline]
+pub fn to_status_replace<T>(p: i64, action: impl FnOnce(T) -> T) -> Result<()> {
+    use std::panic::{catch_unwind, AssertUnwindSafe};
+    let point = p as *mut T;
+    check_ptr(point)?;
+    let status_use = unsafe {
+        point
+            .as_mut()
+            .ok_or_else(|| Runtime(format!("read pointer error: ({})", p)))
+    }?;
+    let result = catch_unwind(AssertUnwindSafe(|| {
+        replace_with_or_abort(status_use, action);
+    }));
+    match result {
+        Ok(_) => Ok(()),
+        Err(_) => Err("replace status error".into()),
     }
 }
 

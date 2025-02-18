@@ -3,6 +3,7 @@ mod difficulty;
 mod gradual;
 mod mods;
 mod performance;
+mod rosu_lib;
 
 use crate::java::{throw_jni, JavaBoolean};
 use crate::jni_call;
@@ -19,8 +20,6 @@ use rosu_pp::any::HitResultPriority;
 
 mod java_fu {
     use crate::java::get_jni_field_id;
-    use crate::osu::difficulty::DifficultySetter;
-    use crate::osu::performance::PerformanceSetter;
     use crate::{throw, to_status, Result};
     use jni::objects::{JByteArray, JFieldID, JObject, JValueGen};
     use jni::signature::{Primitive, ReturnType};
@@ -30,7 +29,7 @@ mod java_fu {
     use rosu_pp::mania::ManiaDifficultyAttributes;
     use rosu_pp::osu::OsuDifficultyAttributes;
     use rosu_pp::taiko::TaikoDifficultyAttributes;
-    use rosu_pp::{Beatmap, GradualPerformance};
+    use rosu_pp::{Beatmap, Difficulty, GradualPerformance, Performance};
 
     #[warn(unused_must_use)]
     pub fn release_by_type(ptr: i64, type_val: i8) -> Result<()> {
@@ -49,8 +48,8 @@ mod java_fu {
         release_status! {
             type_val, ptr {
                 0 Beatmap,
-                1 DifficultySetter,
-                2 PerformanceSetter,
+                1 Difficulty,
+                2 Performance,
                 3 ScoreState,
                 4 OsuDifficultyAttributes,
                 5 TaikoDifficultyAttributes,
