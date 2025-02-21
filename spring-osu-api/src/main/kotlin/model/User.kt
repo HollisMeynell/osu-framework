@@ -210,6 +210,9 @@ data class User(
 
     @JsonProperty("website")
     var website: String?,
+
+    @JsonProperty("team")
+    var team: UserTeam?,
 ) :Friend{
     data class Kudosu(
         @JsonProperty("available")
@@ -337,6 +340,17 @@ data class User(
 
         @JsonProperty("id")
         var id: Long?,
+    )
+
+    data class UserTeam(
+        @JsonProperty("flag_url")
+        var flagUrl: String,
+        @JsonProperty("id")
+        var id: Long,
+        @JsonProperty("name")
+        var name: String,
+        @JsonProperty("short_name")
+        var shortName: String,
     )
 }
 
