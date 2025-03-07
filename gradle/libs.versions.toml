@@ -1,6 +1,6 @@
 [versions]
 commons-compress = "1.27.1"
-exposed = "0.59.0"
+exposed = "0.60.0"
 jwt = "4.4.0"
 hikari = "6.2.1"
 kotlin = "2.1.10"
