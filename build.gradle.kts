@@ -11,7 +11,7 @@ application {
 
 allprojects {
     group = "org.spring"
-    version = "0.0.1"
+    version = "0.0.2"
 
     plugins.apply(rootProject.libs.plugins.kotlin.jvm.get().pluginId)
 
