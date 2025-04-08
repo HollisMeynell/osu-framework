@@ -94,13 +94,12 @@ sealed interface JniDifficultyAttributes : AutoCloseable {
         @JvmStatic
         fun createMania(
             stars: Double,
-            hitWindow: Double,
             nObjects: Int,
             nHoldNotes: Int,
             maxCombo: Int,
             isConvert: Boolean,
         ): JniDifficultyAttributes =
-            ManiaDifficultyAttributes(stars, hitWindow, nObjects, nHoldNotes, maxCombo, isConvert)
+            ManiaDifficultyAttributes(stars, nObjects, nHoldNotes, maxCombo, isConvert)
 
     }
 }
@@ -160,7 +159,6 @@ data class CatchDifficultyAttributes(
 
 data class ManiaDifficultyAttributes(
     val stars: Double = 0.0,
-    val hitWindow: Double = 0.0,
     val nObjects: Int = 0,
     val nHoldNotes: Int = 0,
     @get:JvmName("maxCombo")

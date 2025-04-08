@@ -3,7 +3,6 @@ mod difficulty;
 mod gradual;
 mod mods;
 mod performance;
-mod rosu_lib;
 
 use crate::java::{throw_jni, JavaBoolean};
 use crate::jni_call;

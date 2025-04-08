@@ -59,12 +59,20 @@ mod mods {
     use crate::Result;
     use rosu_mods::serde::GameModsSeed;
     use rosu_mods::{GameMode, GameMods};
-    use serde::de::DeserializeSeed;
-    use serde_json::Deserializer;
+    use serde::de::Deserializer;
+    use serde_json::from_str;
 
-    pub fn get_mods_from_json(json: &str, mode: GameMode) -> Result<GameMods> {
-        let mut json = Deserializer::from_str(json);
-        let mods = GameModsSeed::Mode(mode).deserialize(&mut json)?;
+    #[derive(serde::Deserialize)]
+    struct ModsBox(#[serde(deserialize_with = "custom_mods")] GameMods);
+
+    fn custom_mods<'de, D: Deserializer<'de>>(d: D) -> std::result::Result<GameMods, D::Error> {
+        // Here, we're defining that all deserialized mods should belong to the
+        // same mode.
+        d. deserialize_any(GameModsSeed::SameModeForEachMod { deny_unknown_fields: false })
+    }
+
+    pub fn get_mods_from_json(json: &str, _: GameMode) -> Result<GameMods> {
+        let ModsBox(mods) = from_str(json)?;
         Ok(mods)
     }
 }

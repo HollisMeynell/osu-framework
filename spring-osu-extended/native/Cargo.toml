@@ -23,11 +23,11 @@ members = [
 [dependencies]
 jni-macro = { version = "0.0.1", path = "jni_macro" }
 jni = "0.21.1"
-rosu-pp = "2.0.0"
-rosu-mods = { version = "0.2.0", features = ["serde"] }
-thiserror = "2.0.3"
+rosu-pp = "3.0.0"
+rosu-mods = { version = "0.3.0", features = ["serde"] }
+thiserror = "2.0.12"
 serde = "1.0"
 serde_json = "1.0"
 mini-moka = "0.10.3"
-bytes = "1.8.0"
+bytes = "1.10.1"
 replace_with = "0.1.7"

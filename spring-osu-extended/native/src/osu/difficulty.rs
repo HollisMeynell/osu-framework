@@ -135,7 +135,7 @@ pub fn generate_difficulty_attributes_osu<'l>(
             d: data.speed_difficult_strain_count,
         },
         jvalue { d: data.ar },
-        jvalue { d: data.od },
+        jvalue { d: data.od() },
         jvalue { d: data.hp },
         jvalue {
             i: data.n_circles as i32,
@@ -177,7 +177,7 @@ pub fn generate_difficulty_attributes_taiko<'l>(
         jvalue { d: data.stamina },
         jvalue { d: data.rhythm },
         jvalue { d: data.color },
-        jvalue { d: data.peak },
+        jvalue { d: data.reading },
         jvalue {
             d: data.great_hit_window,
         },
@@ -253,7 +253,6 @@ pub fn generate_difficulty_attributes_mania<'l>(
     let jclass = get_class!(global);
     let args = &[
         jvalue { d: data.stars },
-        jvalue { d: data.hit_window },
         jvalue {
             i: data.n_objects as i32,
         },
@@ -272,7 +271,7 @@ pub fn generate_difficulty_attributes_mania<'l>(
         let method = env.get_static_method_id(
             jclass,
             "createMania",
-            "(DDIIIZ)Lorg/spring/osu/extended/rosu/JniDifficultyAttributes;",
+            "(DIIIZ)Lorg/spring/osu/extended/rosu/JniDifficultyAttributes;",
         )?;
         Ok(method)
     })?;
