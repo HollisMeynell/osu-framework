@@ -24,7 +24,8 @@ task("buildNative") {
     Files.createDirectories(libDir)
     val needBuild: Boolean =
         Files.find(libDir, 1, { path, _ ->
-            path.fileName.toString().endsWith(".so") || path.fileName.toString().endsWith(".dll") || path.fileName.toString().endsWith(".dylib")
+            path.fileName.toString().endsWith(".so") || path.fileName.toString()
+                .endsWith(".dll") || path.fileName.toString().endsWith(".dylib")
         }).count() == 0L
     println(needBuild)
     if (!needBuild) {
@@ -36,13 +37,14 @@ task("buildNative") {
         .start()
     if (testCmd.waitFor() != 0)
         throw Exception("rust environment not find, can not build.")
-println("cargo build")
+    println("cargo build")
     val cmd = ProcessBuilder("cargo", "build", "--release")
         .directory(nativeDir)
         .start()
     if (cmd.waitFor() != 0) throw Exception("build rust error.")
     Files.find(nativeDir.toPath().resolve("target"), 2, { path, attr ->
-        path.fileName.toString().endsWith(".so") || path.fileName.toString().endsWith(".dll") || path.fileName.toString().endsWith(".dylib")
+        path.fileName.toString().endsWith(".so") || path.fileName.toString()
+            .endsWith(".dll") || path.fileName.toString().endsWith(".dylib")
     }).forEach {
         Files.copy(it, libDir.resolve(it.fileName), StandardCopyOption.REPLACE_EXISTING)
     }

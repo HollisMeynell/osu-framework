@@ -5,6 +5,7 @@ import org.spring.core.toJson
 import org.spring.osu.OsuMode
 import org.spring.osu.extended.rosu.JniBeatmap
 import org.spring.osu.extended.rosu.JniDifficulty
+import org.spring.osu.extended.rosu.JniScoreState
 import org.spring.osu.extended.rosu.OsuPerformanceAttributes
 import org.spring.osu.model.LazerMod
 import kotlin.math.pow
@@ -13,7 +14,7 @@ import kotlin.test.assertEquals
 
 class NativeClassTest {
     @Test
-    fun test() {
+    fun testOsu() {
         val x = listOf(
             LazerMod.DifficultyAdjust(approachRate = 7f),
             LazerMod.DoubleTime(speedChange = 1.3f),
@@ -32,10 +33,10 @@ class NativeClassTest {
             val difficulty = JniDifficulty()
             difficulty.mode = OsuMode.Osu
             var attr = difficulty.calculate(beatmap)
-            assertEquals(attr.getStarRating().roundN(2) , 6.42)
+            assertEquals(attr.getStarRating().roundN(2), 6.42)
             difficulty.setMods(LazerMod.DifficultyAdjust(circleSize = 6f))
             attr = difficulty.calculate(beatmap)
-            assertEquals(attr.getStarRating().roundN(2) , 7.15 )
+            assertEquals(attr.getStarRating().roundN(2), 7.15)
 
             val b = beatmap.createPerformance().apply {
                 setLazer(true)
@@ -73,6 +74,37 @@ class NativeClassTest {
             if (performanceAttributes is OsuPerformanceAttributes) {
                 assertEquals(performanceAttributes.pp.roundN(0), 635.0)
             }
+            val difficultyNew = JniDifficulty()
+            difficultyNew.mode = OsuMode.Osu
+            difficultyNew.setOd(9f, false)
+            val calculator = difficultyNew.createGradualPerformance(beatmap)
+            calculator.n300++
+            val result = calculator.next()
+            assertEquals(result?.getPP()?.roundN(0) ?: 0, 18.0, "test fail")
+        }
+    }
+
+    @Test
+    fun testMania() {
+        val beatmapDate = this::class.java.getResource("/beatmap/5041268.osu")
+            ?.openStream()?.readAllBytes() ?: error("beatmap not found")
+        JniBeatmap(beatmapDate).use { beatmap ->
+            val difficulty = JniDifficulty()
+            val calculator = difficulty.createGradualPerformance(beatmap)
+            calculator.katu = 1296
+            calculator.n300 = 16
+            calculator.maxCombo = 1534
+            var result = calculator.next()
+            val performance = beatmap.createPerformance(
+                JniScoreState(
+                    maxCombo = 1534,
+                    geki = 1296,
+                    n300 = 16,
+                )
+            )
+            performance.isLazer(true)
+            result = performance.calculate()
+            assertEquals(result.getPP().roundN(2), 53.75, "test fail")
         }
     }
 
