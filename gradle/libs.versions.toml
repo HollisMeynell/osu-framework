@@ -16,7 +16,7 @@ shadow = "8.3.6"
 extra-java-module-info = "1.9"
 skija = "0.116.4"
 hoplite = "2.9.0"
-maven-publish = "0.32.0"
+maven-publish = "0.34.0"
 
 [plugins]
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
