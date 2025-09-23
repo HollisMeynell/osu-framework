@@ -1,5 +1,5 @@
 [versions]
-commons-compress = "1.27.1"
+commons-compress = "1.28.0"
 exposed = "0.60.0"
 jwt = "4.4.0"
 hikari = "6.3.0"
