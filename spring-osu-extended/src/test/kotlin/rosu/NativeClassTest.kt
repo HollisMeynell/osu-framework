@@ -102,7 +102,7 @@ class NativeClassTest {
                     n300 = 16,
                 )
             )
-            performance.isLazer(true)
+            performance.isLazer(false)
             result = performance.calculate()
             assertEquals(result.getPP().roundN(2), 53.75, "test fail")
         }
