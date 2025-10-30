@@ -14,7 +14,7 @@ logback = "1.5.18"
 postgres = "42.7.8"
 shadow = "8.3.6"
 extra-java-module-info = "1.9"
-skija = "0.116.4"
+skija = "0.123.0"
 hoplite = "2.9.0"
 maven-publish = "0.34.0"
 
