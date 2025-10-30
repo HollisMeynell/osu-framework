@@ -5,44 +5,44 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import org.spring.osu.OsuMode
 
 data class UserGroup(
-    @JsonProperty("colour")
+    @field:JsonProperty("colour")
     var colour: String?,
 
-    @JsonProperty("has_listing")
+    @field:JsonProperty("has_listing")
     var hasListing: Boolean?,
 
-    @JsonProperty("has_playmodes")
+    @field:JsonProperty("has_playmodes")
     var hasPlaymodes: Boolean?,
 
-    @JsonProperty("id")
+    @field:JsonProperty("id")
     var id: Int,
 
-    @JsonProperty("identifier")
+    @field:JsonProperty("identifier")
     var identifier: String,
 
-    @JsonProperty("is_probationary")
+    @field:JsonProperty("is_probationary")
     var isProbationary: Boolean?,
 
-    @JsonProperty("name")
+    @field:JsonProperty("name")
     var name: String,
 
-    @JsonProperty("short_name")
+    @field:JsonProperty("short_name")
     var shortName: String,
 
-    @JsonProperty("description")
+    @field:JsonProperty("description")
     var description: String?,
 
-    @JsonProperty("playmodes")
+    @field:JsonProperty("playmodes")
     private var _playModes: List<String>?,
 ) {
     @JsonIgnore
     val playModes: List<OsuMode>? = _playModes?.map { OsuMode.getMode(it) }
 
     data class Description(
-        @JsonProperty("html")
+        @field:JsonProperty("html")
         var html: String,
 
-        @JsonProperty("markdown")
+        @field:JsonProperty("markdown")
         var markdown: String
     )
 }

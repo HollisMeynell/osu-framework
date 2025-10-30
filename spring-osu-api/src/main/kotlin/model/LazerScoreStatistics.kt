@@ -4,77 +4,76 @@ import com.fasterxml.jackson.annotation.JsonAlias
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.spring.osu.OsuMode
 import org.spring.osu.OsuMode.*
-import kotlin.math.max
 import kotlin.math.roundToInt
 
 data class LazerScoreStatistics(
     /**
      * mania MAX
      */
-    @JsonProperty("perfect")
-    @JsonAlias("count_geki")
+    @field:JsonProperty("perfect")
+    @field:JsonAlias("count_geki")
     var perfect: Int = 0,
 
     /**
      * n300
      */
-    @JsonProperty("great")
-    @JsonAlias("count_300")
+    @field:JsonProperty("great")
+    @field:JsonAlias("count_300")
     var great: Int = 0,
 
     /**
      * mania n200
      */
-    @JsonProperty("good")
-    @JsonAlias("count_katu")
+    @field:JsonProperty("good")
+    @field:JsonAlias("count_katu")
     var good: Int = 0,
 
     /**
      * n100
      */
-    @JsonProperty("ok")
-    @JsonAlias("count_100")
+    @field:JsonProperty("ok")
+    @field:JsonAlias("count_100")
     var ok: Int = 0,
 
     /**
      * n50
      */
-    @JsonProperty("meh")
-    @JsonAlias("count_50")
+    @field:JsonProperty("meh")
+    @field:JsonAlias("count_50")
     var meh: Int = 0,
 
-    @JsonProperty("miss")
-    @JsonAlias("count_miss")
+    @field:JsonProperty("miss")
+    @field:JsonAlias("count_miss")
     var miss: Int = 0,
 
-    @JsonProperty("ignore_hit")
+    @field:JsonProperty("ignore_hit")
     var ignoreHit: Int = 0,
 
-    @JsonProperty("ignore_miss")
+    @field:JsonProperty("ignore_miss")
     var ignoreMiss: Int = 0,
 
-    @JsonProperty("small_tick_hit")
+    @field:JsonProperty("small_tick_hit")
     var smallTickHit: Int = 0,
 
-    @JsonProperty("small_tick_miss")
+    @field:JsonProperty("small_tick_miss")
     var smallTickMiss: Int = 0,
 
-    @JsonProperty("large_tick_hit")
+    @field:JsonProperty("large_tick_hit")
     var largeTickHit: Int = 0,
 
-    @JsonProperty("large_tick_miss")
+    @field:JsonProperty("large_tick_miss")
     var largeTickMiss: Int = 0,
 
-    @JsonProperty("slider_tail_hit")
+    @field:JsonProperty("slider_tail_hit")
     var sliderTailHit: Int = 0,
 
-    @JsonProperty("large_bonus")
+    @field:JsonProperty("large_bonus")
     var largeBonus: Int = 0,
 
-    @JsonProperty("small_bonus")
+    @field:JsonProperty("small_bonus")
     var smallBonus: Int = 0,
 
-    @JsonProperty("legacy_combo_increase")
+    @field:JsonProperty("legacy_combo_increase")
     var legacyComboIncrease: Int = 0,
 ) {
     fun totalHits(mode: OsuMode) = when (mode) {

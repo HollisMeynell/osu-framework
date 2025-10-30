@@ -3,9 +3,9 @@ package org.spring.osu.model
 import com.fasterxml.jackson.annotation.JsonProperty
 
 data class BeatmapUserScore(
-    @JsonProperty("position")
+    @field:JsonProperty("position")
     var position: Int,
 
-    @JsonProperty("score")
+    @field:JsonProperty("score")
     var score: Score,
 )

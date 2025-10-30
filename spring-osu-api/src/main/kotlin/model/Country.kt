@@ -3,9 +3,9 @@ package org.spring.osu.model
 import com.fasterxml.jackson.annotation.JsonProperty
 
 data class Country(
-    @JsonProperty("code")
+    @field:JsonProperty("code")
     val code:String,
 
-    @JsonProperty("name")
+    @field:JsonProperty("name")
     val name:String,
 )

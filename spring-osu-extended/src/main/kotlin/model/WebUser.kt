@@ -7,45 +7,45 @@ import org.spring.osu.model.User
 import java.time.OffsetDateTime
 
 data class WebUser(
-    @JsonProperty("id")
+    @field:JsonProperty("id")
     val id: Long,
 
-    @JsonProperty("username")
+    @field:JsonProperty("username")
     val username: String,
 
-    @JsonProperty("join_date")
+    @field:JsonProperty("join_date")
     val joinDate: OffsetDateTime,
 
-    @JsonProperty("is_supporter")
+    @field:JsonProperty("is_supporter")
     val isSupporter: Boolean,
 
-    @JsonProperty("follow_user_mapping")
+    @field:JsonProperty("follow_user_mapping")
     val followMapperID: List<Long>,
 
-    @JsonProperty("friends")
+    @field:JsonProperty("friends")
     val friends: List<Friend>,
 
-    @JsonProperty("cover")
+    @field:JsonProperty("cover")
     var cover: User.UserCover,
 
-    @JsonProperty("kudosu")
+    @field:JsonProperty("kudosu")
     val kudosu: User.Kudosu,
 
-    @JsonProperty("playmode")
-    @JsonDeserialize(using = OsuMode.RulesetDeserializer::class)
+    @field:JsonProperty("playmode")
+    @field:JsonDeserialize(using = OsuMode.RulesetDeserializer::class)
     val mode: OsuMode,
 
-    @JsonProperty("unread_pm_count")
+    @field:JsonProperty("unread_pm_count")
     val unreadPMCount: Int,
 ) {
     data class Friend(
-        @JsonProperty("target_id")
+        @field:JsonProperty("target_id")
         val targetId: Long,
 
-        @JsonProperty("relation_type")
+        @field:JsonProperty("relation_type")
         val relationType: String,
 
-        @JsonProperty("mutual")
+        @field:JsonProperty("mutual")
         val mutual: Boolean
     )
 }

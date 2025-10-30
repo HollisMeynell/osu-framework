@@ -12,27 +12,27 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer
 import java.time.OffsetDateTime
 
 data class KudosuHistory(
-    @JsonProperty("id")
+    @field:JsonProperty("id")
     var id: Int,
 
-    @JsonProperty("action")
-    @JsonSerialize(using = Action.Serializer::class)
-    @JsonDeserialize(using = Action.Deserializer::class)
+    @field:JsonProperty("action")
+    @field:JsonSerialize(using = Action.Serializer::class)
+    @field:JsonDeserialize(using = Action.Deserializer::class)
     var action: Action,
 
-    @JsonProperty("amount")
+    @field:JsonProperty("amount")
     var amount: Int,
 
-    @JsonProperty("model")
+    @field:JsonProperty("model")
     var model: String,
 
-    @JsonProperty("created_at")
+    @field:JsonProperty("created_at")
     var createdAt: OffsetDateTime,
 
-    @JsonProperty("giver")
+    @field:JsonProperty("giver")
     var giver: Giver?,
 
-    @JsonProperty("post")
+    @field:JsonProperty("post")
     var post: Post,
 ) {
     enum class Action(val action:String) {
@@ -67,18 +67,18 @@ data class KudosuHistory(
     }
 
     data class Giver(
-        @JsonProperty("url")
+        @field:JsonProperty("url")
         var url: String,
 
-        @JsonProperty("username")
+        @field:JsonProperty("username")
         var username: String,
     )
 
     data class Post(
-        @JsonProperty("url")
+        @field:JsonProperty("url")
         var url: String?,
 
-        @JsonProperty("title")
+        @field:JsonProperty("title")
         var title: String,
     )
 }

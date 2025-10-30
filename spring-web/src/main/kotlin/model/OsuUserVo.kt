@@ -8,22 +8,22 @@ import org.spring.osu.model.User
 import org.spring.osu.model.UserStatistics
 
 data class OsuUserVo(
-    @JsonProperty("id")
+    @field:JsonProperty("id")
     var id: Long,
 
-    @JsonProperty("name")
+    @field:JsonProperty("name")
     var name: String,
 
-    @JsonProperty("avatar")
+    @field:JsonProperty("avatar")
     var avatar: String,
 
-    @JsonProperty("cover")
+    @field:JsonProperty("cover")
     var cover: String,
 
-    @JsonProperty("country")
+    @field:JsonProperty("country")
     var country: String = "",
 
-    @JsonUnwrapped
+    @field:JsonUnwrapped
     var extended: OsuUserExtended? = null,
 ) {
     companion object {
@@ -57,32 +57,32 @@ data class OsuUserVo(
     }
 
     data class OsuUserExtended(
-        @JsonProperty("fans")
+        @field:JsonProperty("fans")
         var fans: Int,
 
-        @JsonProperty("mode")
-        @JsonSerialize(using = OsuMode.RulesetSerializer::class)
+        @field:JsonProperty("mode")
+        @field:JsonSerialize(using = OsuMode.RulesetSerializer::class)
         var mode: OsuMode,
 
-        @JsonProperty("pp")
+        @field:JsonProperty("pp")
         var pp: Float,
 
-        @JsonProperty("level")
+        @field:JsonProperty("level")
         var level: UserStatistics.Level,
 
-        @JsonProperty("global_rank")
+        @field:JsonProperty("global_rank")
         var globalRank: Int,
 
-        @JsonProperty("country_rank")
+        @field:JsonProperty("country_rank")
         var countryRank: Int?,
 
-        @JsonProperty("ranked_score")
+        @field:JsonProperty("ranked_score")
         var rankedScore: Long,
 
-        @JsonProperty("total_score")
+        @field:JsonProperty("total_score")
         var totalScore: Long,
 
-        @JsonProperty("total_hits")
+        @field:JsonProperty("total_hits")
         var totalHits: Long,
     )
 }

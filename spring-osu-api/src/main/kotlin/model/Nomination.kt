@@ -5,16 +5,16 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import org.spring.osu.OsuMode
 
 data class Nomination(
-    @JsonProperty("beatmapset_id")
+    @field:JsonProperty("beatmapset_id")
     var beatmapsetID: Long,
 
-    @JsonProperty("rulesets")
+    @field:JsonProperty("rulesets")
     private var _rulesets: List<String>?,
 
-    @JsonProperty("reset")
+    @field:JsonProperty("reset")
     var reset: Boolean,
 
-    @JsonProperty("user_id")
+    @field:JsonProperty("user_id")
     var userID: Long,
 ) {
     @JsonIgnore

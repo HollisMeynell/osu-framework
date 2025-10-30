@@ -203,8 +203,8 @@ internal object ApiRequest {
     }
 
     private data class AuthResult(
-        @JsonProperty("expires_in") val expires: Long,
-        @JsonProperty("access_token") val accessToken: String,
-        @JsonProperty("refresh_token") val refreshToken: String?,
+        @field:JsonProperty("expires_in") val expires: Long,
+        @field:JsonProperty("access_token") val accessToken: String,
+        @field:JsonProperty("refresh_token") val refreshToken: String?,
     )
 }

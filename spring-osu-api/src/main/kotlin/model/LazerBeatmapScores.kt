@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonAlias
 import com.fasterxml.jackson.annotation.JsonProperty
 
 data class LazerBeatmapScores(
-    @JsonProperty("scores")
+    @field:JsonProperty("scores")
     var scores: List<LazerScore>,
 
-    @JsonAlias("user_score")
-    @JsonProperty("userScore")
+    @field:JsonAlias("user_score")
+    @field:JsonProperty("userScore")
     var userScore: LazerBeatmapUserScore?,
 )

@@ -3,69 +3,69 @@ package org.spring.osu.model
 import com.fasterxml.jackson.annotation.JsonProperty
 
 data class BeatmapSearch(
-    @JsonProperty("rule")
+    @field:JsonProperty("rule")
     var rule: String?,
 
-    @JsonProperty("error")
+    @field:JsonProperty("error")
     var error: String?,
 
-    @JsonProperty("result_count")
+    @field:JsonProperty("result_count")
     var resultCount: Int?,
 
-    @JsonProperty("beatmapsets")
+    @field:JsonProperty("beatmapsets")
     var beatmapsets: List<Beatmapset>,
 
-    @JsonProperty("total")
+    @field:JsonProperty("total")
     var total: Int,
 
-    @JsonProperty("cursor_string")
+    @field:JsonProperty("cursor_string")
     var cursorString: String?,
 
-    @JsonProperty("cursor")
+    @field:JsonProperty("cursor")
     @Deprecated("Use cursorString instead")
     var cursor: SearchCursor?,
 
-    @JsonProperty("search")
+    @field:JsonProperty("search")
     var search: String,
 ) {
     @Deprecated("Use cursorString instead")
     data class SearchCursor(
-        @JsonProperty("queued_at")
+        @field:JsonProperty("queued_at")
         var queuedAt: String,
 
-        @JsonProperty("approved_data")
+        @field:JsonProperty("approved_data")
         var approved: String,
 
-        @JsonProperty("id")
+        @field:JsonProperty("id")
         var id: Int,
     )
 
     data class Search(
-        @JsonProperty("c")
+        @field:JsonProperty("c")
         var general: String,
 
-        @JsonProperty("sort")
+        @field:JsonProperty("sort")
         var sort: String,
 
-        @JsonProperty("s")
+        @field:JsonProperty("s")
         var status: String,
 
-        @JsonProperty("nsfw")
+        @field:JsonProperty("nsfw")
         var nsfw: Boolean,
 
-        @JsonProperty("g")
+        @field:JsonProperty("g")
         var genre: Byte,
 
-        @JsonProperty("l")
+        @field:JsonProperty("l")
         var language: Byte,
 
-        @JsonProperty("e")
+        @field:JsonProperty("e")
         var others: String,
 
-        @JsonProperty("r")
+        @field:JsonProperty("r")
         var rank: String,
 
-        @JsonProperty("played")
+        @field:JsonProperty("played")
         var played: String,
     )
 }

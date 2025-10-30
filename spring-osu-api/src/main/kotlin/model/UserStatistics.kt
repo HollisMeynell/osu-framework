@@ -6,124 +6,124 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import org.spring.osu.OsuMode
 
 data class UserStatistics (
-    @JsonProperty("count_100")
+    @field:JsonProperty("count_100")
     var count100: Int,
 
-    @JsonProperty("count_300")
+    @field:JsonProperty("count_300")
     var count300: Int,
 
-    @JsonProperty("count_50")
+    @field:JsonProperty("count_50")
     var count50: Int,
 
-    @JsonProperty("count_miss")
+    @field:JsonProperty("count_miss")
     var countMiss: Int,
 
-    @JsonProperty("country_rank")
+    @field:JsonProperty("country_rank")
     var countryRank: Int?,
 
-    @JsonProperty("grade_counts")
+    @field:JsonProperty("grade_counts")
     var gradeCounts: GradeCounts,
 
-    @JsonProperty("hit_accuracy")
+    @field:JsonProperty("hit_accuracy")
     var hitAccuracy: Float,
 
-    @JsonProperty("is_ranked")
+    @field:JsonProperty("is_ranked")
     var isRanked: Boolean,
 
-    @JsonProperty("level")
+    @field:JsonProperty("level")
     var level: Level,
 
-    @JsonProperty("maximum_combo")
+    @field:JsonProperty("maximum_combo")
     var maximumCombo: Int,
 
-    @JsonProperty("play_count")
+    @field:JsonProperty("play_count")
     var playCount: Int,
 
-    @JsonProperty("play_time")
+    @field:JsonProperty("play_time")
     var playTime: Int,
 
-    @JsonProperty("pp")
+    @field:JsonProperty("pp")
     var pp: Float,
 
-    @JsonProperty("pp_exp")
+    @field:JsonProperty("pp_exp")
     var ppExp: Float,
 
-    @JsonProperty("global_rank")
+    @field:JsonProperty("global_rank")
     var globalRank: Int?,
 
-    @JsonProperty("global_rank_exp")
+    @field:JsonProperty("global_rank_exp")
     var globalRankExp: Int?,
 
-    @JsonProperty("ranked_score")
+    @field:JsonProperty("ranked_score")
     var rankedScore: Long,
 
-    @JsonProperty("replays_watched_by_others")
+    @field:JsonProperty("replays_watched_by_others")
     var replaysWatchedByOthers: Int,
 
-    @JsonProperty("total_hits")
+    @field:JsonProperty("total_hits")
     var totalHits: Long,
 
-    @JsonProperty("total_score")
+    @field:JsonProperty("total_score")
     var totalScore: Long,
 ) {
     data class GradeCounts(
-        @JsonProperty("a")
+        @field:JsonProperty("a")
         var a: Int,
 
-        @JsonProperty("s")
+        @field:JsonProperty("s")
         var s: Int,
 
-        @JsonProperty("sh")
+        @field:JsonProperty("sh")
         var sh: Int,
 
-        @JsonProperty("ss")
+        @field:JsonProperty("ss")
         var ss: Int,
 
-        @JsonProperty("ssh")
+        @field:JsonProperty("ssh")
         var ssh: Int
     )
 
     data class Level(
-        @JsonProperty("current")
+        @field:JsonProperty("current")
         var current: Int,
 
-        @JsonProperty("progress")
+        @field:JsonProperty("progress")
         var progress: Float
     )
 }
 
 data class UserStatisticsRulesets (
-    @JsonProperty("osu")
+    @field:JsonProperty("osu")
     var osu: UserStatistics,
 
-    @JsonProperty("taiko")
+    @field:JsonProperty("taiko")
     var taiko: UserStatistics,
 
-    @JsonProperty("fruits")
+    @field:JsonProperty("fruits")
     var fruits: UserStatistics,
 
-    @JsonProperty("mania")
+    @field:JsonProperty("mania")
     var mania: UserStatistics,
 
-    @JsonProperty("variants")
+    @field:JsonProperty("variants")
     var variants: List<Variants>?,
 )
 
 data class Variants(
-    @JsonProperty("mode")
-    @JsonSerialize(using = OsuMode.RulesetSerializer::class)
-    @JsonDeserialize(using = OsuMode.RulesetDeserializer::class)
+    @field:JsonProperty("mode")
+    @field:JsonSerialize(using = OsuMode.RulesetSerializer::class)
+    @field:JsonDeserialize(using = OsuMode.RulesetDeserializer::class)
     var mode: OsuMode,
 
-    @JsonProperty("variant")
+    @field:JsonProperty("variant")
     var variant: String,
 
-    @JsonProperty("country_rank")
+    @field:JsonProperty("country_rank")
     var countryRank: Int,
 
-    @JsonProperty("global_rank")
+    @field:JsonProperty("global_rank")
     var globalRank: Int,
 
-    @JsonProperty("pp")
+    @field:JsonProperty("pp")
     var pp: Float,
 )

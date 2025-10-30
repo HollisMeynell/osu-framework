@@ -4,17 +4,17 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import java.time.OffsetDateTime
 
 data class SeasonalBackgrounds(
-    @JsonProperty("ends_at")
+    @field:JsonProperty("ends_at")
     var endsAt: OffsetDateTime,
 
-    @JsonProperty("backgrounds")
+    @field:JsonProperty("backgrounds")
     var backgrounds: List<SeasonalBackgroundsItem>,
 ){
     data class SeasonalBackgroundsItem(
-        @JsonProperty("url")
+        @field:JsonProperty("url")
         var url: String,
 
-        @JsonProperty("user")
+        @field:JsonProperty("user")
         var user: User,
     )
 }

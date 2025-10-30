@@ -3,20 +3,20 @@ package org.spring.osu.model
 import com.fasterxml.jackson.annotation.JsonProperty
 
 data class MatchSearch(
-    @JsonProperty("matches")
+    @field:JsonProperty("matches")
     var matches: List<Match.MatchInfo>,
 
-    @JsonProperty("cursor_string")
+    @field:JsonProperty("cursor_string")
     var cursorString: String?,
 
-    @JsonProperty("params")
+    @field:JsonProperty("params")
     var params: MatchSearchParams?,
 ) {
     data class MatchSearchParams(
-        @JsonProperty("limit")
+        @field:JsonProperty("limit")
         var limit: Int,
 
-        @JsonProperty("sort")
+        @field:JsonProperty("sort")
         var sort: SortType,
     )
 

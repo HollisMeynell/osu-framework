@@ -14,19 +14,19 @@ import org.spring.osu.OsuMode
 import java.time.OffsetDateTime
 
 data class MatchEvent(
-    @JsonProperty("id")
+    @field:JsonProperty("id")
     val ID: Long,
 
-    @JsonProperty("detail")
+    @field:JsonProperty("detail")
     val detail: MatchDetail,
 
-    @JsonProperty("timestamp")
+    @field:JsonProperty("timestamp")
     val timestamp: OffsetDateTime,
 
-    @JsonProperty("user_id")
+    @field:JsonProperty("user_id")
     val userID: Long?,
 
-    @JsonProperty("game")
+    @field:JsonProperty("game")
     val game: MatchGame?,
 ) {
     @get:JsonIgnore
@@ -36,42 +36,42 @@ data class MatchEvent(
 }
 
 data class MatchGame(
-    @JsonProperty("id")
+    @field:JsonProperty("id")
     val id: Long,
 
-    @JsonProperty("beatmap")
+    @field:JsonProperty("beatmap")
     var beatmap: Beatmap?,
 
-    @JsonProperty("beatmap_id")
+    @field:JsonProperty("beatmap_id")
     val beatmapID: Long,
 
-    @JsonProperty("start_time")
+    @field:JsonProperty("start_time")
     val startTime: OffsetDateTime,
 
-    @JsonProperty("end_time")
+    @field:JsonProperty("end_time")
     val endTime: OffsetDateTime?,
 
-    @JsonProperty("mode")
-    @JsonSerialize(using = OsuMode.RulesetSerializer::class)
-    @JsonDeserialize(using = OsuMode.RulesetDeserializer::class)
+    @field:JsonProperty("mode")
+    @field:JsonSerialize(using = OsuMode.RulesetSerializer::class)
+    @field:JsonDeserialize(using = OsuMode.RulesetDeserializer::class)
     val mode: OsuMode,
 
-    @JsonProperty("mods")
-    @JsonSerialize(using = OsuMod.OsuModsSerializer::class)
-    @JsonDeserialize(using = OsuMod.OsuModsDeserializer::class)
+    @field:JsonProperty("mods")
+    @field:JsonSerialize(using = OsuMod.OsuModsSerializer::class)
+    @field:JsonDeserialize(using = OsuMod.OsuModsDeserializer::class)
     val mods: List<OsuMod>,
 
-    @JsonProperty("scores")
+    @field:JsonProperty("scores")
     var scores: List<Score>?,
 
-    @JsonProperty("scoring_type")
-    @JsonSerialize(using = GameScoreType.Serializer::class)
-    @JsonDeserialize(using = GameScoreType.Deserializer::class)
+    @field:JsonProperty("scoring_type")
+    @field:JsonSerialize(using = GameScoreType.Serializer::class)
+    @field:JsonDeserialize(using = GameScoreType.Deserializer::class)
     val scoringType: GameScoreType,
 
-    @JsonProperty("team_type")
-    @JsonSerialize(using = GameTeamType.Serializer::class)
-    @JsonDeserialize(using = GameTeamType.Deserializer::class)
+    @field:JsonProperty("team_type")
+    @field:JsonSerialize(using = GameTeamType.Serializer::class)
+    @field:JsonDeserialize(using = GameTeamType.Deserializer::class)
     val teamType: GameTeamType,
 ) {
     @JsonIgnore
@@ -79,12 +79,12 @@ data class MatchGame(
 }
 
 data class MatchDetail(
-    @JsonProperty("text")
+    @field:JsonProperty("text")
     var text: String?,
 
-    @JsonProperty("type")
-    @JsonSerialize(using = MatchEventType.Serializer::class)
-    @JsonDeserialize(using = MatchEventType.Deserializer::class)
+    @field:JsonProperty("type")
+    @field:JsonSerialize(using = MatchEventType.Serializer::class)
+    @field:JsonDeserialize(using = MatchEventType.Deserializer::class)
     var type: MatchEventType,
 )
 

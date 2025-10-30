@@ -10,284 +10,284 @@ import java.time.OffsetDateTime
 
 
 data class User(
-    @JsonProperty("avatar_url")
+    @field:JsonProperty("avatar_url")
     override var avatarUrl: String,
 
-    @JsonProperty("country_code")
+    @field:JsonProperty("country_code")
     override var countryCode: String,
 
-    @JsonProperty("default_group")
+    @field:JsonProperty("default_group")
     override var defaultGroup: String?,
 
-    @JsonProperty("id")
+    @field:JsonProperty("id")
     override var id: Long,
 
-    @JsonProperty("is_active")
+    @field:JsonProperty("is_active")
     override var isActive: Boolean,
 
-    @JsonProperty("is_bot")
+    @field:JsonProperty("is_bot")
     override var isBot: Boolean,
 
-    @JsonProperty("is_deleted")
+    @field:JsonProperty("is_deleted")
     override var isDeleted: Boolean,
 
-    @JsonProperty("is_online")
+    @field:JsonProperty("is_online")
     override var isOnline: Boolean,
 
-    @JsonProperty("is_supporter")
+    @field:JsonProperty("is_supporter")
     override var isSupporter: Boolean,
 
-    @JsonProperty("last_visit")
+    @field:JsonProperty("last_visit")
     override var lastVisit: OffsetDateTime?,
 
-    @JsonProperty("pm_friends_only")
+    @field:JsonProperty("pm_friends_only")
     override var pmFriendsOnly: Boolean,
 
-    @JsonProperty("profile_colour")
+    @field:JsonProperty("profile_colour")
     override var profileColour: String?,
 
-    @JsonProperty("username")
+    @field:JsonProperty("username")
     override var username: String,
 
     // Optional fields
-    @JsonProperty("account_history")
+    @field:JsonProperty("account_history")
     var accountHistory: List<UserAccountHistory>?,
 
-    @JsonProperty("active_tournament_banner")
+    @field:JsonProperty("active_tournament_banner")
     var activeTournamentBanner: ProfileBanner?,
 
-    @JsonProperty("active_tournament_banners")
+    @field:JsonProperty("active_tournament_banners")
     var activeTournamentBanners: List<ProfileBanner>?,
 
-    @JsonProperty("badges")
+    @field:JsonProperty("badges")
     var badges: List<UserBadge>?,
 
-    @JsonProperty("beatmap_playcounts_count")
+    @field:JsonProperty("beatmap_playcounts_count")
     var beatmapPlaycountsCount: Int?,
 
-    @JsonProperty("country")
+    @field:JsonProperty("country")
     override var country: Country?,
 
-    @JsonProperty("cover")
+    @field:JsonProperty("cover")
     override var cover: UserCover?,
 
-    @JsonProperty("favourite_beatmapset_count")
+    @field:JsonProperty("favourite_beatmapset_count")
     var favouriteBeatmapsetCount: Int?,
 
-    @JsonProperty("follow_user_mapping")
+    @field:JsonProperty("follow_user_mapping")
     var followUserMapping: List<Int>?,
 
-    @JsonProperty("follower_count")
+    @field:JsonProperty("follower_count")
     var followerCount: Int?,
 
-    @JsonProperty("graveyard_beatmapset_count")
+    @field:JsonProperty("graveyard_beatmapset_count")
     var graveyardBeatmapsetCount: Int?,
 
-    @JsonProperty("groups")
+    @field:JsonProperty("groups")
     override var groups: List<UserGroup>?,
 
-    @JsonProperty("guest_beatmapset_count")
+    @field:JsonProperty("guest_beatmapset_count")
     var guestBeatmapsetCount: Int?,
 
-    @JsonProperty("is_restricted")
+    @field:JsonProperty("is_restricted")
     var isRestricted: Boolean?,
 
-    @JsonProperty("kudosu")
+    @field:JsonProperty("kudosu")
     var kudosu: Kudosu?,
 
-    @JsonProperty("loved_beatmapset_count")
+    @field:JsonProperty("loved_beatmapset_count")
     var lovedBeatmapsetCount: Int?,
 
-    @JsonProperty("mapping_follower_count")
+    @field:JsonProperty("mapping_follower_count")
     var mappingFollowerCount: Int?,
 
-    @JsonProperty("monthly_playcounts")
+    @field:JsonProperty("monthly_playcounts")
     var monthlyPlaycounts: List<DateCount>?,
 
-    @JsonProperty("page")
+    @field:JsonProperty("page")
     var page: UserPage?,
 
-    @JsonProperty("pending_beatmapset_count")
+    @field:JsonProperty("pending_beatmapset_count")
     var pendingBeatmapsetCount: Int?,
 
-    @JsonProperty("previous_usernames")
+    @field:JsonProperty("previous_usernames")
     var previousUsernames: List<String>?,
 
-    @JsonProperty("rank_highest")
+    @field:JsonProperty("rank_highest")
     var rankHighest: RankHighest?,
 
-    @JsonProperty("rank_history")
+    @field:JsonProperty("rank_history")
     var rankHistory: RankHistory?,
 
-    @JsonProperty("ranked_beatmapset_count")
+    @field:JsonProperty("ranked_beatmapset_count")
     var rankedBeatmapsetCount: Int?,
 
-    @JsonProperty("replays_watched_counts")
+    @field:JsonProperty("replays_watched_counts")
     var replaysWatchedCounts: List<DateCount>?,
 
-    @JsonProperty("scores_best_count")
+    @field:JsonProperty("scores_best_count")
     var scoresBestCount: Int?,
 
-    @JsonProperty("scores_first_count")
+    @field:JsonProperty("scores_first_count")
     var scoresFirstCount: Int?,
 
-    @JsonProperty("scores_recent_count")
+    @field:JsonProperty("scores_recent_count")
     var scoresRecentCount: Int?,
 
-    @JsonProperty("session_verified")
+    @field:JsonProperty("session_verified")
     var sessionVerified: Boolean?,
 
-    @JsonProperty("statistics")
+    @field:JsonProperty("statistics")
     override var statistics: UserStatistics?,
 
-    @JsonProperty("statistics_rulesets")
+    @field:JsonProperty("statistics_rulesets")
     var statisticsRulesets: UserStatisticsRulesets?,
 
-    @JsonProperty("support_level")
+    @field:JsonProperty("support_level")
     override var supportLevel: Int?,
 
-    @JsonProperty("unread_pm_count")
+    @field:JsonProperty("unread_pm_count")
     var unreadPmCount: Int?,
 
-    @JsonProperty("user_achievements")
+    @field:JsonProperty("user_achievements")
     var userAchievements: List<UserAchievement>?,
 
-    @JsonProperty("cover_url")
+    @field:JsonProperty("cover_url")
     var coverUrl: String?,
 
-    @JsonProperty("discord")
+    @field:JsonProperty("discord")
     var discord: String?,
 
-    @JsonProperty("has_supported")
+    @field:JsonProperty("has_supported")
     var hasSupported: Boolean?,
 
-    @JsonProperty("interests")
+    @field:JsonProperty("interests")
     var interests: String?,
 
-    @JsonProperty("join_date")
+    @field:JsonProperty("join_date")
     var joinDate: OffsetDateTime?,
 
-    @JsonProperty("location")
+    @field:JsonProperty("location")
     var location: String?,
 
-    @JsonProperty("max_blocks")
+    @field:JsonProperty("max_blocks")
     var maxBlocks: Int?,
 
-    @JsonProperty("max_friends")
+    @field:JsonProperty("max_friends")
     var maxFriends: Int?,
 
-    @JsonProperty("occupation")
+    @field:JsonProperty("occupation")
     var occupation: String?,
 
-    @JsonProperty("playmode")
-    @JsonSerialize(using = OsuMode.RulesetSerializer::class)
-    @JsonDeserialize(using = OsuMode.RulesetDeserializer::class)
+    @field:JsonProperty("playmode")
+    @field:JsonSerialize(using = OsuMode.RulesetSerializer::class)
+    @field:JsonDeserialize(using = OsuMode.RulesetDeserializer::class)
     var playmode: OsuMode?,
 
-    @JsonProperty("playstyle")
+    @field:JsonProperty("playstyle")
     var playstyle: List<String>?,
 
-    @JsonProperty("post_count")
+    @field:JsonProperty("post_count")
     var postCount: Int?,
 
-    @JsonProperty("profile_hue")
+    @field:JsonProperty("profile_hue")
     var profileHue: Int?,
 
     /**
      * include [`me` ,`recent_activity` ,`beatmaps` ,`historical` ,`kudosu` ,`top_ranks` ,`medals`]
      */
-    @JsonProperty("profile_order")
+    @field:JsonProperty("profile_order")
     var profileOrder: List<String>?,
 
-    @JsonProperty("title")
+    @field:JsonProperty("title")
     var title: String?,
 
-    @JsonProperty("title_url")
+    @field:JsonProperty("title_url")
     var titleUrl: String?,
 
-    @JsonProperty("twitter")
+    @field:JsonProperty("twitter")
     var twitter: String?,
 
-    @JsonProperty("website")
+    @field:JsonProperty("website")
     var website: String?,
 
-    @JsonProperty("team")
+    @field:JsonProperty("team")
     var team: UserTeam?,
 ) :Friend{
     data class Kudosu(
-        @JsonProperty("available")
+        @field:JsonProperty("available")
         val available:Int,
 
-        @JsonProperty("total")
+        @field:JsonProperty("total")
         val total:Int,
     )
 
     data class ProfileBanner(
-        @JsonProperty("id")
+        @field:JsonProperty("id")
         var id: Int,
 
-        @JsonProperty("tournament_id")
+        @field:JsonProperty("tournament_id")
         var tournamentID: Int,
 
-        @JsonProperty("image")
+        @field:JsonProperty("image")
         var image: String?,
 
-        @JsonProperty("image@2x")
+        @field:JsonProperty("image@2x")
         var image2x: String?
     )
 
     data class RankHighest (
-        @JsonProperty("rank")
+        @field:JsonProperty("rank")
         var rank: Int,
 
-        @JsonProperty("updated_at")
+        @field:JsonProperty("updated_at")
         var updatedAt: OffsetDateTime,
     )
 
     data class RankHistory (
-        @JsonProperty("data")
+        @field:JsonProperty("data")
         var data: List<Int>,
 
-        @JsonProperty("mode")
-        @JsonSerialize(using = OsuMode.RulesetSerializer::class)
-        @JsonDeserialize(using = OsuMode.RulesetDeserializer::class)
+        @field:JsonProperty("mode")
+        @field:JsonSerialize(using = OsuMode.RulesetSerializer::class)
+        @field:JsonDeserialize(using = OsuMode.RulesetDeserializer::class)
         var mode: OsuMode,
     )
 
     data class UserBadge(
-        @JsonProperty("awarded_at")
+        @field:JsonProperty("awarded_at")
         var awardedAt: OffsetDateTime,
 
-        @JsonProperty("description")
+        @field:JsonProperty("description")
         var description: String,
 
-        @JsonProperty("image@2x_url")
+        @field:JsonProperty("image@2x_url")
         var image2xUrl: String,
 
-        @JsonProperty("image_url")
+        @field:JsonProperty("image_url")
         var imageUrl: String,
 
-        @JsonProperty("url")
+        @field:JsonProperty("url")
         var url: String
     )
 
     data class UserAccountHistory(
-        @JsonProperty("description")
+        @field:JsonProperty("description")
         var description: String?,
 
-        @JsonProperty("id")
+        @field:JsonProperty("id")
         var id: Long,
 
-        @JsonProperty("length")
+        @field:JsonProperty("length")
         var length: Int,
 
-        @JsonProperty("permanent")
+        @field:JsonProperty("permanent")
         var permanent: Boolean,
 
-        @JsonProperty("timestamp")
+        @field:JsonProperty("timestamp")
         var timestamp: OffsetDateTime,
 
-        @JsonProperty("type")
+        @field:JsonProperty("type")
         private var _type: String
     ) {
         @JsonIgnore
@@ -308,48 +308,48 @@ data class User(
     }
 
     data class UserAchievement(
-        @JsonProperty("achieved_at")
+        @field:JsonProperty("achieved_at")
         var achievedAt: OffsetDateTime,
 
-        @JsonProperty("achievement_id")
+        @field:JsonProperty("achievement_id")
         var achievementID: Int,
     )
 
     data class DateCount(
-        @JsonProperty("count")
+        @field:JsonProperty("count")
         var count: Int,
 
-        @JsonProperty("start_date")
+        @field:JsonProperty("start_date")
         var startDate: LocalDate,
     )
 
     data class UserPage(
-        @JsonProperty("html")
+        @field:JsonProperty("html")
         var html: String,
 
-        @JsonProperty("raw")
+        @field:JsonProperty("raw")
         var raw: String,
     )
 
     data class UserCover(
-        @JsonProperty("custom_url")
+        @field:JsonProperty("custom_url")
         var customUrl: String?,
 
-        @JsonProperty("url")
+        @field:JsonProperty("url")
         var url: String,
 
-        @JsonProperty("id")
+        @field:JsonProperty("id")
         var id: Long?,
     )
 
     data class UserTeam(
-        @JsonProperty("flag_url")
+        @field:JsonProperty("flag_url")
         var flagUrl: String,
-        @JsonProperty("id")
+        @field:JsonProperty("id")
         var id: Long,
-        @JsonProperty("name")
+        @field:JsonProperty("name")
         var name: String,
-        @JsonProperty("short_name")
+        @field:JsonProperty("short_name")
         var shortName: String,
     )
 }

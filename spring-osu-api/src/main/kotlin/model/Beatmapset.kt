@@ -1,6 +1,5 @@
 package org.spring.osu.model
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
@@ -8,103 +7,103 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import org.spring.osu.RankStatus
 
 data class Beatmapset(
-    @JsonProperty("artist")
+    @field:JsonProperty("artist")
     var artist: String,
 
-    @JsonProperty("artist_unicode")
+    @field:JsonProperty("artist_unicode")
     var artistUnicode: String,
 
-    @JsonProperty("covers")
+    @field:JsonProperty("covers")
     var covers: Covers,
 
-    @JsonProperty("creator")
+    @field:JsonProperty("creator")
     var creator: String,
 
-    @JsonProperty("favourite_count")
+    @field:JsonProperty("favourite_count")
     var favouriteCount: Int,
 
-    @JsonProperty("id")
+    @field:JsonProperty("id")
     var id: Long,
 
-    @JsonProperty("nsfw")
+    @field:JsonProperty("nsfw")
     var nsfw: Boolean,
 
-    @JsonProperty("offset")
+    @field:JsonProperty("offset")
     var offset: Int,
 
-    @JsonProperty("play_count")
+    @field:JsonProperty("play_count")
     var playCount: Int,
 
-    @JsonProperty("preview_url")
+    @field:JsonProperty("preview_url")
     var previewUrl: String,
 
-    @JsonProperty("source")
+    @field:JsonProperty("source")
     var source: String,
 
-    @JsonProperty("status")
-    @JsonSerialize(using = RankStatus.RankStatusSerializer::class)
-    @JsonDeserialize(using = RankStatus.RankStatusDeserializer::class)
+    @field:JsonProperty("status")
+    @field:JsonSerialize(using = RankStatus.RankStatusSerializer::class)
+    @field:JsonDeserialize(using = RankStatus.RankStatusDeserializer::class)
     var status: RankStatus,
 
-    @JsonProperty("spotlight")
+    @field:JsonProperty("spotlight")
     var spotlight: Boolean,
 
-    @JsonProperty("title")
+    @field:JsonProperty("title")
     var title: String,
 
-    @JsonProperty("title_unicode")
+    @field:JsonProperty("title_unicode")
     var titleUnicode: String,
 
-    @JsonProperty("user_id")
+    @field:JsonProperty("user_id")
     var userID: Long,
 
-    @JsonProperty("video")
+    @field:JsonProperty("video")
     var video: Boolean,
 
     // Optional fields
-    @JsonProperty("beatmaps")
+    @field:JsonProperty("beatmaps")
     var beatmaps: List<Beatmap>? = null,
 
-    @JsonProperty("converts")
+    @field:JsonProperty("converts")
     var converts: List<Beatmap>? = null,
 
-    @JsonProperty("current_nominations")
+    @field:JsonProperty("current_nominations")
     var currentNominations: List<Nomination>? = null,
 
-    @JsonProperty("current_user_attributes")
+    @field:JsonProperty("current_user_attributes")
     var currentUserAttributes: Any? = null,
 
-    @JsonProperty("description")
+    @field:JsonProperty("description")
     var description: Description? = null,
 
-    @JsonProperty("discussions")
+    @field:JsonProperty("discussions")
     var discussions: Description? = null,
 
-    @JsonProperty("genre")
+    @field:JsonProperty("genre")
     var genre: ShowInfo? = null,
 
-    @JsonProperty("language")
+    @field:JsonProperty("language")
     var language: ShowInfo? = null,
 
-    @JsonProperty("nominations")
+    @field:JsonProperty("nominations")
     var nominations: ObjectNode? = null,
 
-    @JsonProperty("pack_tags")
+    @field:JsonProperty("pack_tags")
     var packTags: List<String>? = null,
 
-    @JsonProperty("ratings")
+    @field:JsonProperty("ratings")
     var ratings: List<Int>? = null,
 
-    @JsonProperty("recent_favourites")
+    @field:JsonProperty("recent_favourites")
     var recentFavourites: List<User>? = null,
 
-    @JsonProperty("related_users")
+    @field:JsonProperty("related_users")
     var relatedUsers: List<User>? = null,
 
-    @JsonProperty("user")
+    @field:JsonProperty("user")
     var user: User? = null,
 
-    @JsonProperty("track_id")
+    @field:JsonProperty("track_id")
     var trackID: Int? = null,
 ) {
     // why?

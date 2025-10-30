@@ -5,19 +5,19 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import java.time.OffsetDateTime
 
 data class Match(
-    @JsonProperty("match")
+    @field:JsonProperty("match")
     var info: MatchInfo,
 
-    @JsonProperty("events")
+    @field:JsonProperty("events")
     var events: MutableList<MatchEvent>,
 
-    @JsonProperty("users")
+    @field:JsonProperty("users")
     var users: MutableList<User>,
 
-    @JsonProperty("first_event_id")
+    @field:JsonProperty("first_event_id")
     var firstEventID: Long,
 
-    @JsonProperty("latest_event_id")
+    @field:JsonProperty("latest_event_id")
     var latestEventID: Long,
 ) {
     @get:JsonIgnore
@@ -28,27 +28,27 @@ data class Match(
          get()= events.lastOrNull { it.game != null }?.game?.id
 
     data class MatchInfo(
-        @JsonProperty("id")
+        @field:JsonProperty("id")
         var id: Long,
 
-        @JsonProperty("start_time")
+        @field:JsonProperty("start_time")
         var startTime: OffsetDateTime,
 
-        @JsonProperty("end_time")
+        @field:JsonProperty("end_time")
         var endTime: OffsetDateTime?,
 
-        @JsonProperty("name")
+        @field:JsonProperty("name")
         var name: String,
     )
 
     data class ScoreInfo(
-        @JsonProperty("slot")
+        @field:JsonProperty("slot")
         var slot: Int,
 
-        @JsonProperty("team")
+        @field:JsonProperty("team")
         var team: String,
 
-        @JsonProperty("pass")
+        @field:JsonProperty("pass")
         var pass: Boolean,
     )
 

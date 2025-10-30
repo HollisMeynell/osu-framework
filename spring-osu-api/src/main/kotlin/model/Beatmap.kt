@@ -8,123 +8,123 @@ import org.spring.osu.RankStatus
 import java.time.OffsetDateTime
 
 data class Beatmap(
-    @JsonProperty("beatmapset_id")
+    @field:JsonProperty("beatmapset_id")
     var beatmapsetID: Long,
 
-    @JsonProperty("difficulty_rating")
+    @field:JsonProperty("difficulty_rating")
     var difficultyRating: Float,
 
-    @JsonProperty("id")
+    @field:JsonProperty("id")
     var id: Long,
 
-    @JsonProperty("mode")
-    @JsonSerialize(using = OsuMode.RulesetSerializer::class)
-    @JsonDeserialize(using = OsuMode.RulesetDeserializer::class)
+    @field:JsonProperty("mode")
+    @field:JsonSerialize(using = OsuMode.RulesetSerializer::class)
+    @field:JsonDeserialize(using = OsuMode.RulesetDeserializer::class)
     var mode: OsuMode,
 
-    @JsonProperty("status")
-    @JsonSerialize(using = RankStatus.RankStatusSerializer::class)
-    @JsonDeserialize(using = RankStatus.RankStatusDeserializer::class)
+    @field:JsonProperty("status")
+    @field:JsonSerialize(using = RankStatus.RankStatusSerializer::class)
+    @field:JsonDeserialize(using = RankStatus.RankStatusDeserializer::class)
     var status: RankStatus,
 
-    @JsonProperty("total_length")
+    @field:JsonProperty("total_length")
     var totalLength: Int,
 
-    @JsonProperty("user_id")
+    @field:JsonProperty("user_id")
     var userID: Long,
 
-    @JsonProperty("version")
+    @field:JsonProperty("version")
     var version: String,
 
     // Optional attributes
 
-    @JsonProperty("beatmapset")
-    @JsonSerialize(converter = BeatmapsetConverter::class)
+    @field:JsonProperty("beatmapset")
+    @field:JsonSerialize(converter = BeatmapsetConverter::class)
     var beatmapset: Beatmapset? = null,
 
-    @JsonProperty("checksum")
+    @field:JsonProperty("checksum")
     var checksum: String? = null,
 
-    @JsonProperty("failtimes")
+    @field:JsonProperty("failtimes")
     var failtimes: FailTimes? = null,
 
-    @JsonProperty("max_combo")
+    @field:JsonProperty("max_combo")
     var maxCombo: Int? = null,
 
-    @JsonProperty("accuracy")
+    @field:JsonProperty("accuracy")
     var accuracy: Float?,
 
-    @JsonProperty("ar")
+    @field:JsonProperty("ar")
     var ar: Float?,
 
-    @JsonProperty("bpm")
+    @field:JsonProperty("bpm")
     var bpm: Float?,
 
     // Extended attributes
 
-    @JsonProperty("convert")
+    @field:JsonProperty("convert")
     var convert: Boolean?,
 
-    @JsonProperty("count_circles")
+    @field:JsonProperty("count_circles")
     var countCircles: Int?,
 
-    @JsonProperty("count_sliders")
+    @field:JsonProperty("count_sliders")
     var countSliders: Int?,
 
-    @JsonProperty("count_spinners")
+    @field:JsonProperty("count_spinners")
     var countSpinners: Int?,
 
-    @JsonProperty("cs")
+    @field:JsonProperty("cs")
     var cs: Float?,
 
-    @JsonProperty("deleted_at")
+    @field:JsonProperty("deleted_at")
     var deletedAt: OffsetDateTime?,
 
-    @JsonProperty("drain")
+    @field:JsonProperty("drain")
     var drain: Float?,
 
-    @JsonProperty("hit_length")
+    @field:JsonProperty("hit_length")
     var hitLength: Int?,
 
-    @JsonProperty("is_scoreable")
+    @field:JsonProperty("is_scoreable")
     var isScoreable: Boolean?,
 
-    @JsonProperty("last_updated")
+    @field:JsonProperty("last_updated")
     var lastUpdated: OffsetDateTime?,
 
-    @JsonProperty("mode_int")
+    @field:JsonProperty("mode_int")
     var modeInt: Int?,
 
-    @JsonProperty("passcount")
+    @field:JsonProperty("passcount")
     var passCount: Int?,
 
-    @JsonProperty("playcount")
+    @field:JsonProperty("playcount")
     var playCount: Int?,
 
-    @JsonProperty("ranked")
-    @JsonSerialize(using = RankStatus.RankStatusSerializer::class)
-    @JsonDeserialize(using = RankStatus.RankStatusDeserializer::class)
+    @field:JsonProperty("ranked")
+    @field:JsonSerialize(using = RankStatus.RankStatusSerializer::class)
+    @field:JsonDeserialize(using = RankStatus.RankStatusDeserializer::class)
     var ranked: RankStatus?,
 
-    @JsonProperty("url")
+    @field:JsonProperty("url")
     var url: String?,
 
-    @JsonProperty("owners")
+    @field:JsonProperty("owners")
     var owners: List<Owner>?,
 ) {
     data class FailTimes(
-        @JsonProperty("exit")
+        @field:JsonProperty("exit")
         var exit: List<Int>?,
 
-        @JsonProperty("fail")
+        @field:JsonProperty("fail")
         var fail: List<Int>?,
     )
 
     data class Owner (
-        @JsonProperty("id")
+        @field:JsonProperty("id")
         var id: Long,
 
-        @JsonProperty("username")
+        @field:JsonProperty("username")
         var username: String,
     )
 }

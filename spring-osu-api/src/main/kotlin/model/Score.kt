@@ -7,86 +7,86 @@ import org.spring.osu.OsuMode
 import java.time.OffsetDateTime
 
 data class Score(
-    @JsonProperty("accuracy")
+    @field:JsonProperty("accuracy")
     var accuracy: Double,
 
-    @JsonProperty("best_id")
+    @field:JsonProperty("best_id")
     var bestID: Long,
 
-    @JsonProperty("score")
+    @field:JsonProperty("score")
     var score: Long,
 
-    @JsonProperty("created_at")
+    @field:JsonProperty("created_at")
     var createdAt: OffsetDateTime,
 
-    @JsonProperty("id")
+    @field:JsonProperty("id")
     var id: Long,
 
-    @JsonProperty("mode")
-    @JsonSerialize(using = OsuMode.RulesetSerializer::class)
-    @JsonDeserialize(using = OsuMode.RulesetDeserializer::class)
+    @field:JsonProperty("mode")
+    @field:JsonSerialize(using = OsuMode.RulesetSerializer::class)
+    @field:JsonDeserialize(using = OsuMode.RulesetDeserializer::class)
     var mode: OsuMode,
 
-    @JsonProperty("max_combo")
+    @field:JsonProperty("max_combo")
     var maxCombo: Int,
 
-    @JsonProperty("mods")
-    @JsonSerialize(using = OsuMod.OsuModsSerializer::class)
-    @JsonDeserialize(using = OsuMod.OsuModsDeserializer::class)
+    @field:JsonProperty("mods")
+    @field:JsonSerialize(using = OsuMod.OsuModsSerializer::class)
+    @field:JsonDeserialize(using = OsuMod.OsuModsDeserializer::class)
     var mods: List<OsuMod>,
 
-    @JsonProperty("passed")
+    @field:JsonProperty("passed")
     var passed: Boolean,
 
-    @JsonProperty("perfect")
+    @field:JsonProperty("perfect")
     var perfect: Boolean,
 
-    @JsonProperty("pp")
+    @field:JsonProperty("pp")
     var pp: Double?,
 
-    @JsonProperty("rank")
+    @field:JsonProperty("rank")
     var rank: String,
 
-    @JsonProperty("statistics")
+    @field:JsonProperty("statistics")
     var statistics: ScoreStatistics,
 
     /**
      * from https://github.com/ppy/osu-web/blob/master/app/Libraries/MorphMap.php#L50
      */
-    @JsonProperty("type")
-    @JsonSerialize(using = ScoreType.Serializer::class)
-    @JsonDeserialize(using = ScoreType.Deserializer::class)
+    @field:JsonProperty("type")
+    @field:JsonSerialize(using = ScoreType.Serializer::class)
+    @field:JsonDeserialize(using = ScoreType.Deserializer::class)
     var type: ScoreType,
 
-    @JsonProperty("replay")
+    @field:JsonProperty("replay")
     var replay: Boolean,
 
-    @JsonProperty("user_id")
+    @field:JsonProperty("user_id")
     var userID: Int,
 
     //Optional attributes
-    @JsonProperty("beatmap")
-    @JsonSerialize(converter = BeatmapConverter::class)
+    @field:JsonProperty("beatmap")
+    @field:JsonSerialize(converter = BeatmapConverter::class)
     var beatmap: Beatmap?,
 
-    @JsonProperty("beatmapset")
-    @JsonSerialize(converter = BeatmapsetConverter::class)
+    @field:JsonProperty("beatmapset")
+    @field:JsonSerialize(converter = BeatmapsetConverter::class)
     var beatmapset: Beatmapset?,
 
-    @JsonProperty("user")
+    @field:JsonProperty("user")
     var user: User?,
 
-    @JsonProperty("weight")
+    @field:JsonProperty("weight")
     var weight: Weight?,
     
-    @JsonProperty("match")
+    @field:JsonProperty("match")
     var match: Match.ScoreInfo?,
 ) {
     data class Weight(
-        @JsonProperty("percentage")
+        @field:JsonProperty("percentage")
         var percentage: Float,
 
-        @JsonProperty("pp")
+        @field:JsonProperty("pp")
         var pp: Float
     )
 }

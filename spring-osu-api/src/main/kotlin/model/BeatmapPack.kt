@@ -4,38 +4,38 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import java.time.LocalDate
 
 data class BeatmapPack(
-    @JsonProperty("author")
+    @field:JsonProperty("author")
     var author: String,
 
-    @JsonProperty("date")
+    @field:JsonProperty("date")
     var date: LocalDate ,
 
-    @JsonProperty("name")
+    @field:JsonProperty("name")
     var name: String,
 
-    @JsonProperty("no_diff_reduction")
+    @field:JsonProperty("no_diff_reduction")
     var noDiffReduction: Boolean,
 
-    @JsonProperty("ruleset_id")
+    @field:JsonProperty("ruleset_id")
     var rulesetID: Int,
 
-    @JsonProperty("tag")
+    @field:JsonProperty("tag")
     var tag: String,
 
-    @JsonProperty("url")
+    @field:JsonProperty("url")
     var url: String,
 
-    @JsonProperty("beatmapsets")
+    @field:JsonProperty("beatmapsets")
     var beatmapsets: List<Beatmapset>?,
 
-    @JsonProperty("user_completion_data")
+    @field:JsonProperty("user_completion_data")
     var userCompletionData: UserCompletionData?
 ) {
     data class UserCompletionData(
-        @JsonProperty("beatmapset_ids")
+        @field:JsonProperty("beatmapset_ids")
         var beatmapsetIDs: List<Long>,
 
-        @JsonProperty("completed")
+        @field:JsonProperty("completed")
         var completed: Boolean,
     )
 }

@@ -7,105 +7,105 @@ import org.spring.osu.model.Score.Weight
 import java.time.OffsetDateTime
 
 data class LazerScore(
-    @JsonProperty("classic_total_score")
+    @field:JsonProperty("classic_total_score")
     var classicTotalScore: Int,
 
-    @JsonProperty("preserve")
+    @field:JsonProperty("preserve")
     var preserve: Boolean,
 
-    @JsonProperty("processed")
+    @field:JsonProperty("processed")
     var processed: Boolean,
 
-    @JsonProperty("ranked")
+    @field:JsonProperty("ranked")
     var ranked: Boolean,
 
-    @JsonProperty("maximum_statistics")
+    @field:JsonProperty("maximum_statistics")
     var maximumStatistics: LazerScoreStatistics,
 
-    @JsonProperty("statistics")
+    @field:JsonProperty("statistics")
     var statistics: LazerScoreStatistics,
 
-    @JsonProperty("mods")
+    @field:JsonProperty("mods")
     var mods: List<LazerMod>,
 
-    @JsonProperty("beatmap_id")
+    @field:JsonProperty("beatmap_id")
     var beatmapId: Long,
 
-    @JsonProperty("best_id")
+    @field:JsonProperty("best_id")
     var bestId: Long?,
 
-    @JsonProperty("id")
+    @field:JsonProperty("id")
     var id: Long,
 
-    @JsonProperty("rank")
+    @field:JsonProperty("rank")
     var rank: String,
 
-    @JsonProperty("type")
-    @JsonSerialize(using = ScoreType.Serializer::class)
-    @JsonDeserialize(using = ScoreType.Deserializer::class)
+    @field:JsonProperty("type")
+    @field:JsonSerialize(using = ScoreType.Serializer::class)
+    @field:JsonDeserialize(using = ScoreType.Deserializer::class)
     var type: ScoreType,
 
-    @JsonProperty("user_id")
+    @field:JsonProperty("user_id")
     var userId: Long,
 
-    @JsonProperty("accuracy")
+    @field:JsonProperty("accuracy")
     var accuracy: Double,
 
-    @JsonProperty("build_id")
+    @field:JsonProperty("build_id")
     var buildId: Long,
 
-    @JsonProperty("ended_at")
+    @field:JsonProperty("ended_at")
     var endedAt: OffsetDateTime,
 
-    @JsonProperty("has_replay")
+    @field:JsonProperty("has_replay")
     var hasReplay: Boolean,
 
-    @JsonProperty("replay")
+    @field:JsonProperty("replay")
     var replay: Boolean,
 
-    @JsonProperty("is_perfect_combo")
+    @field:JsonProperty("is_perfect_combo")
     var isPerfectCombo: Boolean,
 
-    @JsonProperty("legacy_perfect")
+    @field:JsonProperty("legacy_perfect")
     var legacyPerfect: Boolean,
 
-    @JsonProperty("legacy_score_id")
+    @field:JsonProperty("legacy_score_id")
     var legacyScoreId: Long?,
 
-    @JsonProperty("legacy_total_score")
+    @field:JsonProperty("legacy_total_score")
     var legacyTotalScore: Int?,
 
-    @JsonProperty("max_combo")
+    @field:JsonProperty("max_combo")
     var maxCombo: Int,
 
-    @JsonProperty("passed")
+    @field:JsonProperty("passed")
     var passed: Boolean,
 
-    @JsonProperty("pp")
+    @field:JsonProperty("pp")
     var pp: Double?,
 
-    @JsonProperty("ruleset_id")
+    @field:JsonProperty("ruleset_id")
     var rulesetId: Int,
 
-    @JsonProperty("started_at")
+    @field:JsonProperty("started_at")
     var startedAt: OffsetDateTime?,
 
-    @JsonProperty("total_score")
+    @field:JsonProperty("total_score")
     var totalScore: Int,
 
-    @JsonProperty("current_user_attributes")
+    @field:JsonProperty("current_user_attributes")
     var currentUserAttributes:  Map<String, Any?>,
 
-    @JsonProperty("beatmap")
+    @field:JsonProperty("beatmap")
     var beatmap: Beatmap?,
 
-    @JsonProperty("beatmapset")
+    @field:JsonProperty("beatmapset")
     var beatmapset: Beatmapset?,
 
-    @JsonProperty("user")
+    @field:JsonProperty("user")
     var user: User?,
 
 
-    @JsonProperty("weight")
+    @field:JsonProperty("weight")
     var weight: Weight?,
 )
