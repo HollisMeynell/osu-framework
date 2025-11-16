@@ -5,3 +5,5 @@ updates:
     schedule:
       interval: "daily"
     rebase-strategy: "auto"
+    commit-message:
+      prefix: "更新: "
