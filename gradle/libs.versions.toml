@@ -14,7 +14,7 @@ logback = "1.5.20"
 postgres = "42.7.8"
 shadow = "9.2.2"
 extra-java-module-info = "1.9"
-skija = "0.123.0"
+skija = "0.143.3"
 hoplite = "2.9.0"
 gradle = "8.8"
 
