@@ -9,7 +9,7 @@ dependencies {
 }
 
 plugins {
-    `maven-publish`
+    `maven-publish-plugin`
 }
 
 tasks.javadoc {
@@ -22,13 +22,7 @@ java {
     withJavadocJar()
 }
 
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            groupId = project.group.toString()
-            artifactId = "osu-api"
-            version = project.version.toString()
-            from(components["java"])
-        }
-    }
+`maven-publish-plugin` {
+    groupId = "xyz.365246692.mvn"
+    artifactId = "spring-api"
 }

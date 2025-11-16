@@ -46,4 +46,5 @@ bin/
 
 docs/release
 config.toml
+ env.sh
 spring-osu-extended/src/main/resources/lib/*

@@ -56,7 +56,7 @@ object Json {
         // 允许数字前置加号
         .enable(JsonReadFeature.ALLOW_LEADING_PLUS_SIGN_FOR_NUMBERS)
         // 序列化时忽略 null 字段
-        .serializationInclusion(JsonInclude.Include.NON_NULL)
+        .defaultPropertyInclusion(JsonInclude.Value.construct(JsonInclude.Include.NON_NULL, JsonInclude.Include.USE_DEFAULTS))
         .build()
         // 设置允许忽略未知的字段
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)

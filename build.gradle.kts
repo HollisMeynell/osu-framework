@@ -10,7 +10,7 @@ application {
 }
 
 allprojects {
-    group = "org.spring"
+    group = "xyz.365246692.mvn"
     version = "0.0.2"
 
     plugins.apply(rootProject.libs.plugins.kotlin.jvm.get().pluginId)
@@ -30,11 +30,6 @@ allprojects {
 
     tasks.test {
         useJUnitPlatform()
-    }
-
-    java {
-        withSourcesJar()
-        withJavadocJar()
     }
 }
 

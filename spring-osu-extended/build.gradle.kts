@@ -13,7 +13,7 @@ dependencies {
 
 plugins {
     alias(libs.plugins.shadow)
-    `maven-publish`
+    `maven-publish-plugin`
 }
 
 task("buildNative") {
@@ -42,7 +42,7 @@ task("buildNative") {
         .directory(nativeDir)
         .start()
     if (cmd.waitFor() != 0) throw Exception("build rust error.")
-    Files.find(nativeDir.toPath().resolve("target"), 2, { path, attr ->
+    Files.find(nativeDir.toPath().resolve("target"), 2, { path, _ ->
         path.fileName.toString().endsWith(".so") || path.fileName.toString()
             .endsWith(".dll") || path.fileName.toString().endsWith(".dylib")
     }).forEach {
@@ -70,18 +70,13 @@ tasks.javadoc {
     (options as StandardJavadocDocletOptions).addBooleanOption("Xdoclint:none", true)
 }
 
+
 java {
     withSourcesJar()
     withJavadocJar()
 }
 
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            groupId = project.group.toString()
-            artifactId = "osu-extended"
-            version = project.version.toString()
-            from(components["java"])
-        }
-    }
+`maven-publish-plugin` {
+    groupId = "xyz.365246692.mvn"
+    artifactId = "osu-extended"
 }

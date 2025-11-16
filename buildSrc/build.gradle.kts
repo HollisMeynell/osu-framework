@@ -15,5 +15,9 @@ gradlePlugin {
             id = "skija"
             implementationClass = "Skija"
         }
+        create("maven-publish-plugin") {
+            id = "maven-publish-plugin"
+            implementationClass = "MavenPush"
+        }
     }
 }

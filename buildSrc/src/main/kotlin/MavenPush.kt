@@ -1,0 +1,90 @@
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+import org.gradle.api.publish.PublishingExtension
+import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.kotlin.dsl.create
+import org.gradle.plugins.signing.SigningExtension
+
+class MavenPush : Plugin<Project> {
+    override fun apply(target: Project) {
+        val extension = target.extensions.create("maven-publish-plugin", MavenPublishExtension::class.java)
+
+        target.plugins.apply("maven-publish")
+        target.plugins.apply("signing")
+
+
+        target.configPublishing(extension)
+        target.configSigning()
+    }
+
+    private fun Project.configPublishing(extension: MavenPublishExtension) {
+        extensions.configure<PublishingExtension>("publishing") {
+            publications {
+                create<MavenPublication>("maven") {
+                    groupId = extension.groupId ?: project.group.toString()
+                    artifactId = extension.artifactId ?: project.name
+                    version = extension.version ?: project.version.toString()
+
+                    description = extension.description ?: project.description
+
+                    components.findByName("java")?.let { from(it) }
+
+                    tasks.findByName("sourcesJar")?.let { artifact(it) }
+                    tasks.findByName("javadocJar")?.let { artifact(it) }
+
+                    pom {
+                        name.set(project.name)
+                        description.set(extension.description ?: project.description)
+                        url.set("https://github.com/HollisMeynell/osu-framework")
+
+                        licenses {
+                            license {
+                                name.set("MIT")
+                                url.set("https://opensource.org/license/mit")
+                            }
+                        }
+                        scm {
+                            connection.set("scm:git:git://github.com/HollisMeynell/osu-framework.git")
+                            developerConnection.set("scm:git:ssh://github.com:HollisMeynell/osu-framework.git")
+                            url.set("https://github.com/HollisMeynell/osu-framework")
+                        }
+                    }
+                }
+            }
+
+            repositories {
+                maven {
+                    name = "OSSRH_Staging_API"
+                    url = uri("https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/")
+                    credentials {
+                        username = System.getenv("OSSRH_USERNAME")
+                        password = System.getenv("OSSRH_PASSWORD")
+                    }
+                }
+            }
+        }
+    }
+
+    private fun Project.configSigning() {
+        val key = System.getenv("GPG_PRIVATE_KEY")?.let {
+            String(java.util.Base64.getDecoder().decode(it))
+        }
+        val pass = System.getenv("GPG_PASSPHRASE")
+
+        extensions.configure(SigningExtension::class.java) {
+            if (!key.isNullOrBlank()) {
+                useInMemoryPgpKeys(key, pass)
+
+                val publishing = extensions.getByType(PublishingExtension::class.java)
+                sign(publishing.publications)
+            }
+        }
+    }
+}
+
+open class MavenPublishExtension {
+    var groupId: String? = null
+    var artifactId: String? = null
+    var version: String? = null
+    var description: String? = null
+}

@@ -16,14 +16,16 @@ shadow = "8.3.6"
 extra-java-module-info = "1.9"
 skija = "0.123.0"
 hoplite = "2.9.0"
-maven-publish = "0.34.0"
+gradle = "8.8"
 
 [plugins]
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }
 
 [libraries]
+gradle-signing = { group = "org.gradle", name = "gradle-signing", version.ref = "gradle" }
+gradle-publish = { group = "org.gradle", name = "gradle-publish", version.ref = "gradle" }
+
 xz = { group = "org.tukaani", name = "xz", version = "1.10" }
 commons-compress = { group = "org.apache.commons", name = "commons-compress", version.ref = "commons-compress" }
 krontab = { group = "dev.inmo", name = "krontab", version.ref = "krontab" }
