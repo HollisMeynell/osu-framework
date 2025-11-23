@@ -28,5 +28,5 @@ java {
 `maven-publish-plugin` {
     groupId = "xyz.365246692.mvn"
     artifactId = "spring-core"
+    version = "0.0.2-1"
 }
-

@@ -2,11 +2,17 @@ import org.gradle.kotlin.dsl.gradlePlugin
 
 plugins {
     `kotlin-dsl`
+    alias(libs.plugins.jreleaser)
 }
 
 repositories {
     mavenCentral()
+    gradlePluginPortal()
     maven { url = uri("https://maven.aliyun.com/repository/public/") }
+}
+
+dependencies {
+    implementation(libs.jreleaser.lib)
 }
 
 gradlePlugin {
