@@ -44,7 +44,8 @@ bin/
 **/.idea
 **/native/**/target
 
+gradlew
 docs/release
 config.toml
- env.sh
+env.sh
 spring-osu-extended/src/main/resources/lib/*
