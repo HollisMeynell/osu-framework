@@ -1,6 +1,7 @@
 set shell := ["bash", "-cu"]
 
 ROOT := justfile_directory()
+DOC_DIR := join(ROOT, "docs")
 DEPLOY_DIR  := "/home/spring/match"
 
 default:
@@ -18,7 +19,7 @@ update-code:
 build-docs: update-code
     #!/usr/bin/env bash
     set -euxo pipefail
-    cd {{ROOT}} / "docs"
+    cd {{DOC_DIR}}
     pnpm i
     pnpm run build
     echo "down"
