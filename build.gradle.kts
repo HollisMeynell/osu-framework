@@ -16,7 +16,7 @@ allprojects {
     plugins.apply(rootProject.libs.plugins.kotlin.jvm.get().pluginId)
 
     repositories {
-//        maven { url = uri("https://maven.aliyun.com/repository/public/") }
+        maven { url = uri("https://maven.aliyun.com/repository/public/") }
         mavenCentral()
     }
 
@@ -63,6 +63,9 @@ tasks.register("buildApplication") {
 tasks.register<JavaExec>("runApplication") {
     group = "application"
     description = "Run the Application"
+    workingDir = file(
+        System.getenv("APP_WORKDIR") ?: projectDir.absolutePath
+    )
     mainClass = "org.spring.application.MainKt"
     classpath = project(":spring-application").sourceSets["main"].runtimeClasspath
 }
