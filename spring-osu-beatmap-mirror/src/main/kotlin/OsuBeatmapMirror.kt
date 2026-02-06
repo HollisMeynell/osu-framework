@@ -3,13 +3,17 @@ package org.spring.osu.beatmap.mirror
 import io.ktor.util.cio.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.jvm.javaio.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream
 import org.jetbrains.exposed.sql.Column
 import org.spring.core.FileUtils
 import org.spring.core.MainDispatcher
+import org.spring.core.log
 import org.spring.osu.OsuApi
 import org.spring.osu.RankStatus
 import org.spring.osu.extended.api.OsuWebApi
@@ -75,7 +79,7 @@ object OsuBeatmapMirror {
             val job1 = launch {
                 OsuWebApi.doDownloadOsz(account, byteChannel, sid)
             }
-            withContext (MainDispatcher + SupervisorJob()) {
+            withContext(MainDispatcher + SupervisorJob()) {
                 writeStream(sid, beatmapset, byteChannel.toInputStream())
             }
             job1.join()
@@ -188,7 +192,11 @@ object OsuBeatmapMirror {
         var entry: ZipArchiveEntry
         var zipFilePath: Path
         Files.createDirectories(basePath)
-        while (nextEntry.also { entry = it } != null) {
+        while (true) {
+            entry = nextEntry ?: break
+            if (entry.name == null) {
+                continue
+            }
             zipFilePath = basePath.resolve(entry.name)
             if (entry.isDirectory) {
                 continue
@@ -197,7 +205,7 @@ object OsuBeatmapMirror {
             if (entry.name.endsWith(".osu")) {
                 val fileData = readNBytes(entry.size.toInt())
                 val fileMd5 = md5(fileData)
-                val beatmap = beatmapHashMap[fileMd5] ?: throw IllegalStateException("Beatmap not found")
+                val beatmap = beatmapHashMap[fileMd5] ?: throw IllegalStateException("Beatmap ${entry.name} not found")
                 val (audio, background) = OsuFileRecord
                     .parseAudioAndBackground(BufferedReader(InputStreamReader(ByteArrayInputStream(fileData))))
                 val record = OsuFileRecord(
