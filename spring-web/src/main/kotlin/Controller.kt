@@ -152,6 +152,10 @@ fun Route.mirror() = route("mirror") {
         val bid = call.getData<Long>("bid")
         val type = call.getData<String>("type")
         val file = OsuMirrorService.getFilePath(bid, type)
+        if (call.request.header("X-TOKEN") != null) {
+            call.respond(file.toAbsolutePath().toString())
+            return@xGet
+        }
         call.respond(file.fileName.toString())
     }
 
