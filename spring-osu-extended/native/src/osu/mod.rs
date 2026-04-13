@@ -5,16 +5,16 @@ mod mods;
 mod performance;
 
 use crate::java::{throw_jni, JavaBoolean};
-use crate::{jni_call, NativeError};
+use crate::jni_call;
 use crate::osu::performance::*;
 use beatmap::*;
 use difficulty::*;
 use gradual::*;
 use java_fu::*;
 use jni::objects::{JByteArray, JClass, JObject, JString};
-use jni::sys::{jboolean, jbyte, jdouble, jfloat, jint, jlong, jobject, JNI_FALSE, JNI_TRUE};
+use jni::sys::{jboolean, jbyte, jdouble, jfloat, jint, jlong, jobject, JNI_FALSE};
 use jni::JNIEnv;
-use jni_macro::{jni_fn, jni_fn_new};
+use jni_macro::jni_fn;
 use rosu_pp::any::HitResultPriority;
 
 mod java_fu {
@@ -322,6 +322,7 @@ init_performance! {
     |setSmallTick > set_performance_small_tick;
     |setSliderEnds > set_performance_slider_ends;
     |setPassedObjects > set_performance_passed_objects;
+    |setLegacyTotalScore > set_performance_legacy_total_score;
 }
 
 init_performance! {

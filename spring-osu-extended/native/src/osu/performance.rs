@@ -57,6 +57,9 @@ pub fn generate_java_state(env: &mut JNIEnv, score_state: ScoreState) -> Result<
         jvalue {
             i: score_state.misses as jint,
         },
+        jvalue {
+            i: score_state.legacy_total_score.unwrap_or(0) as jint,
+        },
     ];
     let global = get_jni_class(
         PERFORMANCE_STATE_CLASS,
@@ -68,7 +71,7 @@ pub fn generate_java_state(env: &mut JNIEnv, score_state: ScoreState) -> Result<
         let method = env.get_static_method_id(
             jclass,
             "create",
-            "(IIIIIIIIII)Lorg/spring/osu/extended/rosu/JniScoreState;",
+            "(IIIIIIIIIII)Lorg/spring/osu/extended/rosu/JniScoreState;",
         )?;
         Ok(method)
     })?;
@@ -81,17 +84,34 @@ pub fn generate_java_state(env: &mut JNIEnv, score_state: ScoreState) -> Result<
 pub fn parse_java_state(env: &mut JNIEnv, state: &JByteArray) -> Result<ScoreState> {
     let mut array = Bytes::from(env.convert_byte_array(state)?);
 
+    let max_combo = array.get_u32();
+    let osu_large_tick_hits = array.get_u32();
+    let osu_small_tick_hits = array.get_u32();
+    let slider_end_hits = array.get_u32();
+    let n_geki = array.get_u32();
+    let n_katu = array.get_u32();
+    let n300 = array.get_u32();
+    let n100 = array.get_u32();
+    let n50 = array.get_u32();
+    let misses = array.get_u32();
+
+    let legacy_total_score = if array.get_u32() == 0 {
+        None
+    } else {
+        Some(array.get_u32())
+    };
     let state = ScoreState {
-        max_combo: array.get_i32() as u32,
-        osu_large_tick_hits: array.get_i32() as u32,
-        osu_small_tick_hits: array.get_i32() as u32,
-        slider_end_hits: array.get_i32() as u32,
-        n_geki: array.get_i32() as u32,
-        n_katu: array.get_i32() as u32,
-        n300: array.get_i32() as u32,
-        n100: array.get_i32() as u32,
-        n50: array.get_i32() as u32,
-        misses: array.get_i32() as u32,
+        max_combo,
+        osu_large_tick_hits,
+        osu_small_tick_hits,
+        slider_end_hits,
+        n_geki,
+        n_katu,
+        n300,
+        n100,
+        n50,
+        misses,
+        legacy_total_score,
     };
 
     Ok(state)
@@ -190,6 +210,7 @@ set_state! {
     set_performance_small_tick(small_tick_hits);
     set_performance_slider_ends(slider_end_hits);
     set_performance_passed_objects(passed_objects);
+    set_performance_legacy_total_score(legacy_total_score);
 }
 
 set_state! {
@@ -268,7 +289,7 @@ pub(super) fn attribute_to_object(env: &mut JNIEnv, attr: PerformanceAttributes)
                 let field = env.get_static_method_id(
                     class,
                     "createOsu",
-                    "(DDDDDDLorg/spring/osu/extended/rosu/OsuDifficultyAttributes;)Lorg/spring/osu/extended/rosu/JniPerformanceAttributes;",
+                    "(DDDDDDDDDDDLorg/spring/osu/extended/rosu/OsuDifficultyAttributes;)Lorg/spring/osu/extended/rosu/JniPerformanceAttributes;",
                 )?;
                 Ok(field)
             })?;
@@ -284,6 +305,21 @@ pub(super) fn attribute_to_object(env: &mut JNIEnv, attr: PerformanceAttributes)
                 jvalue {
                     d: data.effective_miss_count,
                 },
+                jvalue {
+                    d: data.speed_deviation.unwrap_or(0.0),
+                },
+                jvalue {
+                    d: data.combo_based_estimated_miss_count,
+                },
+                jvalue {
+                    d: data.score_based_estimated_miss_count.unwrap_or(0.0),
+                },
+                jvalue {
+                    d: data.aim_estimated_slider_breaks,
+                },
+                jvalue {
+                    d: data.speed_estimated_slider_breaks,
+                },
                 jvalue { l: attr },
             ];
             let obj = unsafe {
@@ -296,7 +332,7 @@ pub(super) fn attribute_to_object(env: &mut JNIEnv, attr: PerformanceAttributes)
                 let field = env.get_static_method_id(
                     class,
                     "createTaiko",
-                    "(DDDDDLorg/spring/osu/extended/rosu/TaikoDifficultyAttributes;)Lorg/spring/osu/extended/rosu/JniPerformanceAttributes;",
+                    "(DDDDLorg/spring/osu/extended/rosu/TaikoDifficultyAttributes;)Lorg/spring/osu/extended/rosu/JniPerformanceAttributes;",
                 )?;
                 Ok(field)
             })?;
@@ -308,10 +344,7 @@ pub(super) fn attribute_to_object(env: &mut JNIEnv, attr: PerformanceAttributes)
                     d: data.pp_difficulty,
                 },
                 jvalue {
-                    d: data.effective_miss_count,
-                },
-                jvalue {
-                    d: data.estimated_unstable_rate.unwrap_or(-1f64),
+                    d: data.estimated_unstable_rate.unwrap_or(0.0),
                 },
                 jvalue { l: attr },
             ];

@@ -15,10 +15,11 @@ data class JniScoreState @JvmOverloads constructor(
     var n100: Int = 0,
     var n50: Int = 0,
     var misses: Int = 0,
+    var legacyTotalScore: Int = 0,
 ) {
 
     fun serialize(): ByteArray {
-        val data = ByteArray(40)
+        val data = ByteArray(44)
         fun writeInt(index: Int, value: Int) {
             val offset = index * 4
             data[offset] = (value ushr 24).toByte()
@@ -36,6 +37,7 @@ data class JniScoreState @JvmOverloads constructor(
         writeInt(7, n100)
         writeInt(8, n50)
         writeInt(9, misses)
+        writeInt(10, legacyTotalScore)
         return data
     }
 
@@ -52,10 +54,11 @@ data class JniScoreState @JvmOverloads constructor(
             state.count100,
             state.count50,
             state.countMiss,
+            state.legacyTotalScore,
         )
 
         @JvmStatic
-        fun create(state: LazerScoreStatistics, maxCombo: Int, mode: OsuMode):JniScoreState {
+        fun create(state: LazerScoreStatistics, maxCombo: Int, mode: OsuMode): JniScoreState {
             val old = state.toScoreStatistics(mode)
             return JniScoreState(
                 maxCombo,
@@ -68,6 +71,7 @@ data class JniScoreState @JvmOverloads constructor(
                 old.count100,
                 old.count50,
                 old.countMiss,
+                0,
             )
         }
 
@@ -83,6 +87,7 @@ data class JniScoreState @JvmOverloads constructor(
             n100: Int = 0,
             n50: Int = 0,
             misses: Int = 0,
+            legacyTotalScore: Int = 0,
         ): JniScoreState {
             return JniScoreState(
                 maxCombo,
@@ -94,7 +99,8 @@ data class JniScoreState @JvmOverloads constructor(
                 n300,
                 n100,
                 n50,
-                misses
+                misses,
+                legacyTotalScore,
             )
         }
     }

@@ -120,10 +120,19 @@ pub fn generate_difficulty_attributes_osu<'l>(
     let jclass = get_class!(global);
     let args = &[
         jvalue { d: data.aim },
+        jvalue {
+            d: data.aim_difficult_slider_count,
+        },
         jvalue { d: data.speed },
         jvalue { d: data.flashlight },
         jvalue {
             d: data.slider_factor,
+        },
+        jvalue {
+            d: data.aim_top_weighted_slider_factor,
+        },
+        jvalue {
+            d: data.speed_top_weighted_slider_factor,
         },
         jvalue {
             d: data.speed_note_count,
@@ -134,9 +143,27 @@ pub fn generate_difficulty_attributes_osu<'l>(
         jvalue {
             d: data.speed_difficult_strain_count,
         },
+        jvalue {
+            d: data.nested_score_per_object,
+        },
+        jvalue {
+            d: data.legacy_score_base_multiplier,
+        },
+        jvalue {
+            d: data.maximum_legacy_combo_score,
+        },
         jvalue { d: data.ar },
-        jvalue { d: data.od() },
+        jvalue {
+            d: data.great_hit_window,
+        },
+        jvalue {
+            d: data.ok_hit_window,
+        },
+        jvalue {
+            d: data.meh_hit_window,
+        },
         jvalue { d: data.hp },
+        jvalue { d: data.od() }, // 19
         jvalue {
             i: data.n_circles as i32,
         },
@@ -151,6 +178,9 @@ pub fn generate_difficulty_attributes_osu<'l>(
         },
         jvalue { d: data.stars },
         jvalue {
+            i: data.n_objects() as i32,
+        },
+        jvalue {
             i: data.max_combo as i32,
         },
     ];
@@ -158,7 +188,7 @@ pub fn generate_difficulty_attributes_osu<'l>(
         let method = env.get_static_method_id(
             jclass,
             "createOsu",
-            "(DDDDDDDDDDIIIIDI)Lorg/spring/osu/extended/rosu/JniDifficultyAttributes;",
+            "(DDDDDDDDDDDDDDDDDDDIIIIDII)Lorg/spring/osu/extended/rosu/JniDifficultyAttributes;",
         )?;
         Ok(method)
     })?;
@@ -187,6 +217,9 @@ pub fn generate_difficulty_attributes_taiko<'l>(
         jvalue {
             d: data.mono_stamina_factor,
         },
+        jvalue {
+            d: data.consistency_factor,
+        },
         jvalue { d: data.stars },
         jvalue {
             i: data.max_combo as i32,
@@ -200,7 +233,7 @@ pub fn generate_difficulty_attributes_taiko<'l>(
         let method = env.get_static_method_id(
             jclass,
             "createTaiko",
-            "(DDDDDDDDIZ)Lorg/spring/osu/extended/rosu/JniDifficultyAttributes;",
+            "(DDDDDDDDDIZ)Lorg/spring/osu/extended/rosu/JniDifficultyAttributes;",
         )?;
         Ok(method)
     })?;
@@ -217,7 +250,7 @@ pub fn generate_difficulty_attributes_catch<'l>(
     let jclass = get_class!(global);
     let args = &[
         jvalue { d: data.stars },
-        jvalue { d: data.ar },
+        jvalue { d: data.preempt },
         jvalue {
             i: data.n_fruits as i32,
         },

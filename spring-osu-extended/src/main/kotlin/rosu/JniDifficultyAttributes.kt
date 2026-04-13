@@ -16,39 +16,59 @@ sealed interface JniDifficultyAttributes : AutoCloseable {
         @JvmStatic
         fun createOsu(
             aim: Double,
+            aimDifficultSliderCount: Double,
             speed: Double,
             flashlight: Double,
             sliderFactor: Double,
+            aimTopWeightedSliderFactor: Double,
+            speedTopWeightedSliderFactor: Double,
             speedNoteCount: Double,
             aimDifficultStrainCount: Double,
             speedDifficultStrainCount: Double,
+            nestedScorePerObject: Double,
+            legacyScoreBaseMultiplier: Double,
+            maximumLegacyComboScore: Double,
             ar: Double,
-            od: Double,
+            greatHitWindow: Double,
+            okHitWindow: Double,
+            mehHitWindow: Double,
             hp: Double,
+            od: Double,
             nCircles: Int,
             nSliders: Int,
             nLargeTicks: Int,
             nSpinners: Int,
             stars: Double,
+            nObjects: Int,
             maxCombo: Int,
         ): JniDifficultyAttributes =
             OsuDifficultyAttributes(
                 aim,
+                aimDifficultSliderCount,
                 speed,
                 flashlight,
                 sliderFactor,
+                aimTopWeightedSliderFactor,
+                speedTopWeightedSliderFactor,
                 speedNoteCount,
                 aimDifficultStrainCount,
                 speedDifficultStrainCount,
+                nestedScorePerObject,
+                legacyScoreBaseMultiplier,
+                maximumLegacyComboScore,
                 ar,
-                od,
+                greatHitWindow,
+                okHitWindow,
+                mehHitWindow,
                 hp,
+                od,
                 nCircles,
                 nSliders,
                 nLargeTicks,
                 nSpinners,
                 stars,
-                maxCombo
+                nObjects,
+                maxCombo,
             )
 
 
@@ -57,10 +77,11 @@ sealed interface JniDifficultyAttributes : AutoCloseable {
             stamina: Double,
             rhythm: Double,
             color: Double,
-            peak: Double,
+            reading: Double,
             greatHitWindow: Double,
             okHitWindow: Double,
             monoStaminaFactor: Double,
+            consistencyFactor: Double,
             stars: Double,
             maxCombo: Int,
             isConvert: Boolean,
@@ -69,26 +90,27 @@ sealed interface JniDifficultyAttributes : AutoCloseable {
                 stamina,
                 rhythm,
                 color,
-                peak,
+                reading,
                 greatHitWindow,
                 okHitWindow,
                 monoStaminaFactor,
+                consistencyFactor,
                 stars,
                 maxCombo,
-                isConvert
+                isConvert,
             )
 
 
         @JvmStatic
         fun createCatch(
             stars: Double,
-            ar: Double,
+            preempt: Double,
             nFruits: Int,
             nDroplets: Int,
             nTinyDroplets: Int,
             isConvert: Boolean,
         ): JniDifficultyAttributes =
-            CatchDifficultyAttributes(stars, ar, nFruits, nDroplets, nTinyDroplets, isConvert)
+            CatchDifficultyAttributes(stars, preempt, nFruits, nDroplets, nTinyDroplets, isConvert)
 
 
         @JvmStatic
@@ -106,20 +128,30 @@ sealed interface JniDifficultyAttributes : AutoCloseable {
 
 data class OsuDifficultyAttributes(
     val aim: Double = 0.0,
+    val aimDifficultSliderCount: Double = 0.0,
     val speed: Double = 0.0,
     val flashlight: Double = 0.0,
     val sliderFactor: Double = 0.0,
+    val aimTopWeightedSliderFactor: Double = 0.0,
+    val speedTopWeightedSliderFactor: Double = 0.0,
     val speedNoteCount: Double = 0.0,
     val aimDifficultStrainCount: Double = 0.0,
     val speedDifficultStrainCount: Double = 0.0,
+    val nestedScorePerObject: Double = 0.0,
+    val legacyScoreBaseMultiplier: Double = 0.0,
+    val maximumLegacyComboScore: Double = 0.0,
     val ar: Double = 0.0,
-    val od: Double = 0.0,
+    val greatHitWindow: Double = 0.0,
+    val okHitWindow: Double = 0.0,
+    val mehHitWindow: Double = 0.0,
     val hp: Double = 0.0,
+    val od: Double = 0.0,
     val nCircles: Int = 0,
     val nSliders: Int = 0,
     val nLargeTicks: Int = 0,
     val nSpinners: Int = 0,
     val stars: Double = 0.0,
+    val nObjects: Int = 0,
     @get:JvmName("maxCombo")
     val maxCombo: Int = 0,
 ) : JniDifficultyAttributes, NativeClass(4) {
@@ -131,10 +163,11 @@ data class TaikoDifficultyAttributes(
     val stamina: Double = 0.0,
     val rhythm: Double = 0.0,
     val color: Double = 0.0,
-    val peak: Double = 0.0,
+    val reading: Double = 0.0,
     val greatHitWindow: Double = 0.0,
     val okHitWindow: Double = 0.0,
     val monoStaminaFactor: Double = 0.0,
+    val consistencyFactor: Double = 0.0,
     val stars: Double = 0.0,
     @get:JvmName("maxCombo")
     val maxCombo: Int = 0,
@@ -146,7 +179,7 @@ data class TaikoDifficultyAttributes(
 
 data class CatchDifficultyAttributes(
     val stars: Double = 0.0,
-    val ar: Double = 0.0,
+    val preempt: Double = 0.0,
     val nFruits: Int = 0,
     val nDroplets: Int = 0,
     val nTinyDroplets: Int = 0,

@@ -1,4 +1,5 @@
 @file:Suppress("unused")
+
 package org.spring.osu.extended.rosu
 
 sealed interface JniPerformanceAttributes {
@@ -15,35 +16,43 @@ sealed interface JniPerformanceAttributes {
             ppFlashlight: Double,
             ppSpeed: Double,
             effectiveMissCount: Double,
+            speedDeviation: Double,
+            comboBasedEstimatedMissCount: Double,
+            scoreBasedEstimatedMissCount: Double,
+            aimEstimatedSliderBreaks: Double,
+            speedEstimatedSliderBreaks: Double,
             difficulty: OsuDifficultyAttributes,
         ): JniPerformanceAttributes =
             OsuPerformanceAttributes(
-            pp,
-            ppAcc,
-            ppAim,
-            ppFlashlight,
-            ppSpeed,
-            effectiveMissCount,
-            difficulty
-        )
+                pp,
+                ppAcc,
+                ppAim,
+                ppFlashlight,
+                ppSpeed,
+                effectiveMissCount,
+                speedDeviation,
+                comboBasedEstimatedMissCount,
+                scoreBasedEstimatedMissCount,
+                aimEstimatedSliderBreaks,
+                speedEstimatedSliderBreaks,
+                difficulty,
+            )
 
         @JvmStatic
         fun createTaiko(
             pp: Double,
             ppAcc: Double,
             ppDifficulty: Double,
-            effectiveMissCount: Double,
             estimatedUnstableRate: Double,
             difficulty: TaikoDifficultyAttributes,
         ): JniPerformanceAttributes =
             TaikoPerformanceAttributes(
-            pp,
-            ppAcc,
-            ppDifficulty,
-            effectiveMissCount,
-            estimatedUnstableRate,
-            difficulty
-        )
+                pp,
+                ppAcc,
+                ppDifficulty,
+                estimatedUnstableRate,
+                difficulty
+            )
 
         @JvmStatic
         fun createCatch(
@@ -51,9 +60,9 @@ sealed interface JniPerformanceAttributes {
             difficulty: CatchDifficultyAttributes,
         ): JniPerformanceAttributes =
             CatchPerformanceAttributes(
-            pp,
-            difficulty
-        )
+                pp,
+                difficulty
+            )
 
         @JvmStatic
         fun createMania(
@@ -62,10 +71,10 @@ sealed interface JniPerformanceAttributes {
             difficulty: ManiaDifficultyAttributes,
         ): JniPerformanceAttributes =
             ManiaPerformanceAttributes(
-            pp,
-            ppDifficulty,
-            difficulty
-        )
+                pp,
+                ppDifficulty,
+                difficulty
+            )
     }
 }
 
@@ -76,6 +85,11 @@ data class OsuPerformanceAttributes(
     val ppFlashlight: Double,
     val ppSpeed: Double,
     val effectiveMissCount: Double,
+    val speedDeviation: Double,
+    val comboBasedEstimatedMissCount: Double,
+    val scoreBasedEstimatedMissCount: Double,
+    val aimEstimatedSliderBreaks: Double,
+    val speedEstimatedSliderBreaks: Double,
     val difficulty: OsuDifficultyAttributes,
 ) : JniPerformanceAttributes {
     override fun getStarRating() = difficulty.stars
@@ -89,7 +103,6 @@ data class TaikoPerformanceAttributes(
     val pp: Double,
     val ppAcc: Double,
     val ppDifficulty: Double,
-    val effectiveMissCount: Double,
     val estimatedUnstableRate: Double,
     val difficulty: TaikoDifficultyAttributes,
 ) : JniPerformanceAttributes {

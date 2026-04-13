@@ -34,6 +34,7 @@ class JniPerformance private constructor(
     external fun setSmallTick(value: Int)
     external fun setSliderEnds(value: Int)
     external fun setPassedObjects(value: Int)
+    external fun setLegacyTotalScore(value: Int)
     external fun setHardrock(value: Boolean)
     external fun setClockRate(value: Double)
     external fun setHitResultPriority(value: Boolean)

@@ -23,8 +23,8 @@ members = [
 [dependencies]
 jni-macro = { version = "0.0.1", path = "jni_macro" }
 jni = "0.21.1"
-rosu-pp = "3.0.0"
-rosu-mods = { version = "0.3.0", features = ["serde"] }
+rosu-pp = "4.0.0"
+rosu-mods = { version = "0.4.1", features = ["serde"] }
 thiserror = "2.0.12"
 serde = "1.0"
 serde_json = "1.0"

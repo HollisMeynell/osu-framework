@@ -68,7 +68,9 @@ mod mods {
     fn custom_mods<'de, D: Deserializer<'de>>(d: D) -> std::result::Result<GameMods, D::Error> {
         // Here, we're defining that all deserialized mods should belong to the
         // same mode.
-        d. deserialize_any(GameModsSeed::SameModeForEachMod { deny_unknown_fields: false })
+        d.deserialize_any(GameModsSeed::SameModeForEachMod {
+            deny_unknown_fields: false,
+        })
     }
 
     pub fn get_mods_from_json(json: &str, _: GameMode) -> Result<GameMods> {

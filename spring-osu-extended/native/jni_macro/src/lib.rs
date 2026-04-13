@@ -45,7 +45,6 @@ pub fn jni_fn_new(attr: TokenStream, item: TokenStream) -> TokenStream {
         }) {
             Ok(result) => { result }
             Err(_) => {
-                
                 if env.exception_check().expect("check error.") {
                     env.exception_describe().expect("show");
                 }

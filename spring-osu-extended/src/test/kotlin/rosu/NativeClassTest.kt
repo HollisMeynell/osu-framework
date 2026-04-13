@@ -33,17 +33,17 @@ class NativeClassTest {
             val difficulty = JniDifficulty()
             difficulty.mode = OsuMode.Osu
             var attr = difficulty.calculate(beatmap)
-            assertEquals(attr.getStarRating().roundN(2), 6.42)
+            assertEquals(attr.getStarRating().roundN(2), 6.4)
             difficulty.setMods(LazerMod.DifficultyAdjust(circleSize = 6f))
             attr = difficulty.calculate(beatmap)
-            assertEquals(attr.getStarRating().roundN(2), 7.15)
+            assertEquals(attr.getStarRating().roundN(2), 7.12)
 
             val b = beatmap.createPerformance().apply {
                 setLazer(true)
                 setPassedObjects(2126)
             }
 
-            assertEquals(b.calculate().getPP().roundN(0), 474.0)
+            assertEquals(b.calculate().getPP().roundN(0), 477.0)
 
             var performanceAttributes = beatmap.createPerformance().apply {
                 setLazer(false)
@@ -56,7 +56,7 @@ class NativeClassTest {
             }.calculate()
             assert(performanceAttributes is OsuPerformanceAttributes)
             if (performanceAttributes is OsuPerformanceAttributes) {
-                assertEquals(performanceAttributes.pp.roundN(2), 299.67)
+                assertEquals(performanceAttributes.pp.roundN(2), 302.81)
             }
             performanceAttributes = beatmap.createPerformance().apply {
                 setMods(
@@ -72,7 +72,7 @@ class NativeClassTest {
                 setLazer(true)
             }.calculate()
             if (performanceAttributes is OsuPerformanceAttributes) {
-                assertEquals(performanceAttributes.pp.roundN(0), 635.0)
+                assertEquals(performanceAttributes.pp.roundN(0), 637.0)
             }
             val difficultyNew = JniDifficulty()
             difficultyNew.mode = OsuMode.Osu
