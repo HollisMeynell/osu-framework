@@ -54,7 +54,7 @@ data class JniScoreState @JvmOverloads constructor(
             state.count100,
             state.count50,
             state.countMiss,
-            state.legacyTotalScore,
+            0,
         )
 
         @JvmStatic
