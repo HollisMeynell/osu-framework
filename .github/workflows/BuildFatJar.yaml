@@ -1,0 +1,82 @@
+name: build-fat-jar
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-native:
+    defaults:
+      run:
+        working-directory: spring-osu-extended/native
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Set up cache
+        uses: Swatinem/rust-cache@v2
+      - name: Build
+        run: cargo build --release
+      - name: Upload native artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-${{ matrix.os }}
+          path: |
+            spring-osu-extended/native/target/release/spring_jni.dll
+            spring-osu-extended/native/target/release/libspring_jni.so
+            spring-osu-extended/native/target/release/libspring_jni.dylib
+
+  build-fat-jar:
+    needs: build-native
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Download native artifact (linux)
+        uses: actions/download-artifact@v4
+        with:
+          name: native-ubuntu-latest
+          path: spring-osu-extended/src/main/resources/lib
+
+      - name: Download native artifact (windows)
+        uses: actions/download-artifact@v4
+        with:
+          name: native-windows-latest
+          path: spring-osu-extended/src/main/resources/lib
+
+      - name: Download native artifact (macos)
+        uses: actions/download-artifact@v4
+        with:
+          name: native-macos-latest
+          path: spring-osu-extended/src/main/resources/lib
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Set up Gradle cache
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build fat jar
+        run: ./gradlew :spring-osu-extended:shadowJar
+
+      - name: Upload fat jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: spring-osu-extended-fat-jar
+          path: spring-osu-extended/build/libs/*-all.jar
